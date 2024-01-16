@@ -1,0 +1,1116 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cube Osmium HTTP API",
+    "contact": {
+      "name": "Cube",
+      "url": "https://www.cube.exchange",
+      "email": "support@cube.exchange"
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/orders": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "subaccountId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "orders"
+                      ],
+                      "properties": {
+                        "orders": {
+                          "type": "array",
+                          "items": {
+                            "description": "A resting order. Sent on bootstrap in `RestingOrders`.",
+                            "type": "object",
+                            "required": [
+                              "clientOrderId",
+                              "cumulativeQuantity",
+                              "exchangeOrderId",
+                              "marketId",
+                              "orderQuantity",
+                              "orderType",
+                              "price",
+                              "remainingQuantity",
+                              "restTime",
+                              "side",
+                              "subaccountId",
+                              "timeInForce"
+                            ],
+                            "properties": {
+                              "clientOrderId": {
+                                "description": "The client order ID specified in the new-order request.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "exchangeOrderId": {
+                                "description": "[Exchange order ID](#exchange-order-id)",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "marketId": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "price": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "orderQuantity": {
+                                "description": "The quantity submitted in the latest quantity-modifying request. If the order has not been modified, then it is the quantity on the new-order-ack. If it has been modified, then it is the quantity of the latest modify-order-ack.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "side": {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "timeInForce": {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "orderType": {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "remainingQuantity": {
+                                "description": "The current remaining quantity on the book.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "restTime": {
+                                "description": "[Transact time](#transact-time) of the NewOrderAck",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "subaccountId": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "cumulativeQuantity": {
+                                "description": "The cumulative filled quantity for this order.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "requestBody": {
+          "description": "Cancel all resting orders, optionally limiting to a particular market and / or order book side.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Cancel all resting orders, optionally limiting to a particular market and / or order book side.",
+                "type": "object",
+                "required": [
+                  "requestId",
+                  "subaccountId"
+                ],
+                "properties": {
+                  "subaccountId": {
+                    "description": "The subaccount to cancel orders for.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "requestId": {
+                    "description": "A request ID that is echoed back on the MassCancelAck and individual CancelOrderAck's.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "marketId": {
+                    "description": "If specified, only orders on the corresponding market will be canceled.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0,
+                    "nullable": true
+                  },
+                  "side": {
+                    "description": "If specified, only orders with this side will be canceled.",
+                    "type": "integer",
+                    "format": "int32",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "description": "Mass-cancel-ack confirms a mass-cancel request. If `reason` is set, the mass cancel was not applied and there are no affected orders. Individual CancelOrderAck's will be sent for each order that was affected.",
+                      "type": "object",
+                      "required": [
+                        "msgSeqNum",
+                        "requestId",
+                        "subaccountId",
+                        "totalAffectedOrders",
+                        "transactTime"
+                      ],
+                      "properties": {
+                        "msgSeqNum": {
+                          "type": "integer",
+                          "format": "uint64",
+                          "minimum": 0
+                        },
+                        "subaccountId": {
+                          "type": "integer",
+                          "format": "uint64",
+                          "minimum": 0
+                        },
+                        "requestId": {
+                          "description": "The request ID specified in the mass-cancel request.",
+                          "type": "integer",
+                          "format": "uint64",
+                          "minimum": 0
+                        },
+                        "transactTime": {
+                          "description": "[Transact time](#transact-time)",
+                          "type": "integer",
+                          "format": "uint64",
+                          "minimum": 0
+                        },
+                        "reason": {
+                          "type": "integer",
+                          "format": "int32",
+                          "nullable": true
+                        },
+                        "totalAffectedOrders": {
+                          "description": "The total number of orders that were canceled.",
+                          "type": "integer",
+                          "format": "uint32",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order": {
+      "post": {
+        "requestBody": {
+          "description": "Place a new order.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Place a new order.",
+                "type": "object",
+                "required": [
+                  "cancelOnDisconnect",
+                  "clientOrderId",
+                  "marketId",
+                  "orderType",
+                  "postOnly",
+                  "quantity",
+                  "requestId",
+                  "side",
+                  "subaccountId",
+                  "timeInForce"
+                ],
+                "properties": {
+                  "clientOrderId": {
+                    "description": "A unique order ID assigned by the client for this order. The ID must be unique among open orders by this subaccount.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "requestId": {
+                    "description": "A request ID that is echoed back on the NewOrderAck or NewOrderReject",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "marketId": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "price": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0,
+                    "nullable": true
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "side": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "timeInForce": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "orderType": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "subaccountId": {
+                    "description": "The subaccount to place this order on. This subaccount must be writable by the API key specified in the Credentials message.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "selfTradePrevention": {
+                    "type": "integer",
+                    "format": "int32",
+                    "nullable": true
+                  },
+                  "postOnly": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "cancelOnDisconnect": {
+                    "description": "If true, this order will be automatically cancelled after the closure of the network connection between Cube's servers and the client that placed the order.\n\nIf the client initiates the disconnect or network instability drops the connection, the order will be cancelled when Cube's servers recognize the disconnection.\n\nIn the event of a server-side disconnect that causes a halt in trading, such as scheduled downtime, the order will be cancelled before trading resumes.",
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "Ack"
+                          ],
+                          "properties": {
+                            "Ack": {
+                              "description": "New-order-ack confirms a new-order request. The ack will be ordered before any fills for this order.",
+                              "type": "object",
+                              "required": [
+                                "cancelOnDisconnect",
+                                "clientOrderId",
+                                "exchangeOrderId",
+                                "marketId",
+                                "msgSeqNum",
+                                "orderType",
+                                "quantity",
+                                "requestId",
+                                "side",
+                                "subaccountId",
+                                "timeInForce",
+                                "transactTime"
+                              ],
+                              "properties": {
+                                "msgSeqNum": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "clientOrderId": {
+                                  "description": "The client order ID specified in the new-order request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "requestId": {
+                                  "description": "The request ID specified in the new-order request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "exchangeOrderId": {
+                                  "description": "[Exchange order ID](#exchange-order-id)",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "marketId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "price": {
+                                  "description": "If the order ultimately rests, the `price` field will include the resting price.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0,
+                                  "nullable": true
+                                },
+                                "quantity": {
+                                  "description": "The quantity submitted in the new-order request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "side": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "timeInForce": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "orderType": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "transactTime": {
+                                  "description": "[Transact time](#transact-time)",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "subaccountId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "cancelOnDisconnect": {
+                                  "type": "boolean"
+                                }
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "Rej"
+                          ],
+                          "properties": {
+                            "Rej": {
+                              "description": "New-order-reject indicates that a new-order request was not applied.",
+                              "type": "object",
+                              "required": [
+                                "clientOrderId",
+                                "marketId",
+                                "msgSeqNum",
+                                "orderType",
+                                "quantity",
+                                "reason",
+                                "requestId",
+                                "side",
+                                "subaccountId",
+                                "timeInForce",
+                                "transactTime"
+                              ],
+                              "properties": {
+                                "msgSeqNum": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "clientOrderId": {
+                                  "description": "The client order ID specified in the new-order request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "requestId": {
+                                  "description": "The request ID specified in the new-order request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "transactTime": {
+                                  "description": "[Transact time](#transact-time)",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "subaccountId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "reason": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "marketId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "price": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0,
+                                  "nullable": true
+                                },
+                                "quantity": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "side": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "timeInForce": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "orderType": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                }
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "requestBody": {
+          "description": "Cancel a resting order. Note that this can be done before the order is acknowledged (an aggressive cancel) since the identifying field is the `client_order_id`.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Cancel a resting order. Note that this can be done before the order is acknowledged (an aggressive cancel) since the identifying field is the `client_order_id`.",
+                "type": "object",
+                "required": [
+                  "clientOrderId",
+                  "marketId",
+                  "requestId",
+                  "subaccountId"
+                ],
+                "properties": {
+                  "marketId": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "clientOrderId": {
+                    "description": "The order ID specified by the client on the NewOrder request.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "requestId": {
+                    "description": "A request ID that is echoed back on the CancelOrderAck or CancelOrderReject",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "subaccountId": {
+                    "description": "The subaccount that the NewOrder was placed on.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "Ack"
+                          ],
+                          "properties": {
+                            "Ack": {
+                              "description": "Cancel-order-ack confirms a cancel request, or that an order has been canceled as the result of a different user-initiated reason.",
+                              "type": "object",
+                              "required": [
+                                "clientOrderId",
+                                "exchangeOrderId",
+                                "marketId",
+                                "msgSeqNum",
+                                "reason",
+                                "requestId",
+                                "subaccountId",
+                                "transactTime"
+                              ],
+                              "properties": {
+                                "msgSeqNum": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "clientOrderId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "requestId": {
+                                  "description": "If the Reason is `DISCONNECT`, `IOC`, `STP_RESTING`, or `STP_AGGRESSING`, this request ID will be `u64::MAX`. Otherwise, it will be the request ID of the initiated cancel action. For a mass cancel, each cancel order ack will have the MassCancel's request_id.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "transactTime": {
+                                  "description": "[Transact time](#transact-time)",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "subaccountId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "reason": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "marketId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "exchangeOrderId": {
+                                  "description": "[Exchange order ID](#exchange-order-id)",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                }
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "Rej"
+                          ],
+                          "properties": {
+                            "Rej": {
+                              "description": "Cancel-order-reject indicates that a cancel-order request was not applied.",
+                              "type": "object",
+                              "required": [
+                                "clientOrderId",
+                                "marketId",
+                                "msgSeqNum",
+                                "reason",
+                                "requestId",
+                                "subaccountId",
+                                "transactTime"
+                              ],
+                              "properties": {
+                                "msgSeqNum": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "clientOrderId": {
+                                  "description": "The client order ID specified in the cancel-order request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "requestId": {
+                                  "description": "The request ID specified in the cancel-order request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "transactTime": {
+                                  "description": "[Transact time](#transact-time)",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "subaccountId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "reason": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "marketId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                }
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "requestBody": {
+          "description": "Modify a resting order. - If the `newPrice` and the current resting order's price is the same, and `newQuantity` is not greater, then the modify is considered a modify down, and the FIFO queue priority is maintained. Otherwise, the modify-order request is treated as an atomic cancel-replace and the replacement order is placed at the end of the FIFO queue for the new price level. - If post-only is specified and the replacement order would trade, then the request is rejected and the current resting order remains resting.\n\nCurrently, in-flight-mitigation (IFM) is always enabled. That is, the cumulative fill qty is subtracted from `newQuantity` to calculate the new resting quantity. For example:\n\n```text | Resting | Filled ---------+---------+-------- New 5    | 5       | 0 Fill 2   | 3       | 2 Modify 4 | 2       | 2 ```\n\nThe post-modify quantity will be `newQuantity - filled = 4 - 2 = 2`.\n\nRegardless of IFM, the invariant for order quantity is that `quantity = remaining_quantity + cumulative_quantity`.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Modify a resting order. - If the `newPrice` and the current resting order's price is the same, and `newQuantity` is not greater, then the modify is considered a modify down, and the FIFO queue priority is maintained. Otherwise, the modify-order request is treated as an atomic cancel-replace and the replacement order is placed at the end of the FIFO queue for the new price level. - If post-only is specified and the replacement order would trade, then the request is rejected and the current resting order remains resting.\n\nCurrently, in-flight-mitigation (IFM) is always enabled. That is, the cumulative fill qty is subtracted from `newQuantity` to calculate the new resting quantity. For example:\n\n```text | Resting | Filled ---------+---------+-------- New 5    | 5       | 0 Fill 2   | 3       | 2 Modify 4 | 2       | 2 ```\n\nThe post-modify quantity will be `newQuantity - filled = 4 - 2 = 2`.\n\nRegardless of IFM, the invariant for order quantity is that `quantity = remaining_quantity + cumulative_quantity`.",
+                "type": "object",
+                "required": [
+                  "clientOrderId",
+                  "marketId",
+                  "newPrice",
+                  "newQuantity",
+                  "postOnly",
+                  "requestId",
+                  "subaccountId"
+                ],
+                "properties": {
+                  "marketId": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "clientOrderId": {
+                    "description": "The order ID specified by the client on the NewOrder request.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "requestId": {
+                    "description": "A request ID that is echoed back on the ModifyOrderAck or ModifyOrderReject",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "newPrice": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "newQuantity": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "subaccountId": {
+                    "description": "The subaccount that the NewOrder was placed on.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "selfTradePrevention": {
+                    "type": "integer",
+                    "format": "int32",
+                    "nullable": true
+                  },
+                  "postOnly": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "Ack"
+                          ],
+                          "properties": {
+                            "Ack": {
+                              "description": "Modify-order-ack confirms a modify-order request. If the modify resulted in an aggressing cancel-replace, the ack will be ordered before any fills for this order.",
+                              "type": "object",
+                              "required": [
+                                "clientOrderId",
+                                "cumulativeQuantity",
+                                "exchangeOrderId",
+                                "marketId",
+                                "msgSeqNum",
+                                "price",
+                                "quantity",
+                                "remainingQuantity",
+                                "requestId",
+                                "subaccountId",
+                                "transactTime"
+                              ],
+                              "properties": {
+                                "msgSeqNum": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "clientOrderId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "requestId": {
+                                  "description": "The request ID specified in the modify request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "transactTime": {
+                                  "description": "[Transact time](#transact-time)",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "remainingQuantity": {
+                                  "description": "The quantity remaining on the book after applying the modify request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "subaccountId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "marketId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "price": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "quantity": {
+                                  "description": "The quantity submitted in the modify request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "cumulativeQuantity": {
+                                  "description": "The cumulative filled quantity for this order.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "exchangeOrderId": {
+                                  "description": "[Exchange order ID](#exchange-order-id)",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                }
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "Rej"
+                          ],
+                          "properties": {
+                            "Rej": {
+                              "description": "Modify-order-reject indicates that a modify-order request was not applied.",
+                              "type": "object",
+                              "required": [
+                                "clientOrderId",
+                                "marketId",
+                                "msgSeqNum",
+                                "reason",
+                                "requestId",
+                                "subaccountId",
+                                "transactTime"
+                              ],
+                              "properties": {
+                                "msgSeqNum": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "clientOrderId": {
+                                  "description": "The client order ID specified in the modify-order request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "requestId": {
+                                  "description": "The request ID specified in the modify-order request.",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "transactTime": {
+                                  "description": "[Transact time](#transact-time)",
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "subaccountId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "reason": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "marketId": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                }
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "The API Key ID as specified in the [API settings page](https://cube.exchange/settings/api).\n\nEach API key has a corresponding access level that is set when the key is created.\n- Read access only allows access to read HTTP methods (GET, HEAD, etc.).\n- Write access allows access to all HTTP methods.\n"
+      },
+      "ApiSignature": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-signature",
+        "description": "The API signature string authenticating this request.\n\nThe payload to be signed is the concatenation of the byte string `cube.xyz` and the current unix epoch timestamp in seconds converted into an 8-byte little-endian array. The signature is the HMAC-SHA256 digest of the payload using the secret key associated with the specified API key.\n\nImplementation notes:\n- The signature is base-64 encoded with the 'standard' alphabet and\n  padding.\n\n  ```\n  ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/\n  ```\n- The timestamp should be encoded as 8-byte little-endian (array of bytes)\n- The secret key should be decoded from a hex string into a 32-byte array of\n  bytes\n"
+      },
+      "ApiTimestamp": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-timestamp",
+        "description": "The timestamp used for signature generation."
+      }
+    },
+    "headers": {
+      "x-cube-request-id": {
+        "description": "The cube-assigned ID for this request. If known, please supply with support requests",
+        "style": "simple",
+        "required": true,
+        "schema": {
+          "title": "RequestId",
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+      }
+    }
+  }
+}

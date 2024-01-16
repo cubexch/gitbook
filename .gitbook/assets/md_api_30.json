@@ -1,0 +1,874 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cube Mendelev HTTP API",
+    "contact": {
+      "name": "Cube",
+      "url": "https://www.cube.exchange",
+      "email": "support@cube.exchange"
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/book/{market_id}/snapshot": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mbp",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "mbo",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "levels",
+            "schema": {
+              "default": null,
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0,
+              "nullable": true
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "lastTradePrice",
+                            "lastTransactTime",
+                            "levels"
+                          ],
+                          "properties": {
+                            "levels": {
+                              "type": "array",
+                              "items": {
+                                "description": "Each price level is the aggregate total quantity of orders placed at that price.",
+                                "type": "object",
+                                "required": [
+                                  "price",
+                                  "quantity",
+                                  "side"
+                                ],
+                                "properties": {
+                                  "price": {
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "minimum": 0
+                                  },
+                                  "quantity": {
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "minimum": 0
+                                  },
+                                  "side": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                  }
+                                }
+                              }
+                            },
+                            "lastTransactTime": {
+                              "type": "integer",
+                              "format": "uint64",
+                              "minimum": 0
+                            },
+                            "lastTradePrice": {
+                              "type": "integer",
+                              "format": "uint64",
+                              "minimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "lastTradePrice",
+                            "lastTransactTime",
+                            "orders"
+                          ],
+                          "properties": {
+                            "orders": {
+                              "type": "array",
+                              "items": {
+                                "description": "A resting order.",
+                                "type": "object",
+                                "required": [
+                                  "exchangeOrderId",
+                                  "price",
+                                  "priority",
+                                  "quantity",
+                                  "side"
+                                ],
+                                "properties": {
+                                  "price": {
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "minimum": 0
+                                  },
+                                  "quantity": {
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "minimum": 0
+                                  },
+                                  "exchangeOrderId": {
+                                    "description": "[Exchange order ID](./websocket-trade-api.md#exchange-order-id)",
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "minimum": 0
+                                  },
+                                  "side": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                  },
+                                  "priority": {
+                                    "description": "Order priority for execution. Valid within a price level and side. That is, orders must first be sorted by side and price (in descending order for bids and ascending for asks), and then the OrderPriority within the level. A lower value is a higher priority.",
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "minimum": 0
+                                  }
+                                }
+                              }
+                            },
+                            "lastTransactTime": {
+                              "type": "integer",
+                              "format": "uint64",
+                              "minimum": 0
+                            },
+                            "lastTradePrice": {
+                              "type": "integer",
+                              "format": "uint64",
+                              "minimum": 0
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/book/{market_id}/recent-trades": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "trades"
+                      ],
+                      "properties": {
+                        "trades": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "aggressingExchangeOrderId",
+                              "aggressingSide",
+                              "fillQuantity",
+                              "price",
+                              "restingExchangeOrderId",
+                              "tradeId",
+                              "transactTime"
+                            ],
+                            "properties": {
+                              "tradeId": {
+                                "description": "The ID assigned to this trade. All trades that occur from the same event will be assigned the same ID, and are considered to be an atomic batch.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "price": {
+                                "description": "The price that this trade occurred at.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "aggressingSide": {
+                                "description": "The side of the aggressing order.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "restingExchangeOrderId": {
+                                "description": "The [Exchange order ID](./websocket-trade-api.md#exchange-order-id) of the resting order.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "fillQuantity": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "transactTime": {
+                                "description": "The [transact time](./websocket-trade-api.md#transact-time) assigned by the matching engine for this trade. All trades that occur from the same event will be assigned the same transact time.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "aggressingExchangeOrderId": {
+                                "description": "The [Exchange order ID](./websocket-trade-api.md#exchange-order-id) of the aggressing order.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickers/snapshot": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "summaries",
+                        "tops"
+                      ],
+                      "properties": {
+                        "tops": {
+                          "type": "array",
+                          "items": {
+                            "description": "Top of book",
+                            "type": "object",
+                            "required": [
+                              "askPrice",
+                              "askQuantity",
+                              "bidPrice",
+                              "bidQuantity",
+                              "lastPrice",
+                              "marketId",
+                              "rolling24hPrice",
+                              "transactTime"
+                            ],
+                            "properties": {
+                              "marketId": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "transactTime": {
+                                "description": "The [transact time](./websocket-trade-api.md#transact-time) of the latest book update on this market.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "bidPrice": {
+                                "description": "The best bid price.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "bidQuantity": {
+                                "description": "The total bid quantity at the best bid price.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "askPrice": {
+                                "description": "The best ask price.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "askQuantity": {
+                                "description": "The total ask quantity at the best ask price.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "lastPrice": {
+                                "description": "The last trade price.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "rolling24hPrice": {
+                                "description": "The 24h open price.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              }
+                            }
+                          }
+                        },
+                        "summaries": {
+                          "type": "array",
+                          "items": {
+                            "description": "Rolling 24h stats.",
+                            "type": "object",
+                            "required": [
+                              "baseVolumeHi",
+                              "baseVolumeLo",
+                              "close",
+                              "high",
+                              "low",
+                              "open",
+                              "quoteVolumeHi",
+                              "quoteVolumeLo"
+                            ],
+                            "properties": {
+                              "open": {
+                                "description": "24h open price",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "close": {
+                                "description": "Latest price",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "low": {
+                                "description": "24h low price",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "high": {
+                                "description": "24h high price",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "baseVolumeLo": {
+                                "description": "Low 64-bits of the base quantity traded",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "baseVolumeHi": {
+                                "description": "High 64-bits of the base quantity traded",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "quoteVolumeLo": {
+                                "description": "Low 64-bits of the quote quantity traded",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "quoteVolumeHi": {
+                                "description": "High 64-bits of the quote quantity traded",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parsed/tickers": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "base_currency",
+                          "base_volume",
+                          "last_price",
+                          "quote_currency",
+                          "quote_volume",
+                          "ticker_id"
+                        ],
+                        "properties": {
+                          "ticker_id": {
+                            "type": "string"
+                          },
+                          "base_currency": {
+                            "type": "string"
+                          },
+                          "quote_currency": {
+                            "type": "string"
+                          },
+                          "last_price": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "base_volume": {
+                            "description": "The rolling 24-hour volume in the base currency.",
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "quote_volume": {
+                            "description": "The rolling 24-hour volume in the quote currency.",
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "bid": {
+                            "type": "number",
+                            "format": "double",
+                            "nullable": true
+                          },
+                          "ask": {
+                            "type": "number",
+                            "format": "double",
+                            "nullable": true
+                          },
+                          "high": {
+                            "description": "The rolling 24-hour highest price.",
+                            "type": "number",
+                            "format": "double",
+                            "nullable": true
+                          },
+                          "low": {
+                            "description": "The rolling 24-hour lowest price.",
+                            "type": "number",
+                            "format": "double",
+                            "nullable": true
+                          },
+                          "open": {
+                            "description": "The rolling 24-hour opening price.",
+                            "type": "number",
+                            "format": "double",
+                            "nullable": true
+                          }
+                        },
+                        "example": {
+                          "ask": 101.17,
+                          "base_currency": "SOL",
+                          "base_volume": 29332.58,
+                          "bid": 101.16,
+                          "high": 109.69,
+                          "last_price": 101.17,
+                          "low": 100.23,
+                          "open": 107.72,
+                          "quote_currency": "USDC",
+                          "quote_volume": 3062431.887,
+                          "ticker_id": "SOLUSDC"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parsed/book/{market_symbol}/snapshot": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "depth",
+            "schema": {
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0,
+              "nullable": true
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "description": "A market-by-price order book.\n\nEach level contains the price and the total quantity at that price. There may be multiple orders at the same price.",
+                      "type": "object",
+                      "required": [
+                        "asks",
+                        "bids",
+                        "ticker_id",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "ticker_id": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "integer",
+                          "format": "uint64",
+                          "minimum": 0
+                        },
+                        "bids": {
+                          "description": "A list of (price, quantity) pairs, sorted by price in descending order.",
+                          "type": "array",
+                          "items": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "number",
+                                "format": "double"
+                              },
+                              {
+                                "type": "number",
+                                "format": "double"
+                              }
+                            ],
+                            "maxItems": 2,
+                            "minItems": 2
+                          }
+                        },
+                        "asks": {
+                          "description": "A list of (price, quantity) pairs, sorted by price in ascending order.",
+                          "type": "array",
+                          "items": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "number",
+                                "format": "double"
+                              },
+                              {
+                                "type": "number",
+                                "format": "double"
+                              }
+                            ],
+                            "maxItems": 2,
+                            "minItems": 2
+                          }
+                        }
+                      },
+                      "example": {
+                        "asks": [
+                          [
+                            101.85,
+                            0.14
+                          ],
+                          [
+                            101.86,
+                            1.16
+                          ],
+                          [
+                            101.87,
+                            1.85
+                          ],
+                          [
+                            101.88,
+                            6.13
+                          ]
+                        ],
+                        "bids": [
+                          [
+                            101.84,
+                            2.56
+                          ],
+                          [
+                            101.83,
+                            5.51
+                          ],
+                          [
+                            101.82,
+                            5.86
+                          ],
+                          [
+                            101.81,
+                            1.26
+                          ]
+                        ],
+                        "ticker_id": "SOLUSDC",
+                        "timestamp": 1708542402778
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parsed/book/{market_symbol}/recent-trades": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "ticker_id",
+                        "trades"
+                      ],
+                      "properties": {
+                        "ticker_id": {
+                          "type": "string"
+                        },
+                        "trades": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "p",
+                              "q",
+                              "side",
+                              "ts"
+                            ],
+                            "properties": {
+                              "id": {
+                                "description": "The trade ID.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "p": {
+                                "description": "The price of the trade.",
+                                "type": "number",
+                                "format": "double"
+                              },
+                              "q": {
+                                "description": "The quantity of the trade.",
+                                "type": "number",
+                                "format": "double"
+                              },
+                              "side": {
+                                "description": "The side of the aggressing order.",
+                                "type": "string",
+                                "enum": [
+                                  "Bid",
+                                  "Ask"
+                                ]
+                              },
+                              "ts": {
+                                "description": "The millisecond timestamp of the trade.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              }
+                            },
+                            "example": {
+                              "id": 63167016,
+                              "p": 101.12,
+                              "q": 0.23,
+                              "side": "Bid",
+                              "ts": 1708542117788
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

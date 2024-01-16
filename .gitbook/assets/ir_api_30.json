@@ -1,0 +1,1940 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cube Iridium HTTP API",
+    "contact": {
+      "name": "Cube",
+      "url": "https://www.cube.exchange",
+      "email": "support@cube.exchange"
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/users/check": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/info": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "apiKeys",
+                        "email",
+                        "hasApprovedKyc",
+                        "hasGuardianQuorum",
+                        "id",
+                        "kycStatus",
+                        "maxSubaccounts",
+                        "points",
+                        "status",
+                        "subaccounts",
+                        "vipLevel"
+                      ],
+                      "properties": {
+                        "apiKeys": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "accessLevel",
+                              "apiKey",
+                              "createdAt",
+                              "isMasterKey",
+                              "subaccountIds"
+                            ],
+                            "properties": {
+                              "isMasterKey": {
+                                "type": "boolean"
+                              },
+                              "subaccountIds": {
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "format": "int64"
+                                }
+                              },
+                              "accessLevel": {
+                                "type": "string",
+                                "enum": [
+                                  "read",
+                                  "write"
+                                ]
+                              },
+                              "apiKey": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "subaccounts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "hasOrderHistory",
+                              "id",
+                              "name",
+                              "pubkeys"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "pubkeys": {
+                                "type": "array",
+                                "items": {
+                                  "type": "array",
+                                  "items": [
+                                    {
+                                      "type": "integer",
+                                      "format": "int32"
+                                    },
+                                    {
+                                      "type": "string"
+                                    }
+                                  ],
+                                  "maxItems": 2,
+                                  "minItems": 2
+                                }
+                              },
+                              "hasOrderHistory": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        },
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "waitlist",
+                            "active",
+                            "disabled"
+                          ]
+                        },
+                        "vipLevel": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "points": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "mpcKeyId": {
+                          "type": "integer",
+                          "format": "int64",
+                          "nullable": true
+                        },
+                        "guardianHasKey": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "hasKey": {
+                                "type": "boolean",
+                                "nullable": true
+                              }
+                            }
+                          },
+                          "nullable": true
+                        },
+                        "hasGuardianQuorum": {
+                          "type": "boolean"
+                        },
+                        "phoneNumber": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "kycStatus": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                              "approved",
+                              "level",
+                              "state"
+                            ],
+                            "properties": {
+                              "level": {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "state": {
+                                "type": "string",
+                                "enum": [
+                                  "init",
+                                  "pending",
+                                  "prechecked",
+                                  "queued",
+                                  "onHold",
+                                  "completed"
+                                ]
+                              },
+                              "approved": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        },
+                        "hasApprovedKyc": {
+                          "type": "boolean"
+                        },
+                        "registration": {
+                          "type": "object",
+                          "required": [
+                            "newlyStarted",
+                            "startedAt",
+                            "windowSeconds"
+                          ],
+                          "properties": {
+                            "newlyStarted": {
+                              "type": "boolean"
+                            },
+                            "startedAt": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "windowSeconds": {
+                              "type": "integer",
+                              "format": "int32"
+                            }
+                          },
+                          "nullable": true
+                        },
+                        "firstName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "lastName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "country": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "inviteId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "nullable": true
+                        },
+                        "referralCode": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "maxSubaccounts": {
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/positions": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "inner",
+                          "name"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "inner": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "accountingType",
+                                "amount",
+                                "assetId",
+                                "pendingDeposits",
+                                "receivedAmount"
+                              ],
+                              "properties": {
+                                "amount": {
+                                  "description": "The cube-sequenced amount.",
+                                  "type": "string",
+                                  "format": "number"
+                                },
+                                "receivedAmount": {
+                                  "description": "The on-chain amount according to the latest `received` block.",
+                                  "type": "string",
+                                  "format": "number"
+                                },
+                                "pendingDeposits": {
+                                  "type": "string",
+                                  "format": "number"
+                                },
+                                "assetId": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "accountingType": {
+                                  "type": "string",
+                                  "enum": [
+                                    "liability",
+                                    "receivable",
+                                    "income",
+                                    "asset",
+                                    "loss"
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/transfers": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "deposits",
+                        "withdrawals"
+                      ],
+                      "properties": {
+                        "deposits": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                              "inner",
+                              "name"
+                            ],
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "inner": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "required": [
+                                    "amount",
+                                    "assetId",
+                                    "createdAt",
+                                    "fiatToCrypto",
+                                    "timeEst",
+                                    "txnState",
+                                    "updatedAt"
+                                  ],
+                                  "properties": {
+                                    "assetId": {
+                                      "type": "integer",
+                                      "format": "int32"
+                                    },
+                                    "amount": {
+                                      "type": "string"
+                                    },
+                                    "txnHash": {
+                                      "description": "Deposits that are found on-chain will have a `txn_hash` and `txn_index`. If it is a pending deposit determined by some external payment system, these can be empty",
+                                      "type": "string",
+                                      "nullable": true
+                                    },
+                                    "txnIndex": {
+                                      "type": "integer",
+                                      "format": "int64",
+                                      "nullable": true
+                                    },
+                                    "createdAt": {
+                                      "description": "When we first started tracking this deposit. Probably in the mempool.",
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "updatedAt": {
+                                      "description": "If `txn_state` is `Confirmed` and `KytStatus` is accepted, this is the time that the deposit is credited. Otherwise, it is the last update (e.g if a kyt external id was created, or transaction state updated).",
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "txnState": {
+                                      "description": "The deposit is credited when `Confirmed` and accepted.",
+                                      "type": "string",
+                                      "enum": [
+                                        "pending",
+                                        "received",
+                                        "confirmed",
+                                        "dropped",
+                                        "failed"
+                                      ]
+                                    },
+                                    "address": {
+                                      "description": "The deposit source address",
+                                      "type": "string",
+                                      "nullable": true
+                                    },
+                                    "timeEst": {
+                                      "description": "The estimated time that this deposit will transition to `Confirmed`. This is currently only applicable for `Received` deposits",
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "fiatToCrypto": {
+                                      "type": "boolean"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "withdrawals": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                              "inner",
+                              "name"
+                            ],
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "inner": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "required": [
+                                    "address",
+                                    "amount",
+                                    "assetId",
+                                    "attemptId",
+                                    "createdAt",
+                                    "updatedAt"
+                                  ],
+                                  "properties": {
+                                    "assetId": {
+                                      "type": "integer",
+                                      "format": "int32"
+                                    },
+                                    "amount": {
+                                      "type": "string",
+                                      "format": "number"
+                                    },
+                                    "txnHash": {
+                                      "description": "Once the transaction has been determined / sent, `txn_hash`, `txn_index`, and `txn_state` will be populated",
+                                      "type": "string",
+                                      "nullable": true
+                                    },
+                                    "txnIndex": {
+                                      "type": "integer",
+                                      "format": "int64",
+                                      "nullable": true
+                                    },
+                                    "txnState": {
+                                      "type": "string",
+                                      "enum": [
+                                        "pending",
+                                        "received",
+                                        "confirmed",
+                                        "dropped",
+                                        "failed"
+                                      ],
+                                      "nullable": true
+                                    },
+                                    "createdAt": {
+                                      "description": "When the withdrawal request was created.",
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "updatedAt": {
+                                      "description": "When the withdrawal was sent out.",
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "attemptId": {
+                                      "description": "A unique identifier for this withdrawal request.",
+                                      "type": "integer",
+                                      "format": "int64"
+                                    },
+                                    "address": {
+                                      "description": "The withdrawal destination address",
+                                      "type": "string"
+                                    },
+                                    "approved": {
+                                      "type": "boolean",
+                                      "nullable": true
+                                    },
+                                    "reason": {
+                                      "type": "string",
+                                      "nullable": true
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/deposits": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "inner",
+                          "name"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "inner": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "amount",
+                                "assetId",
+                                "createdAt",
+                                "fiatToCrypto",
+                                "timeEst",
+                                "txnState",
+                                "updatedAt"
+                              ],
+                              "properties": {
+                                "assetId": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "amount": {
+                                  "type": "string"
+                                },
+                                "txnHash": {
+                                  "description": "Deposits that are found on-chain will have a `txn_hash` and `txn_index`. If it is a pending deposit determined by some external payment system, these can be empty",
+                                  "type": "string",
+                                  "nullable": true
+                                },
+                                "txnIndex": {
+                                  "type": "integer",
+                                  "format": "int64",
+                                  "nullable": true
+                                },
+                                "createdAt": {
+                                  "description": "When we first started tracking this deposit. Probably in the mempool.",
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                "updatedAt": {
+                                  "description": "If `txn_state` is `Confirmed` and `KytStatus` is accepted, this is the time that the deposit is credited. Otherwise, it is the last update (e.g if a kyt external id was created, or transaction state updated).",
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                "txnState": {
+                                  "description": "The deposit is credited when `Confirmed` and accepted.",
+                                  "type": "string",
+                                  "enum": [
+                                    "pending",
+                                    "received",
+                                    "confirmed",
+                                    "dropped",
+                                    "failed"
+                                  ]
+                                },
+                                "address": {
+                                  "description": "The deposit source address",
+                                  "type": "string",
+                                  "nullable": true
+                                },
+                                "timeEst": {
+                                  "description": "The estimated time that this deposit will transition to `Confirmed`. This is currently only applicable for `Received` deposits",
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                "fiatToCrypto": {
+                                  "type": "boolean"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/withdrawals": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "inner",
+                          "name"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "inner": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "address",
+                                "amount",
+                                "assetId",
+                                "attemptId",
+                                "createdAt",
+                                "updatedAt"
+                              ],
+                              "properties": {
+                                "assetId": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "amount": {
+                                  "type": "string",
+                                  "format": "number"
+                                },
+                                "txnHash": {
+                                  "description": "Once the transaction has been determined / sent, `txn_hash`, `txn_index`, and `txn_state` will be populated",
+                                  "type": "string",
+                                  "nullable": true
+                                },
+                                "txnIndex": {
+                                  "type": "integer",
+                                  "format": "int64",
+                                  "nullable": true
+                                },
+                                "txnState": {
+                                  "type": "string",
+                                  "enum": [
+                                    "pending",
+                                    "received",
+                                    "confirmed",
+                                    "dropped",
+                                    "failed"
+                                  ],
+                                  "nullable": true
+                                },
+                                "createdAt": {
+                                  "description": "When the withdrawal request was created.",
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                "updatedAt": {
+                                  "description": "When the withdrawal was sent out.",
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                "attemptId": {
+                                  "description": "A unique identifier for this withdrawal request.",
+                                  "type": "integer",
+                                  "format": "int64"
+                                },
+                                "address": {
+                                  "description": "The withdrawal destination address",
+                                  "type": "string"
+                                },
+                                "approved": {
+                                  "type": "boolean",
+                                  "nullable": true
+                                },
+                                "reason": {
+                                  "type": "string",
+                                  "nullable": true
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/orders": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "subaccountId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "createdBefore",
+            "description": "Returns the most recent orders where `created_at < created_before`. If null, returns the most recent orders.",
+            "schema": {
+              "description": "Returns the most recent orders where `created_at < created_before`. If null, returns the most recent orders.",
+              "type": "integer",
+              "format": "int64",
+              "nullable": true
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "The maximum number of orders to return. If null, defaults to 100. The maximum is 1000.",
+            "schema": {
+              "description": "The maximum number of orders to return. If null, defaults to 100. The maximum is 1000.",
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "orders"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "orders": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "createdAt",
+                              "fills",
+                              "marketId",
+                              "modifies",
+                              "price",
+                              "qty",
+                              "side",
+                              "status"
+                            ],
+                            "properties": {
+                              "orderId": {
+                                "description": "The cube-assigned order ID, also known as `ExchangeOrderId`. Unique per order.",
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                              },
+                              "marketId": {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "side": {
+                                "type": "string",
+                                "enum": [
+                                  "Bid",
+                                  "Ask"
+                                ]
+                              },
+                              "price": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "qty": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "createdAt": {
+                                "description": "The matching-engine transact-time in nanoseconds that this order was created.",
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "canceledAt": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                              },
+                              "filledAt": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                              },
+                              "filledTotal": {
+                                "type": "object",
+                                "required": [
+                                  "baseAmount",
+                                  "feeAmount",
+                                  "filledAt",
+                                  "quoteAmount"
+                                ],
+                                "properties": {
+                                  "baseAmount": {
+                                    "type": "string",
+                                    "format": "number"
+                                  },
+                                  "quoteAmount": {
+                                    "type": "string",
+                                    "format": "number"
+                                  },
+                                  "feeAmount": {
+                                    "type": "string",
+                                    "format": "number"
+                                  },
+                                  "feeAsset": {
+                                    "type": "integer",
+                                    "format": "int32",
+                                    "nullable": true
+                                  },
+                                  "filledAt": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                  }
+                                },
+                                "nullable": true
+                              },
+                              "fills": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "required": [
+                                    "baseAmount",
+                                    "baseSettled",
+                                    "feeAmount",
+                                    "filledAt",
+                                    "quoteAmount",
+                                    "quoteSettled",
+                                    "tradeId"
+                                  ],
+                                  "properties": {
+                                    "tradeId": {
+                                      "type": "integer",
+                                      "format": "int64"
+                                    },
+                                    "baseBatchId": {
+                                      "type": "string",
+                                      "format": "uuid",
+                                      "nullable": true
+                                    },
+                                    "quoteBatchId": {
+                                      "type": "string",
+                                      "format": "uuid",
+                                      "nullable": true
+                                    },
+                                    "baseSettled": {
+                                      "type": "boolean"
+                                    },
+                                    "quoteSettled": {
+                                      "type": "boolean"
+                                    },
+                                    "baseAmount": {
+                                      "type": "string",
+                                      "format": "number"
+                                    },
+                                    "quoteAmount": {
+                                      "type": "string",
+                                      "format": "number"
+                                    },
+                                    "feeAmount": {
+                                      "type": "string",
+                                      "format": "number"
+                                    },
+                                    "feeAsset": {
+                                      "type": "integer",
+                                      "format": "int32",
+                                      "nullable": true
+                                    },
+                                    "filledAt": {
+                                      "type": "integer",
+                                      "format": "int64"
+                                    }
+                                  }
+                                }
+                              },
+                              "modifies": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "required": [
+                                    "modifiedAt",
+                                    "price",
+                                    "quantity"
+                                  ],
+                                  "properties": {
+                                    "price": {
+                                      "type": "integer",
+                                      "format": "uint64",
+                                      "minimum": 0
+                                    },
+                                    "quantity": {
+                                      "type": "integer",
+                                      "format": "uint64",
+                                      "minimum": 0
+                                    },
+                                    "modifiedAt": {
+                                      "type": "integer",
+                                      "format": "int64"
+                                    }
+                                  }
+                                }
+                              },
+                              "reason": {
+                                "description": "Reject reason if rejected. Cancel reason if canceled.",
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "settled": {
+                                "description": "The settlement status for this order's fills.\n\nIf the order has no fills, or none of the fills have been assigned to a settlement batch, then this will be `None`. This can be derived from `fills`.",
+                                "type": "boolean",
+                                "nullable": true
+                              },
+                              "status": {
+                                "description": "The current status of this order. Note that if the order is `Open`, this is a best-effort estimation, and the order service has the most correct status.",
+                                "type": "string",
+                                "enum": [
+                                  "open",
+                                  "rejected",
+                                  "filled",
+                                  "p-filled",
+                                  "canceled"
+                                ]
+                              },
+                              "clientOrderId": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0,
+                                "nullable": true
+                              },
+                              "timeInForce": {
+                                "type": "integer",
+                                "format": "int32",
+                                "nullable": true
+                              },
+                              "orderType": {
+                                "type": "integer",
+                                "format": "int32",
+                                "nullable": true
+                              },
+                              "selfTradePrevention": {
+                                "type": "integer",
+                                "format": "int32",
+                                "nullable": true
+                              },
+                              "cancelOnDisconnect": {
+                                "type": "boolean",
+                                "nullable": true
+                              },
+                              "postOnly": {
+                                "type": "boolean",
+                                "nullable": true
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/fills": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "subaccountId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "startTime",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "nullable": true
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "endTime",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "nullable": true
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "marketIds",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "orderIds",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "fills",
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "fills": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "baseAmount",
+                              "feeAmount",
+                              "filledAt",
+                              "marketId",
+                              "orderId",
+                              "quoteAmount",
+                              "side",
+                              "tradeId"
+                            ],
+                            "properties": {
+                              "marketId": {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "tradeId": {
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "orderId": {
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "side": {
+                                "type": "string",
+                                "enum": [
+                                  "Bid",
+                                  "Ask"
+                                ]
+                              },
+                              "aggressingSide": {
+                                "type": "string",
+                                "enum": [
+                                  "Bid",
+                                  "Ask"
+                                ],
+                                "nullable": true
+                              },
+                              "price": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                              },
+                              "quantity": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                              },
+                              "baseAmount": {
+                                "type": "string",
+                                "format": "number"
+                              },
+                              "quoteAmount": {
+                                "type": "string",
+                                "format": "number"
+                              },
+                              "feeAmount": {
+                                "type": "string",
+                                "format": "number"
+                              },
+                              "feeAsset": {
+                                "type": "integer",
+                                "format": "int32",
+                                "nullable": true
+                              },
+                              "filledAt": {
+                                "type": "integer",
+                                "format": "int64"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/subaccounts": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "accountType",
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "accountType": {
+                    "type": "string",
+                    "enum": [
+                      "spot",
+                      "margin"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/subaccounts/{subaccount_id}": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/markets": {
+      "get": {
+        "summary": "Fetch all asset, market, and source definitions",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "assets",
+                        "markets",
+                        "sources"
+                      ],
+                      "properties": {
+                        "assets": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "assetId",
+                              "assetType",
+                              "decimals",
+                              "disabled",
+                              "displayDecimals",
+                              "metadata",
+                              "settles",
+                              "sourceId",
+                              "symbol"
+                            ],
+                            "properties": {
+                              "assetId": {
+                                "description": "The Cube-assigned asset ID.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "symbol": {
+                                "description": "The canonical symbol for this asset.",
+                                "type": "string"
+                              },
+                              "decimals": {
+                                "description": "The maximum precision of this asset.\n\ne.g `18` for ETH (`10^18` WEI per ETH), `8` for BTC (`10^8` SAT per BTC)",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "displayDecimals": {
+                                "description": "The default number of decimal places to display for human-readable quantities for this asset.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "settles": {
+                                "description": "Whether this asset settles to the blockchain.",
+                                "type": "boolean"
+                              },
+                              "assetType": {
+                                "description": "The type of this asset.",
+                                "type": "string",
+                                "enum": [
+                                  "Fiat",
+                                  "Crypto"
+                                ]
+                              },
+                              "sourceId": {
+                                "description": "The source ID of this asset.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "metadata": {
+                                "description": "Additional metadata about this asset."
+                              },
+                              "disabled": {
+                                "description": "Whether this asset is currently supported by Cube. For crypto assets, this means that the asset is supported by the MPC Vault and tracked in Cube infrastructure. For fiat assets, this means that the asset appears in the currencies list.",
+                                "type": "boolean"
+                              }
+                            },
+                            "example": {
+                              "assetId": 1,
+                              "assetType": "Crypto",
+                              "decimals": 8,
+                              "disabled": false,
+                              "displayDecimals": 5,
+                              "metadata": {},
+                              "settles": true,
+                              "sourceId": 1,
+                              "symbol": "BTC"
+                            }
+                          }
+                        },
+                        "sources": {
+                          "type": "array",
+                          "items": {
+                            "description": "A collection of assets grouped by origination.\n\nFor `Crypto` assets, this is their native blockchain.\n\ne.g `ETH` and `SHIB` are both on the `ethereum` (`CHAIN_ID = 0x1`) blockchain.",
+                            "type": "object",
+                            "required": [
+                              "metadata",
+                              "name",
+                              "sourceId"
+                            ],
+                            "properties": {
+                              "sourceId": {
+                                "description": "The Cube-assigned source ID.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "name": {
+                                "description": "A human-readable name for this source.",
+                                "type": "string"
+                              },
+                              "transactionExplorer": {
+                                "description": "The URL of a block explorer that can be used to view transactions.\n\nThe value is provided as a format string with a single `{}` placeholder for the transaction. e.g `https://etherscan.io/tx/{}`",
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "addressExplorer": {
+                                "description": "The URL of a block explorer that can be used to view addresses.\n\nThe value is provided as a format string with a single `{}` placeholder for the address. e.g `https://etherscan.io/address/{}`",
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "metadata": {
+                                "description": "Additional metadata about this source."
+                              }
+                            },
+                            "example": {
+                              "addressExplorer": "https://mempool.space/address/{}",
+                              "metadata": {
+                                "network": "Mainnet",
+                                "scope": "bitcoin",
+                                "type": "mainnet"
+                              },
+                              "name": "bitcoin",
+                              "sourceId": 1,
+                              "transactionExplorer": "https://mempool.space/tx/{}"
+                            }
+                          }
+                        },
+                        "markets": {
+                          "type": "array",
+                          "items": {
+                            "description": "A market is identified by its unique `marketId`. The market definition specifies specifies the base and quote assets and their respective lot sizes for the particular market.",
+                            "type": "object",
+                            "required": [
+                              "baseAssetId",
+                              "baseLotSize",
+                              "disabled",
+                              "marketId",
+                              "priceDisplayDecimals",
+                              "priceTickSize",
+                              "protectionPriceLevels",
+                              "quantityTickSize",
+                              "quoteAssetId",
+                              "quoteLotSize",
+                              "symbol"
+                            ],
+                            "properties": {
+                              "marketId": {
+                                "description": "The Cube-assigned market ID.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "symbol": {
+                                "description": "The market's symbol. Normally this is base symbol concatenated with the quote symbol.\n\ne.g `BTCUSDC`",
+                                "type": "string"
+                              },
+                              "baseAssetId": {
+                                "description": "The asset ID of the base asset.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "baseLotSize": {
+                                "description": "The number of units of the base asset that are represented by one base lot.",
+                                "type": "string"
+                              },
+                              "quoteAssetId": {
+                                "description": "The asset ID of the quote asset.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "quoteLotSize": {
+                                "description": "The number of units of the quote asset that are represented by one quote lot.",
+                                "type": "string"
+                              },
+                              "priceDisplayDecimals": {
+                                "description": "The default number of decimal places to display for human-readable prices for this market.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "protectionPriceLevels": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "priceTickSize": {
+                                "description": "The human-readable minimum price increment.",
+                                "type": "string"
+                              },
+                              "quantityTickSize": {
+                                "description": "The human-readable minimum quantity increment.",
+                                "type": "string"
+                              },
+                              "disabled": {
+                                "description": "Whether this market can currently be traded.",
+                                "type": "boolean"
+                              }
+                            },
+                            "example": {
+                              "baseAssetId": 2,
+                              "baseLotSize": "1000000000000000",
+                              "disabled": false,
+                              "marketId": 100001,
+                              "priceDisplayDecimals": 5,
+                              "priceTickSize": "0.00001",
+                              "protectionPriceLevels": 1000,
+                              "quantityTickSize": "0.001",
+                              "quoteAssetId": 1,
+                              "quoteLotSize": "1",
+                              "symbol": "ETHBTC"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "The API Key ID as specified in the [API settings page](https://cube.exchange/settings/api).\n\nEach API key has a corresponding access level that is set when the key is created.\n- Read access only allows access to read HTTP methods (GET, HEAD, etc.).\n- Write access allows access to all HTTP methods.\n"
+      },
+      "ApiSignature": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-signature",
+        "description": "The API signature string authenticating this request.\n\nThe payload to be signed is the concatenation of the byte string `cube.xyz` and the current unix epoch timestamp in seconds converted into an 8-byte little-endian array. The signature is the HMAC-SHA256 digest of the payload using the secret key associated with the specified API key.\n\nImplementation notes:\n- The signature is base-64 encoded with the 'standard' alphabet and\n  padding.\n\n  ```\n  ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/\n  ```\n- The timestamp should be encoded as 8-byte little-endian (array of bytes)\n- The secret key should be decoded from a hex string into a 32-byte array of\n  bytes\n"
+      },
+      "ApiTimestamp": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-timestamp",
+        "description": "The timestamp used for signature generation."
+      }
+    },
+    "headers": {
+      "x-cube-request-id": {
+        "description": "The cube-assigned ID for this request. If known, please supply with support requests",
+        "style": "simple",
+        "required": true,
+        "schema": {
+          "title": "RequestId",
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+      }
+    }
+  }
+}
