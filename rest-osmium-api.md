@@ -2,6 +2,8 @@
 
 The base URL for endpoints described in this page of live trading API is `https://api.cube.exchange/os/v0`.
 
+[OpenAPI document for Trade API](.gitbook/assets/os_api_30.json)
+
 ## Endpoints, require authentication
 
 Endpoints in this section require [REST Authentication headers](README.md#rest-authentication-headers).

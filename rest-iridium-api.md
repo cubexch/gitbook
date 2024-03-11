@@ -2,6 +2,8 @@
 
 The base URL for endpoints described in this page of live trading API is `https://api.cube.exchange/ir/v0`.
 
+[OpenAPI document for Market & User API](.gitbook/assets/ir_api_30.json)
+
 ## Endpoints, public
 
 {% swagger src=".gitbook/assets/ir_api_30.json" path="/markets" method="get" %}
