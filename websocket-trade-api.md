@@ -1,7 +1,8 @@
 # WebSocket: Trade API
 
 This schema defines the Protobuf messages used for communication with the
-Cube Order Service (Osmium, OS). The `proto` definition file can be found
+Cube Order Service (Osmium, OS). The base URL for channels described in this
+page is `wss://api.cube.exchange/os`. The `proto` definition file can be found
 [here](https://github.com/cubexch/ws-api/blob/main/schema/trade.proto).
 
 ### Connection
