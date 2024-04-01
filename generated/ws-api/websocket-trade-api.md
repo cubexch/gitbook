@@ -50,6 +50,15 @@ ETH`. In more detail, we have:
   / (10^8 SAT / BTC)
   = 0.06300 BTC / ETH
 ```
+## Important Note about Fill Price
+
+When orders are filled in a market enabled for implied matching,
+**the price may not reflect the exact ratio between the base and quote asset transacted**.
+See [Implied Matching](./implied-matching.md) for more details.
+
+When calculating `RawUnit` amounts for transacted assets, e.g. for reconciliation,
+**use the `fill_quantity * base lot size` for the base asset
+and the `fill_quote_quantity * quote lot size` for the quote asset**.
 
 ### Trading Fees
 
@@ -531,7 +540,7 @@ A fill for an order.
 | market_id | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
 | exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](#exchange-order-id) |
-| fill_price | [uint64](#uint64) |  | The price at which this trade occured. In the case of an implied fill, this price may be fractional, and will be truncated in that case. To determine the exact amount of the assets exchanged in the fill, use the fill_quantity and quote_quantity fields. |
+| fill_price | [uint64](#uint64) |  | The price at which this trade occured. In the case of an implied fill, this price may be fractional, and will be truncated in that case. To determine the exact amount of the assets exchanged in the fill, use the fill_quantity and fill_quote_quantity fields. |
 | fill_quantity | [uint64](#uint64) |  | The quantity of the base asset that was traded in this fill, expressed in lots of the base asset. |
 | leaves_quantity | [uint64](#uint64) |  | The remaining base quantity for this order after the fill is applied. |
 | fill_quote_quantity | [uint64](#uint64) |  | The quantity of the quote asset that was traded in this fill, expressed in lots of the quote asset. This will generally be the same as the base fill_quantity * fill_price, but may be different in the case of an implied fill. |
