@@ -60,9 +60,16 @@ Under that assumption, the executed price would converge to the theoretical pric
 Since lot sizes can differ between markets, we need to adjust for them.  Here is one such way:
 ```
 lot size ratio = base lot size / quote lot size
-lot size factor = ratio(implied market) * ratio(quote source market) / ratio (base source market)
-theoretical price (implied market) = (base source market price / quote source market price) * lot size factor
+lot size factor =
+    ratio(implied market)
+    * ratio(quote source market)
+    / ratio (base source market)
+theoretical price (implied market) =
+    base source market price
+    / quote source market price
+    * lot size factor
 ```
+
 More concretely, using the example above:
 ```
 ETH/BTC theoretical price = (ETH/USDC price / BTC/USDC price) * lot size factor
