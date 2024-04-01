@@ -50,7 +50,7 @@ ETH`. In more detail, we have:
   / (10^8 SAT / BTC)
   = 0.06300 BTC / ETH
 ```
-## Important Note about Fill Price
+#### Important Note about Fill Price
 
 When orders are filled in a market enabled for implied matching,
 **the price may not reflect the exact ratio between the base and quote asset transacted**.
