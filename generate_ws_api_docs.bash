@@ -76,11 +76,11 @@ echo 'Generating markdown for Market Data API...'
 protoc \
   --plugin=protoc-gen-doc="$PLUGIN" \
   --doc_out="$OUT_DIR" \
-  --doc_opt=markdown,websocket-market_data-api.md \
+  --doc_opt=markdown,websocket-market-data-api.md \
   --proto_path="$SCHEMAS" "$SCHEMAS"/market_data.proto
 
 sed -i '' '1i\
-# WebSocket: Market Data API' $OUT_DIR/websocket-market_data-api.md
+# WebSocket: Market Data API' $OUT_DIR/websocket-market-data-api.md
 
 ONCE=(
   # md messages
@@ -108,7 +108,7 @@ ONCE=(
 )
 
 for STRUCT in "${ONCE[@]}"; do
-  sed -i '' "s/^\\(#*\\) $STRUCT\$/\\1# $STRUCT/" $OUT_DIR/websocket-market_data-api.md
+  sed -i '' "s/^\\(#*\\) $STRUCT\$/\\1# $STRUCT/" $OUT_DIR/websocket-market-data-api.md
 done
 
 echo 'Success!'
