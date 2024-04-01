@@ -163,7 +163,7 @@ Via the "Theoretical Price" section, the theoretical price in the implied market
     - This nets us 25290 * 692,000 / 1e0 = 17,500,680,000 rawUSDC
     - Subtracting the 17,500,000,000 used to aquire our ETH, we have 680,000 rawUSDC extra
 
-5. The 680,000 extra rawUSDC (worth ~69 cents; nice) is then added to the aggressor's float account.
+5. The 680,000 extra rawUSDC is then added to the aggressor's float account.
 
 #### Filled Legs
 
