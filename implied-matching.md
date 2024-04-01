@@ -42,10 +42,10 @@ In the ETH/BTC example, there will either be:
 Cube tracks the float continuously between trades.  Whether or not the float is positive or negative in any given trade is handled automatically:
 - If the subaccount has a sufficient amount of the implied-through asset in their float account to round the implied-through asset up to the next lot in the second market:
     - That amount will be spent towards covering the purchase of the asset received in the implied match.
-    - This results in a slightly improved price and a debit from the floated assets account.
+    - This results in a debit from the floated assets account.
 - If the subaccount does not have a sufficient amount of the implied-through asset in their float account to do so:
     - The matching engine will purchase more of the implied-through asset than required to cover the receipt of the asset in the trade, generating a surplus, positive float.
-    - This results in a slightly worse price and a credit to the floated assets account that will be used to improve the price in subsequent implied matches.
+    - This results in a credit to the floated assets account that will be put towards the purchase of the received asset in subsequent implied matches.
 
 The amount in the floated assets account will never exceed the value of a single lot.
 The max bound is the largest of the lot sizes of all assets, base or quote,
