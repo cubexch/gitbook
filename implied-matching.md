@@ -144,27 +144,29 @@ Via the "Theoretical Price" section, the theoretical price in the implied market
 
 ### Example Aggressing Order
 
-```text
+#### Match
+
 1. Aggressing order to Buy 5 ETH on the ETH/BTC market:
-    ETH decimals is 18, i.e. 1 ETH = 1e18 wei
-    order amount = 5 ETH * 1e18 = 5e18 wei
+    - ETH decimals is 18, i.e. 1 ETH = 1e18 wei
+    - Order amount = 5 ETH * 1e18 = 5e18 wei
 
 2. Need to acquire 5e18 wei in the ETH/USDC market:
-    Hit ask at price 350,000: for every 1e15 wei, we will need to pay 350,000 * 1e1 = 3,500,000 rawUSDC
-    5e18 wei / 1e15 * 3,500,000 = 17,500,000,000 rawUSDC
+    - Hit ask at price 350,000: for every 1e15 wei, we will need to pay 350,000 * 1e1 = 3,500,000 rawUSDC
+    - 5e18 wei / 1e15 * 3,500,000 = 17,500,000,000 rawUSDC
 
 3. How much BTC will we have to sell in the BTC/USDC market to acquire the 1.75e10 rawUSDC need to cover that purchase?
-    Hit bid at price 692,000: for every 1000 satoshis, we will receive 692,000 * 1e0 = 692,000 rawUSDC (because quote lot size is 1)
-    17,500,000,000 rawUSDC / price of 692,000 = 25289.0173 base lots in the BTC/USDC market
+    - Hit bid at price 692,000: for every 1000 satoshis, we will receive 692,000 * 1e0 = 692,000 rawUSDC (because quote lot size is 1)
+    - 17,500,000,000 rawUSDC / price of 692,000 = 25289.0173 base lots in the BTC/USDC market
 
 4. This presents an issue as we can only transact in whole lots, which in this case means whole multiples of 1000 satoshis.  To compensate:
-    We round up and oversell 25,290 lots of BTC into the BTC/USDC market
-    25,290 * 1e3 = 25,290,000 satoshis
-    This nets us 25290 * 692,000 / 1e0 = 17,500,680,000 rawUSDC
-    Subtracting the 17,500,000,000 used to aquire our ETH, we have 680,000 rawUSDC extra
+    - Round up and oversell 25,290 lots of BTC into the BTC/USDC market
+    - 25,290 * 1e3 = 25,290,000 satoshis
+    - This nets us 25290 * 692,000 / 1e0 = 17,500,680,000 rawUSDC
+    - Subtracting the 17,500,000,000 used to aquire our ETH, we have 680,000 rawUSDC extra
 
 5. The 680,000 extra rawUSDC (worth ~69 cents; nice) is then added to the aggressor's float account.
-```
+
+#### Fill
 
 The resulting fill will consist of three legs, one in each market.
 
@@ -187,39 +189,51 @@ because it accounts for the floated amount, which itself is compensating for the
 the exact price transacted in the implied market in inexpressible in the two source markets.**
 
 ### Second Identical Aggressing Order
+
+#### Match
+
 If the same aggressor placed the exact same order into the exact same market,
 the calculation would start out the same as the first trade, but would diverge in step 3
 due to the 680,000 rawUSDC left in the float account from the previous trade:
 
-```text
 3. How much BTC will we have to sell in the BTC/USDC market to acquire the 1.75e10 rawUSDC need to cover that purchase?
-    Hit bid at price 692,000: for every 1000 satoshis, we will receive 692,000 * 1e0 = 692,000 rawUSDC (because quote lot size is 1)
-    We already have 680,000 rawUSDC in the float account that can be put towards the purchase
-    We only need to acquire 17,500,000,000 - 680,000 = 17,499,320,000 rawUSDC
-    17,499,320,000 rawUSDC / price of 692,000 = 25288.0347 base lots in the BTC/USDC market
+    - Hit bid at price 692,000: for every 1000 satoshis, we will receive 692,000 * 1e0 = 692,000 rawUSDC (because quote lot size is 1)
+    - We already have 680,000 rawUSDC in the float account that can be put towards the purchase
+    - We only need to acquire 17,500,000,000 - 680,000 = 17,499,320,000 rawUSDC
+    - 17,499,320,000 rawUSDC / price of 692,000 = 25288.0347 base lots in the BTC/USDC market
 
 4. We can only transact in whole lots, so:
-    We round up and sell 25289 lots of BTC into the BTC/USDC market
-        Note that this is different from the first trade, where this would have been 25290
-    This nets us 25289 * 692,000 / 1e0 = 17,499,988,000 rawUSDC
-    Adding the amount from our float account and subtracting the amount used to acquire our ETH, we have:
-        17,499,988,000 + 680,000 - 17,500,000,000 = 668,000 rawUSDC left over
+    - We round up and sell 25289 lots of BTC into the BTC/USDC market
+        - Note that this is different from the first trade, where this would have been 25290
+    - This nets us 25289 * 692,000 / 1e0 = 17,499,988,000 rawUSDC
+    - Adding the amount from our float account and subtracting the amount used to acquire our ETH, we have:
+        - 17,499,988,000 + 680,000 - 17,500,000,000 = 668,000 rawUSDC left over
 
 5. The 668,000 rawUSDC left over is the new balance of the aggressor's float account.
-```
+
+#### Fill
+
+**Emphasized** fields differ from the previous fill:
 
 - ETH/BTC:
   - base lots = 5e18 wei / 1e16 = 500
-  - quote lots = 25,289,000 satoshis / 1e0 = 25,289,000 (from step 4)
+  - **quote lots** = 25,289,000 satoshis / 1e0 = 25,289,000 (from step 4)
   - price = 50,578 (theoretical price rounded to nearest integer)
+- ETH/USDC:
+  - base lots = 5e18 wei / 1e15 = 5000
+  - quote lots = 17,500,000,000 rawUSDC / 1e1 = 1,750,000
+  - price = 350,000 (price level of the resting order)
+- BTC/USDC:
+  - **base lots** = 25289 (from step 4)
+  - **quote lots** = 17,499,988,000 rawUSDC / 1e0 = 17,499,988,000
+  - price = 692,000 (price level of the resting order)
 
-**Note that the price given for the ETH/BTC trade is the same as the first trade,
+**Note that the price given for the ETH/BTC trade is the same as the first trade**,
 since the characteristics of the trade are identical,
-but the base and quote lots transacted would be different.**
-The float balance allows completion of the same trade in the implied market
+but the base and quote lots transacted are different.
+The floated balance allows the aggressor to receive the same amount of ETH in the ETH/USDC market
 while spending one fewer lot of BTC in the BTC/USDC market.
 
-In this case, the quote/base ratio is exactly 50,578,
+Note: In this second trade, the quote/base ratio is exactly 50,578,
 which happens to look the same as the rounded theoretical price (50,578.03 => 50,578),
 but this is coincidence.
-```
