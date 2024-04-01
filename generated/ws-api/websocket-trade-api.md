@@ -29,13 +29,13 @@ units of base and quote _lots_. That is, a quantity of 1 equals 1 base lot,
 and a price of 10 equals 10 quote lots / base lot (read as quote lots per
 base lot).
 
-For example, consider an ETHBTC market. ETH is the base asset and BTC is the
+For example, consider an ETH/BTC market. ETH is the base asset and BTC is the
 quote asset. ETH has 18 decimal places (`1 ETH = 10^18 WEI`) and BTC has 8
-decimal places (`1 BTC = 10^8 SAT`). Suppose that in this example, the ETHBTC
+decimal places (`1 BTC = 10^8 SAT`). Suppose that in this example, the ETH/BTC
 market has a base lot size of `10^15` and a quote lot size of `10^0` (`1`).
-Then an order placed with `quantity = 230` and `price = 6300` in
+Then an order placed with `quantity = 230` and `limit price = 6300` in
 market-agnostic terms is an order for `0.23 ETH` at a price of `0.06300 BTC /
-ETH`. In more detail, we have:
+ETH`, calculated from:
 
 ```text
 230 base lots
@@ -51,6 +51,8 @@ ETH`. In more detail, we have:
   = 0.06300 BTC / ETH
 ```
 #### Important Note about Fill Price
+The above example applies to the quantities expected at the limit price,
+but the order might be filled at a different, better price.
 
 When orders are filled in a market enabled for implied matching,
 **the price may not reflect the exact ratio between the base and quote asset transacted**.
