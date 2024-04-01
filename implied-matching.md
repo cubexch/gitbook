@@ -53,24 +53,29 @@ in all markets which participate in implied matches by floating the asset in que
 
 ## Theoretical Price
 
-The "theoretical" price of the implied match is the best possible price for which the implied trade could execute,
-Assuming infinite quantity on the top levels of the source markets.
-Under that assumption, the executed price would converge to the theoretical price as the executed quantity increases.
+The theoretical price for a single fill is the ratio of the prices of the source markets.
 
-Since lot sizes can differ between markets, we need to adjust for them.  Here is one such way:
+If a fill would match all assets to a lot size boundary in both source markets,
+there would be no change in the floated asset
+and the ratio of the quote/base amounts transacted would equal the theoretical price.
+**When float is involved in the match, this will not be the case**.
+
+Since lot sizes can differ between markets, we need to adjust for them.  Here is one way to calculate the theoretical price:
 ```
 lot size ratio = base lot size / quote lot size
+
 lot size factor =
     ratio(implied market)
     * ratio(quote source market)
     / ratio (base source market)
-theoretical price (implied market) =
+
+implied market theoretical price =
     base source market price
     / quote source market price
     * lot size factor
 ```
 
-More concretely, using the example above:
+More concretely, using the formulae above:
 ```
 ETH/BTC theoretical price = (ETH/USDC price / BTC/USDC price) * lot size factor
 
@@ -80,7 +85,7 @@ If buying ETH/BTC: theoretical price =
     * (BTC/USDC base lot size / BTC/USDC quote lot size)
     / (ETH/USDC base lot size / ETH/USDC quote lot size)
 
-If buying ETH/BTC: theoretical price =
+If selling ETH/BTC: theoretical price =
     (ETH/USDC bid price / BTC/USDC ask price)  # only difference vs. the buy case
     * (ETH/BTC base lot size / ETH/BTC quote lot size)
     * (BTC/USDC base lot size / BTC/USDC quote lot size)
@@ -89,22 +94,18 @@ If buying ETH/BTC: theoretical price =
 
 ## Executed Price
 
-In practice, trades are for finite quantities and the book is finitely thick.  The executed price and quantity will depend on:
-- the quantity of the aggressing order
-- the quantity and price on the resting orders on the books of the source markets
-    - i.e. not all quantity will be available at the "best" level
-- the amount of the traded-through asset in the user's float account at the time of the match
-    - i.e. any floated asset previously accumulated will be put towards acquiring the desired asset in a given trade
-
-* The price that appears in the fill message will be the average of the theoretical prices at each executed level, weighted by the quantity executed at each level.
+* The price that appears in the fill message will be the average of the theoretical prices at each executed level, each weighted by the quantity executed at that level.
+  * Since that value may be between price levels and the API requires an integer for price, it will be rounded to the nearest whole number.  This may change in the future.
 * This price reflects the true price paid, inclusive of the floated asset, and so **may not reflect the ratio between base and quote transacted in the trade**.
 * When calculating `RawUnit` amounts for transacted assets, e.g. for reconciliation,
   **use the `fill_quantity * base lot size` for the base asset
   and the `fill_quote_quantity * quote lot size` for the quote asset**.
 
-That said, each match offers the following guarantees:
-- The quantity on a single order will always execute at an average price no worse than the limit price.
-- If there are orders on the direct book (i.e. the market where the agressing order was placed), and matching against them would produce a better price, the agressing orders will be matched against the direct book.
+Note that the amount of the traded-through asset in the user's float account at the time of the match does **not** affect the reported price; see [example](./implied-matching.md#Example) below.
+
+That said, each match still offers the following guarantees:
+- The quantity on an order will always execute at an average price no worse than the limit price.
+- If there are orders on the direct book (i.e. the market where the agressing order was placed), and matching against them would produce a better price, the agressing orders will be matched against the direct book first.
 - An entire match and all fills generated are one atomic operation regardless of how many fills are direct and how many are implied.
 
 ## Effect on Fees
