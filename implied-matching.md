@@ -17,17 +17,20 @@ in the same market as the aggressing order.
 An aggressing Bid in ETH/BTC triggering an implied match would result in:
 - first, selling the BTC in the BTC/USDC market to acquire the implied-through asset, USDC
 - second, using that USDC to Buy ETH in the ETH/USDC market
+
 ... thus executing the intent of the original order - to acquire ETH using BTC.
 
 The same logic applies if the order is an Ask, with the markets reversed:
 - first, acquire USDC by Selling ETH into the ETH/USDC market
 - second, acquire BTC by Buying BTC in the BTC/USDC market using the proceeds of the first transaction
+
 ... as this would acquire BTC using ETH.
 
 ## Match Characteristics
 When a match takes place in a market with implied pricing enabled:
 - During the matching process, if a price level is exhausted, both direct and implied books will be considered before matching further quantity
 - All legs of all trades in the match, direct and implied, are executed atomically in all relevant markets from the user's perspective
+- The average price of all fills in a single atomic operation will be no worse than the limit price.
 
 ## Floated Assets
 
@@ -103,11 +106,6 @@ If selling ETH/BTC: theoretical price =
 
 Note that the amount of the traded-through asset in the user's float account at the time of the match does **not** affect the reported price; see [example](./implied-matching.md#Example) below.
 
-That said, each match still offers the following guarantees:
-- The quantity on an order will always execute at an average price no worse than the limit price.
-- If there are orders on the direct book (i.e. the market where the agressing order was placed), and matching against them would produce a better price, the agressing orders will be matched against the direct book first.
-- An entire match and all fills generated are one atomic operation regardless of how many fills are direct and how many are implied.
-
 ## Effect on Fees
 The legs of the implied trade are treated the same as a single-market trade from the perspective of each subaccount participating in the trade.
 As such, for the purposes of fee calculation:
@@ -145,7 +143,7 @@ Via the "Theoretical Price" section, the theoretical price in the implied market
 
 ### Example Aggressing Order
 
-#### Match
+#### Matching Process
 
 1. Aggressing order to Buy 5 ETH on the ETH/BTC market:
     - ETH decimals is 18, i.e. 1 ETH = 1e18 wei
@@ -167,7 +165,7 @@ Via the "Theoretical Price" section, the theoretical price in the implied market
 
 5. The 680,000 extra rawUSDC (worth ~69 cents; nice) is then added to the aggressor's float account.
 
-#### Fill
+#### Filled Legs
 
 The resulting fill will consist of three legs, one in each market.
 
@@ -191,7 +189,7 @@ the exact price transacted in the implied market in inexpressible in the two sou
 
 ### Second Identical Aggressing Order
 
-#### Match
+#### Matching Process
 
 If the same aggressor placed the exact same order into the exact same market,
 the calculation would start out the same as the first trade, but would diverge in step 3
@@ -212,7 +210,7 @@ due to the 680,000 rawUSDC left in the float account from the previous trade:
 
 5. The 668,000 rawUSDC left over is the new balance of the aggressor's float account.
 
-#### Fill
+#### Filled Legs
 
 **Emphasized** fields differ from the previous fill:
 
