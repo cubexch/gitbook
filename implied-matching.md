@@ -134,14 +134,21 @@ Consider a hypothetical aggressing order to buy 5 ETH on the ETH/BTC market, ass
 
 *integer value as entered on API; defined as `number of quote lots per base lot`
 
+### Human-Readable Price
+```
+5 ETH for 0.2529 BTC
+via 17,500.68 USDC (of which 0.68 USDC is floated)
+```
+
+### Aggressing Order Calculation (API)
+
+#### Theoretical Price
 Via the "Theoretical Price" section, the theoretical price in the implied market is:
 ```text
 (ETH/USDC price / BTC/USDC price) * lot size factor
-= 350,000 / 962,000 * 1e5
-= 50578.03
+= 350,000 / 692,000 * 1e5
+= 50,578.035
 ```
-
-### Example Aggressing Order
 
 #### Matching Process
 
@@ -153,7 +160,7 @@ Via the "Theoretical Price" section, the theoretical price in the implied market
     - Hit ask at price 350,000: for every 1e15 wei, we will need to pay 350,000 * 1e1 = 3,500,000 rawUSDC
     - 5e18 wei / 1e15 * 3,500,000 = 17,500,000,000 rawUSDC
 
-3. How much BTC will we have to sell in the BTC/USDC market to acquire the 1.75e10 rawUSDC need to cover that purchase?
+3. How much BTC will we have to sell in the BTC/USDC market to acquire the 1.75e10 rawUSDC needed to cover that purchase?
     - Hit bid at price 692,000: for every 1000 satoshis, we will receive 692,000 * 1e0 = 692,000 rawUSDC (because quote lot size is 1)
     - 17,500,000,000 rawUSDC / price of 692,000 = 25289.0173 base lots in the BTC/USDC market
 
@@ -187,15 +194,17 @@ Pricing in lots, based on the amount transacted and lot size in each market:
 because it accounts for the floated amount, which itself is compensating for the fact that
 the exact price transacted in the implied market in inexpressible in the two source markets.**
 
-### Second Identical Aggressing Order
+### Subsequent Aggressing Order (API)
+
+#### Theoretical Price
+
+The market conditions are same as the first trade, so the calculation is the same as the first trade (50,578.035).
 
 #### Matching Process
 
-If the same aggressor placed the exact same order into the exact same market,
-the calculation would start out the same as the first trade, but would diverge in step 3
-due to the 680,000 rawUSDC left in the float account from the previous trade:
+The matching calculation diverges in step 3 due to the 680,000 rawUSDC left in the float account from the previous trade:
 
-3. How much BTC will we have to sell in the BTC/USDC market to acquire the 1.75e10 rawUSDC need to cover that purchase?
+3. How much BTC will we have to sell in the BTC/USDC market to acquire the 1.75e10 rawUSDC needed to cover that purchase?
     - Hit bid at price 692,000: for every 1000 satoshis, we will receive 692,000 * 1e0 = 692,000 rawUSDC (because quote lot size is 1)
     - We already have 680,000 rawUSDC in the float account that can be put towards the purchase
     - We only need to acquire 17,500,000,000 - 680,000 = 17,499,320,000 rawUSDC
