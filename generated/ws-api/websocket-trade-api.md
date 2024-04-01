@@ -54,7 +54,7 @@ ETH`. In more detail, we have:
 
 When orders are filled in a market enabled for implied matching,
 **the price may not reflect the exact ratio between the base and quote asset transacted**.
-See [Implied Matching](./implied-matching.md) for more details.
+See [Implied Matching](../implied-matching.md) for more details.
 
 When calculating `RawUnit` amounts for transacted assets, e.g. for reconciliation,
 **use the `fill_quantity * base lot size` for the base asset
