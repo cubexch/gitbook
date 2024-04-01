@@ -1,5 +1,6 @@
 # WebSocket: Trade API
 
+## trade.proto
 This schema defines the Protobuf messages used for communication with the
 Cube Order Service (Osmium, OS). The base URL for channels described in this
 page is `wss://api.cube.exchange/os`. The `proto` definition file can be found
@@ -40,7 +41,7 @@ ETH`. In more detail, we have:
 230 base lots
   * (10^15 WEI / base lot)
   / (10^18 WEI / ETH)
-  = 230 ETH
+  = 0.230 ETH
 
 6300 quote lots / base lot
   * (1 SAT / quote lot)
@@ -190,11 +191,11 @@ OrderRequest.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| new | [NewOrder](#neworder) |  |  |
-| cancel | [CancelOrder](#cancelorder) |  |  |
-| modify | [ModifyOrder](#modifyorder) |  |  |
+| new | [NewOrder](#new-order) |  |  |
+| cancel | [CancelOrder](#cancel-order) |  |  |
+| modify | [ModifyOrder](#modify-order) |  |  |
 | heartbeat | [Heartbeat](#heartbeat) |  |  |
-| mc | [MassCancel](#masscancel) |  |  |
+| mc | [MassCancel](#mass-cancel) |  |  |
 
 
 
@@ -214,11 +215,11 @@ Place a new order.
 | price | [uint64](#uint64) | optional |  |
 | quantity | [uint64](#uint64) |  |  |
 | side | [Side](#side) |  |  |
-| time_in_force | [TimeInForce](#timeinforce) |  |  |
-| order_type | [OrderType](#ordertype) |  |  |
+| time_in_force | [TimeInForce](#time-in-force) |  |  |
+| order_type | [OrderType](#order-type) |  |  |
 | subaccount_id | [uint64](#uint64) |  | The subaccount to place this order on. This subaccount must be writable by the API key specified in the Credentials message. |
-| self_trade_prevention | [SelfTradePrevention](#selftradeprevention) | optional |  |
-| post_only | [PostOnly](#postonly) |  |  |
+| self_trade_prevention | [SelfTradePrevention](#self-trade-prevention) | optional |  |
+| post_only | [PostOnly](#post-only) |  |  |
 | cancel_on_disconnect | [bool](#bool) |  | If true, this order will be automatically cancelled after the closure of the network connection between Cube's servers and the client that placed the order.
 
 If the client initiates the disconnect or network instability drops the connection, the order will be cancelled when Cube's servers recognize the disconnection.
@@ -286,8 +287,8 @@ remaining_quantity + cumulative_quantity`.
 | new_price | [uint64](#uint64) |  |  |
 | new_quantity | [uint64](#uint64) |  |  |
 | subaccount_id | [uint64](#uint64) |  | The subaccount that the NewOrder was placed on. |
-| self_trade_prevention | [SelfTradePrevention](#selftradeprevention) | optional |  |
-| post_only | [PostOnly](#postonly) |  |  |
+| self_trade_prevention | [SelfTradePrevention](#self-trade-prevention) | optional |  |
+| post_only | [PostOnly](#post-only) |  |  |
 
 
 
@@ -341,16 +342,17 @@ OrderResponse.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| new_ack | [NewOrderAck](#neworderack) |  |  |
-| cancel_ack | [CancelOrderAck](#cancelorderack) |  |  |
-| modify_ack | [ModifyOrderAck](#modifyorderack) |  |  |
-| new_reject | [NewOrderReject](#neworderreject) |  |  |
-| cancel_reject | [CancelOrderReject](#cancelorderreject) |  |  |
-| modify_reject | [ModifyOrderReject](#modifyorderreject) |  |  |
+| new_ack | [NewOrderAck](#new-order-ack) |  |  |
+| cancel_ack | [CancelOrderAck](#cancel-order-ack) |  |  |
+| modify_ack | [ModifyOrderAck](#modify-order-ack) |  |  |
+| new_reject | [NewOrderReject](#new-order-reject) |  |  |
+| cancel_reject | [CancelOrderReject](#cancel-order-reject) |  |  |
+| modify_reject | [ModifyOrderReject](#modify-order-reject) |  |  |
 | fill | [Fill](#fill) |  |  |
 | heartbeat | [Heartbeat](#heartbeat) |  |  |
-| position | [AssetPosition](#assetposition) |  |  |
-| mass_cancel_ack | [MassCancelAck](#masscancelack) |  |  |
+| position | [AssetPosition](#asset-position) |  |  |
+| mass_cancel_ack | [MassCancelAck](#mass-cancel-ack) |  |  |
+| trading_status | [TradingStatus](#trading-status) |  |  |
 
 
 
@@ -373,8 +375,8 @@ any fills for this order.
 | price | [uint64](#uint64) | optional | If the order ultimately rests, the `price` field will include the resting price. |
 | quantity | [uint64](#uint64) |  | The quantity submitted in the new-order request. |
 | side | [Side](#side) |  |  |
-| time_in_force | [TimeInForce](#timeinforce) |  |  |
-| order_type | [OrderType](#ordertype) |  |  |
+| time_in_force | [TimeInForce](#time-in-force) |  |  |
+| order_type | [OrderType](#order-type) |  |  |
 | transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | cancel_on_disconnect | [bool](#bool) |  |  |
@@ -397,7 +399,7 @@ canceled as the result of a different user-initiated reason.
 | request_id | [uint64](#uint64) |  | If the Reason is `DISCONNECT`, `IOC`, `STP_RESTING`, or `STP_AGGRESSING`, this request ID will be `u64::MAX`. Otherwise, it will be the request ID of the initiated cancel action. For a mass cancel, each cancel order ack will have the MassCancel's request_id. |
 | transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
-| reason | [CancelOrderAck.Reason](#cancelorderack.reason) |  |  |
+| reason | [CancelOrderAck.Reason](#cancel-order-ack-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
 | exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](#exchange-order-id) |
 
@@ -445,7 +447,7 @@ CancelOrderAck's will be sent for each order that was affected.
 | subaccount_id | [uint64](#uint64) |  |  |
 | request_id | [uint64](#uint64) |  | The request ID specified in the mass-cancel request. |
 | transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
-| reason | [MassCancelAck.Reason](#masscancelack.reason) | optional |  |
+| reason | [MassCancelAck.Reason](#mass-cancel-ack-reason) | optional |  |
 | total_affected_orders | [uint32](#uint32) |  | The total number of orders that were canceled. |
 
 
@@ -465,13 +467,13 @@ New-order-reject indicates that a new-order request was not applied.
 | request_id | [uint64](#uint64) |  | The request ID specified in the new-order request. |
 | transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
-| reason | [NewOrderReject.Reason](#neworderreject.reason) |  |  |
+| reason | [NewOrderReject.Reason](#new-order-reject-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
 | price | [uint64](#uint64) | optional |  |
 | quantity | [uint64](#uint64) |  |  |
 | side | [Side](#side) |  |  |
-| time_in_force | [TimeInForce](#timeinforce) |  |  |
-| order_type | [OrderType](#ordertype) |  |  |
+| time_in_force | [TimeInForce](#time-in-force) |  |  |
+| order_type | [OrderType](#order-type) |  |  |
 
 
 
@@ -490,7 +492,7 @@ Cancel-order-reject indicates that a cancel-order request was not applied.
 | request_id | [uint64](#uint64) |  | The request ID specified in the cancel-order request. |
 | transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
-| reason | [CancelOrderReject.Reason](#cancelorderreject.reason) |  |  |
+| reason | [CancelOrderReject.Reason](#cancel-order-reject-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
 
 
@@ -510,7 +512,7 @@ Modify-order-reject indicates that a modify-order request was not applied.
 | request_id | [uint64](#uint64) |  | The request ID specified in the modify-order request. |
 | transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
-| reason | [ModifyOrderReject.Reason](#modifyorderreject.reason) |  |  |
+| reason | [ModifyOrderReject.Reason](#modify-order-reject-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
 
 
@@ -529,15 +531,16 @@ A fill for an order.
 | market_id | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
 | exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](#exchange-order-id) |
-| fill_price | [uint64](#uint64) |  | The price that this trade occured at. |
-| fill_quantity | [uint64](#uint64) |  | The quantity that was traded in this fill. |
-| leaves_quantity | [uint64](#uint64) |  | The remaining quantity for this order after the fill is applied. |
+| fill_price | [uint64](#uint64) |  | The price at which this trade occured. In the case of an implied fill, this price may be fractional, and will be truncated in that case. To determine the exact amount of the assets exchanged in the fill, use the fill_quantity and quote_quantity fields. |
+| fill_quantity | [uint64](#uint64) |  | The quantity of the base asset that was traded in this fill, expressed in lots of the base asset. |
+| leaves_quantity | [uint64](#uint64) |  | The remaining base quantity for this order after the fill is applied. |
+| fill_quote_quantity | [uint64](#uint64) |  | The quantity of the quote asset that was traded in this fill, expressed in lots of the quote asset. This will generally be the same as the base fill_quantity * fill_price, but may be different in the case of an implied fill. |
 | transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
-| cumulative_quantity | [uint64](#uint64) |  | The cumulative filled quantity for this order after the fill is applied. |
+| cumulative_quantity | [uint64](#uint64) |  | The cumulative filled base quantity for this order after the fill is applied. |
 | side | [Side](#side) |  |  |
 | aggressor_indicator | [bool](#bool) |  |  |
-| fee_ratio | [FixedPointDecimal](#fixedpointdecimal) |  | Indicates the fee charged on this trade. See [Fees](#fees) for details. |
+| fee_ratio | [FixedPointDecimal](#fixed-point-decimal) |  | Indicates the fee charged on this trade. See [Fees](#fees) for details. |
 | trade_id | [uint64](#uint64) |  | The unique trade ID associated with a match event. Each order participanting in the match event will receive this trade ID |
 
 
@@ -575,8 +578,8 @@ can also be tracked by applying other OrderResponse messages individually.
 | ----- | ---- | ----- | ----------- |
 | subaccount_id | [uint64](#uint64) |  |  |
 | asset_id | [uint64](#uint64) |  |  |
-| total | [RawUnits](#rawunits) |  |  |
-| available | [RawUnits](#rawunits) |  | The available amount after open orders are subtracted. |
+| total | [RawUnits](#raw-units) |  |  |
+| available | [RawUnits](#raw-units) |  | The available amount after open orders are subtracted. |
 
 
 
@@ -608,9 +611,9 @@ word3]`.
 
 ## Bootstrap
 A bootstrap message sent after Credentials authentication.
-Client resting and pending orders used to bootstrap state. Sent as the first
-message(s) after initialization. Bootstrap is complete after a message tagged
-`Done` is received and every message after that will be an `OrderResponse`.
+Client resting and pending orders used to bootstrap state.
+Sent as the first message(s) after initialization.
+A message containing the `Done` variant indicates that the Bootstrap is complete.
 Multiple messages may be received for `RestingOrders` and `AssetPositions`
 and these should be concatenated.
 
@@ -618,8 +621,9 @@ and these should be concatenated.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | done | [Done](#done) |  |  |
-| resting | [RestingOrders](#restingorders) |  |  |
-| position | [AssetPositions](#assetpositions) |  |  |
+| resting | [RestingOrders](#resting-orders) |  |  |
+| position | [AssetPositions](#asset-positions) |  |  |
+| trading_status | [TradingStatus](#trading-status) |  |  |
 
 
 
@@ -633,7 +637,7 @@ A chunk of resting orders. Sent on bootstrap.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| orders | [RestingOrder](#restingorder) | repeated |  |
+| orders | [RestingOrder](#resting-order) | repeated |  |
 
 
 
@@ -647,7 +651,7 @@ A chunk of asset positions. Sent on bootstrap.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| positions | [AssetPosition](#assetposition) | repeated |  |
+| positions | [AssetPosition](#asset-position) | repeated |  |
 
 
 
@@ -662,7 +666,22 @@ An indication that bootstrap is complete.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | latest_transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
-| read_only | [bool](#bool) |  |  |
+| read_only | [bool](#bool) |  | DEPRECATED: will be removed in a future version; read the "connection_status" field in the "Bootstrap.TradingStatus" message that arrives before the "Done" message |
+
+
+
+
+
+
+
+## TradingStatus
+Indicates the scope of the ability to trade via this connection.
+This message will be sent each time that scope changes.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| connection_status | [ConnectionStatus](#connection-status) |  | Indicates which operations are available through this connection as of this message. |
 
 
 
@@ -682,8 +701,8 @@ A resting order. Sent on bootstrap in `RestingOrders`.
 | price | [uint64](#uint64) |  |  |
 | order_quantity | [uint64](#uint64) |  | The quantity submitted in the latest quantity-modifying request. If the order has not been modified, then it is the quantity on the new-order-ack. If it has been modified, then it is the quantity of the latest modify-order-ack. |
 | side | [Side](#side) |  |  |
-| time_in_force | [TimeInForce](#timeinforce) |  |  |
-| order_type | [OrderType](#ordertype) |  |  |
+| time_in_force | [TimeInForce](#time-in-force) |  |  |
+| order_type | [OrderType](#order-type) |  |  |
 | remaining_quantity | [uint64](#uint64) |  | The current remaining quantity on the book. |
 | rest_time | [uint64](#uint64) |  | [Transact time](#transact-time) of the NewOrderAck |
 | subaccount_id | [uint64](#uint64) |  |  |
@@ -699,7 +718,8 @@ A resting order. Sent on bootstrap in `RestingOrders`.
 ## Enums
 
 
-### Side
+
+## Side
 Side specifies whether the order is buying or selling the base asset. A trade
 is matched when a buyer (BID) and a seller (ASK) agree on a price (cross).
 The bid-ask spread is the gap between the highest bid price and lowest ask
@@ -713,7 +733,7 @@ price on the orderbook.
 
 
 
-### TimeInForce
+## TimeInForce
 Time-in-force (TIF) specifies how long the order remains in effect.
 
 | Name | Number | Description |
@@ -725,7 +745,7 @@ Time-in-force (TIF) specifies how long the order remains in effect.
 
 
 
-### OrderType
+## OrderType
 Order-type specifies how the order will be placed into the order book.
 
 - Note that for LIMIT orders, there is a pre-flight check that there is
@@ -746,7 +766,7 @@ Order-type specifies how the order will be placed into the order book.
 
 
 
-### SelfTradePrevention
+## SelfTradePrevention
 Self-trade-prevention (STP) allows market participants to prevent the matching
 of orders for accounts with common ownership. Currently, STP only applies for
 orders with the same subaccount_id. STP will only be applied when a match is
@@ -763,7 +783,7 @@ will happen.
 
 
 
-### PostOnly
+## PostOnly
 Post-only specifies whether a new order is allowed to immediately execute.
 Post-only cannot be enabled with market orders or with a TIF that does not
 allow resting orders.
@@ -776,7 +796,19 @@ allow resting orders.
 
 
 
-### CancelOrderAck.Reason
+## ConnectionStatus
+Indicates which operations are allowed on this connection.
+The ConnectionStatus may change during a single connection's lifetime.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| READ_ONLY | 0 | This connection may query balances and see resting orders but may not create, modify, or cancel orders e.g. |
+| READ_WRITE | 1 | There are no restrictions imposed by this connection (though restrictions may apply from elsewhere in the system). |
+
+
+
+
+## CancelOrderAck.Reason
 
 
 | Name | Number | Description |
@@ -793,7 +825,7 @@ allow resting orders.
 
 
 
-### MassCancelAck.Reason
+## MassCancelAck.Reason
 
 
 | Name | Number | Description |
@@ -805,7 +837,7 @@ allow resting orders.
 
 
 
-### NewOrderReject.Reason
+## NewOrderReject.Reason
 Reasons that are prefixed with `INVALID_` normally indicate that the
 corresponding field did not take a valid value.
 
@@ -837,7 +869,7 @@ corresponding field did not take a valid value.
 
 
 
-### CancelOrderReject.Reason
+## CancelOrderReject.Reason
 
 
 | Name | Number | Description |
@@ -849,7 +881,7 @@ corresponding field did not take a valid value.
 
 
 
-### ModifyOrderReject.Reason
+## ModifyOrderReject.Reason
 Reasons that are prefixed with `INVALID_` normally indicate that the
 corresponding field did not take a valid value.
 
