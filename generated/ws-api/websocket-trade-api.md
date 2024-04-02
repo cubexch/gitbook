@@ -153,13 +153,17 @@ let mut mac = Hmac::<sha2::Sha256>::new_from_slice(
 ).expect("new HMAC error");
 mac.update(b"cube.xyz");
 mac.update(&timestamp.to_le_bytes());
+
 let signature_bytes = <[u8; 32]>::from(mac.finalize().into_bytes());
 let signature = base64::general_purpose::STANDARD.encode(signature_bytes);
+
+println!("{}", signature);
 ```
 
 #### Typescript
-```
+```typescript
 import { createHmac } from 'crypto';
+
 const secretKey = "cafecafecafecafecafecafecafecafecafecafecafecafecafecafecafecafe";
 const timestampSecs = Math.floor(Date.now() / 1000);
 const timestampBytes = Buffer.alloc(8);
@@ -169,7 +173,29 @@ const signature = createHmac('sha256', Buffer.from(secretKey, 'hex'))
   .update(`cube.xyz`)
   .update(timestampBytes)
   .digest('base64');
+
+console.log(signature)
 ```
+
+#### Python
+```python
+import base64
+import hmac
+
+# Calculates "signature" field for "Credentials" message
+def calculate_signature(secret_key: bytes, timestamp_seconds: int) -> str:
+    h = hmac.new(secret_key, digestmod=hashlib.sha256)
+    h.update("cube.xyz".encode('utf-8'))
+    h.update(timestamp_seconds.to_bytes(8, byteorder="little", signed=False))
+    signature_bytes = h.digest()
+    return base64.standard_b64encode(signature_bytes).decode('utf-8')
+
+secret_key = bytes.fromhex("cafecafecafecafecafecafecafecafecafecafecafecafecafecafecafecafe")
+timestamp = int(time.time())
+signature = calculate_signature(secret_key, timestamp)
+
+print(signature)
+````
 
 
 | Field | Type | Label | Description |
@@ -531,7 +557,7 @@ A fill for an order.
 | market_id | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
 | exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](#exchange-order-id) |
-| fill_price | [uint64](#uint64) |  | The price at which this trade occured. In the case of an implied fill, this price may be fractional, and will be truncated in that case. To determine the exact amount of the assets exchanged in the fill, use the fill_quantity and quote_quantity fields. |
+| fill_price | [uint64](#uint64) |  | The price at which this trade occured. In the case of an implied fill, this price may be fractional, and will be truncated in that case. To determine the exact amount of the assets exchanged in the fill, use the fill_quantity and fill_quote_quantity fields. |
 | fill_quantity | [uint64](#uint64) |  | The quantity of the base asset that was traded in this fill, expressed in lots of the base asset. |
 | leaves_quantity | [uint64](#uint64) |  | The remaining base quantity for this order after the fill is applied. |
 | fill_quote_quantity | [uint64](#uint64) |  | The quantity of the quote asset that was traded in this fill, expressed in lots of the quote asset. This will generally be the same as the base fill_quantity * fill_price, but may be different in the case of an implied fill. |
@@ -926,4 +952,3 @@ corresponding field did not take a valid value.
 | bool |  | bool | bool | boolean | bool |
 | string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | String | string | str/unicode | string |
 | bytes | May contain any arbitrary sequence of bytes. | Vec<u8> | string | str | []byte |
-
