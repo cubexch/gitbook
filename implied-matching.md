@@ -28,60 +28,20 @@ The same logic applies if the order is an Ask, with the markets reversed:
 
 ## Match Characteristics
 When a match takes place in a market with implied pricing enabled:
-- During the matching process, if a price level is exhausted, both direct and implied books will be considered before matching further quantity
-- All legs of all trades in the match, direct and implied, are executed atomically in all relevant markets from the user's perspective
-- The average price of all fills in a single atomic operation will be no worse than the limit price.
+- If a price level is exhausted during the match, both direct and implied books will be considered for matching further quantity
+- All legs of all trades in the match, direct and implied, are executed atomically in all relevant markets
 
-## Float and Floated Assets
+# Implied Price
 
-### Fill Float
+The implied price for a single fill is the ratio of the prices of the source markets.
 
-Because trades in the spot markets are currency swaps and prices can vary with high granularity,
-it's common that the amount of the implied-through asset that can be acquired in the first step (in this case, the USDC)
-is not evenly divisible into lots in the target market.  We call this discrepancy the fill's "float".
+If the aggressing order trades against multiple levels, the price will be the average of the implied prices at each executed level,  weighted by the quantity executed at each level.
 
-In the ETH/BTC example, there will either be:
-- some amount of USDC acquired in the first source market left over after buying the desired asset in in the second source market (positive float)
-- some amount of USDC that, if paid into the transaction, would cover the remaining cost of buying a complete lot in the second source market (negative float)
+Since that value may be between price levels and the API requires an integer for price, the price reported on the API will be rounded to the next price level away from the market (i.e. up for bids, down for asks).
 
-### Floated Asset Fee
+## Example Calculation
 
-When a subaccount first places a trade that gets filled through an implied asset, Cube collects a fee, paid in that implied asset,
-with a value equivalent to the largest size of a single lot of any asset in any market in which that asset is traded.
-If a new market is added with a larger single-lot size, the fee will be increased to match.
-
-When that subaccount's orders are being indirectly matched against markets implied through that asset,
-Cube will credit or debit your account some amount of the implied-through asset,
-where the cumulative sum of such credits and debits never exceeds the value of the Floated Asset Fee.
-
-### Floated Asset Balance
-
-The amount of the fee debited from a given subaccount at any given time is referred to as that subaccount's "Floated Asset Balance".
-
-Cube tracks the floated balance continuously between trades.  The matching engine automatically handles whether or not the float for any given fill is positive or negative based on the Floated Asset Balance at the time of the fill:
-1. If the subaccount has a sufficient Floated Asset Balance in the implied-through asset to round up to the next full lot in the second market:
-    - That amount will be debited from the Floated Asset Balance
-    - The amount will be put towards covering the purchase of the asset received in the implied match.
-2. If the subaccount's Floated Asset Balance is insufficient to do so:
-    - The matching engine will cause the aggressing order to purchase more of the implied-through asset than required to cover the receipt of the asset in the trade, generating a surplus, positive float.
-    - The surplus float will to credited to the Floated Asset Balance
-    - The now-higher Floated Asset Balance will be more likely to assist acquisition in subsequent implied matches (case 1 above)
-
-See the [example](./implied-matching.md#Example) below for details on how this such orders are matched.
-
-The Floated Asset Balance for a given subaccount will never be negative, nor will it ever exceed the amount of the Floated Asset Fee.
-
-## Theoretical Price
-
-The theoretical price for a single fill is the ratio of the prices of the source markets.
-
-If a fill would match all assets in the trade to a lot size boundary in every source market:
-- that fill would have a float of zero (0)
-- the ratio of the quote/base amounts transacted would equal the theoretical price.
-
-All direct market fills have this property, but most implied fills do not. **When a fill's float is nonzero, the theoretical price will not equal the ratio of the quote to the base** as the price is inclusive of the implied-through float.
-
-Since lot sizes can differ between markets, we need to adjust for them.  Here is one way to calculate the theoretical price:
+Since lot sizes can differ between markets, we need to adjust for them.  Here is one way to calculate the implied price:
 ```
 lot size ratio = base lot size / quote lot size
 
@@ -90,7 +50,7 @@ lot size factor =
     * ratio(quote source market)
     / ratio (base source market)
 
-implied market theoretical price =
+implied price =
     base source market price
     / quote source market price
     * lot size factor
@@ -98,39 +58,111 @@ implied market theoretical price =
 
 More concretely, using the formulae above:
 ```
-ETH/BTC theoretical price = (ETH/USDC price / BTC/USDC price) * lot size factor
+ETH/BTC implied price = (ETH/USDC price / BTC/USDC price) * lot size factor
 
-If buying ETH/BTC: theoretical price =
+If buying ETH/BTC: implied price =
     (ETH/USDC ask price / BTC/USDC bid price)
     * (ETH/BTC base lot size / ETH/BTC quote lot size)
     * (BTC/USDC base lot size / BTC/USDC quote lot size)
     / (ETH/USDC base lot size / ETH/USDC quote lot size)
 
-If selling ETH/BTC: theoretical price =
-    (ETH/USDC bid price / BTC/USDC ask price)  # only difference vs. the buy case
+If selling ETH/BTC: implied price =
+    (ETH/USDC bid price / BTC/USDC ask price)  # flipped bid/ask vs. the buy case; below lines are the same
     * (ETH/BTC base lot size / ETH/BTC quote lot size)
     * (BTC/USDC base lot size / BTC/USDC quote lot size)
     / (ETH/USDC base lot size / ETH/USDC quote lot size)
 ```
 
-## Executed Price
+# Fees and Rebates
 
-* The price that appears in the fill message will be the average of the theoretical prices at each executed level, each weighted by the quantity executed at that level.
-  * Since that value may be between price levels and the API requires an integer for price, it will be rounded to the nearest whole number.  This may change in the future.
-* This price reflects the true price paid, inclusive of the floated asset, and so **may not reflect the ratio between base and quote transacted in the trade**.
-* When calculating `RawUnit` amounts for transacted assets, e.g. for reconciliation,
-  **use the `fill_quantity * base lot size` for the base asset
-  and the `fill_quote_quantity * quote lot size` for the quote asset**.
+Two fees may be present on an implied fill:
+- An [Implied Match Fee or Rebate](./implied-matching.md#ImpliedMatchFeeOrRebate)
+- The usual [Trading Fee](./implied-matching.md#TradingFee)
 
-Note that the subaccount's Floated Asset Balance at the time of the match does **not** affect the reported price; see [example](./implied-matching.md#Example) below.
+## Implied Match Fee or Rebate
 
-## Effect on Fees
-The legs of the implied trade are treated the same as a single-market trade from the perspective of each subaccount participating in the trade.
-As such, for the purposes of fee calculation:
-- the aggressing order will be charged the taker fee
-- all resting orders involved in the match, on the books of any of the markets involved, will be charged the maker fee
+### Lot Size Mismatch
+Because trades in the spot markets are currency swaps and prices can vary with high granularity,
+it's common that the amount of the implied-through asset that can be acquired in the first step (in this case, the USDC)
+is not evenly divisible into lots in the target market.
 
-## Example
+### Decision to Fee or Rebate
+
+In the event of a lot size mismatch, the Cube matching engine will either:
+- round up to the next lot of the divested asset and take a fee equal to the difference
+- round down to the previous lot of the divested asset and provide the shortfall in the form of a rebate
+
+Cube tracks the value of implied match fees paid by each individual subaccount across all markets in real-time,
+a value referred to as the **Floated Balance**.
+
+The decision to choose fee or rebate for any given trade is based on the Floated Balance at the time of the match.
+For example:
+```text
+Aggressing Bid for 1 base lot, Implied Price is 6.7:
+
+If Floated Balance value < 0.7 quote lots,
+  Aggressor sells 7 quote lots; Cube takes implied fee equal to 0.3 quote lots
+If Floated Balance value >= 0.7 quote lots,
+  Aggressor sells 6 quote lots; Cube provides implied rebate equal to 0.7 quote lots
+
+The aggressor receives the same 1 base lot in either case.
+```
+
+The value of the fee or rebate for any given trade will always be less than a single lot of either the base or quote asset.
+The [implied match example](./implied-matching.md#Example) contains a more precise illustration of this behavior.
+
+Since any previously paid fees are rebated whenever possible on future implied trades,
+the assets settled are always within one lot of the implied price
+regardless of how many trades are filled via implied markets.
+
+### Asset for Fee or Rebate
+Like trading fees, the Implied Match Fee or Rebate is denominated in the asset received in the trade:
+- Bid => fee paid/rebate received in base asset
+- Ask => fee paid/rebate received in quote asset
+
+## Trading Fee
+Implied fills incur trading fees in [the same way as direct fills](./trading_fees.md).
+This fee is charged on top of the implied match fee or rebate.
+All legs of the implied trade are treated the same way as a direct fill would be in their respective books.
+
+For the purposes of calculating the trading fees:
+- the aggressing order will be charged the taker fee rate
+- all resting orders involved in the match, on the books of any of the markets involved, will be charged the maker fee rate
+
+# Reconciling Fills (API)
+
+## Calculating Transacted Amount
+
+Due to current API limitations, the price and quantities are reported as whole integers.
+To avoid breaking this relationship:
+
+- The `quantity` fields in the `Fill` message reflect the amounts that will be settled:
+  - **Inclusive** of any implied asset fees
+  - **Exclusive** of any trading fees
+
+...such that calculating the `RawUnit` amount filled remains the same as for a direct market, namely:
+
+```text
+Divested Asset:
+  -(quantity * lot size)
+Received Asset:
+  (quantity * lot size) - trade fee amount
+```
+
+## Relationship to `fill_price`
+
+Note that for trades resulting in an [Implied Match Fee or Rebate](./implied-matching.md#ImpliedMatchFeeOrRebate),
+**the price reported in the fill message will not equal the ratio of the quote quantity to the base quantity**,
+for two reasons:
+- The `fill_price` reported is net of the implied asset fees/rebates
+- If the implied price is fractional, it will be rounded to the next worst level due to API limitations
+
+> Do not reply on the `fill_price` field when calculating `RawUnit` amounts for transacted assets.
+>
+> Use the `fill_quantity * base lot size` for the base asset
+> and the `fill_quote_quantity * quote lot size` for the quote asset.
+
+# Detailed Example
 Consider a hypothetical aggressing order to buy 5 ETH on the ETH/BTC market, assuming:
 - "Price of Best Order" is the price of the side that would be hit during the implied match
 - There's more than enough quantity at that price level in both source markets to fill the aggressing order via implied match
@@ -152,16 +184,19 @@ Consider a hypothetical aggressing order to buy 5 ETH on the ETH/BTC market, ass
 
 *integer value as entered on API; defined as `number of quote lots per base lot`
 
-### Human-Readable Price
+### Value of Traded Assets
+
+In human-readable terms, this trade will exchange:
+
 ```
 5 ETH for 0.2529 BTC
-via 17,500.68 USDC (of which 0.68 USDC will be added to the floated asset balance)
+via 17,500.68 USDC (of which 0.68 USDC will be taken as an Implied Match Fee)
 ```
 
 ### Aggressing Order Calculation (API)
 
-#### Theoretical Price
-Via the "Theoretical Price" section, the theoretical price in the implied market is:
+#### Implied Price
+The implied price in the implied market is:
 ```text
 (ETH/USDC price / BTC/USDC price) * lot size factor
 = 350,000 / 692,000 * 1e5
@@ -180,15 +215,11 @@ Via the "Theoretical Price" section, the theoretical price in the implied market
 
 3. How much BTC will we have to sell in the BTC/USDC market to acquire the 1.75e10 rawUSDC needed to cover that purchase?
     - Hit bid at price 692,000: for every 1000 satoshis, we will receive 692,000 * 1e0 = 692,000 rawUSDC (because quote lot size is 1)
-    - 17,500,000,000 rawUSDC / price of 692,000 = 25289.0173 base lots in the BTC/USDC market
+    - 17,500,000,000 rawUSDC / price of 692,000 = 25,289.0173 base lots in the BTC/USDC market
 
 4. This presents an issue as we can only transact in whole lots, which in this case means whole multiples of 1000 satoshis.  To compensate:
-    - Round up and oversell 25,290 lots of BTC into the BTC/USDC market
-    - 25,290 * 1e3 = 25,290,000 satoshis
-    - This nets us 25290 * 692,000 / 1e0 = 17,500,680,000 rawUSDC
-    - Subtracting the 17,500,000,000 used to aquire our ETH, we have 680,000 rawUSDC extra
-
-5. The 680,000 extra rawUSDC is then added to the aggressor's float account.
+    - We round up and oversell 25,290 lots of BTC into the BTC/USDC market
+    - The fractional 0.9827 lots of BTC will be taken as the Implied Match Fee
 
 #### Filled Legs
 
@@ -198,7 +229,7 @@ Pricing in lots, based on the amount transacted and lot size in each market:
 - ETH/BTC:
   - base lots = 5e18 wei / 1e16 = 500
   - quote lots = 25,290,000 satoshis / 1e0 = 25,290,000 (from step 4)
-  - price = 50,578 (theoretical price rounded to nearest integer)
+  - price = 50,579 (implied price rounded up, since this is a Bid)
 - ETH/USDC:
   - base lots = 5e18 wei / 1e15 = 5000
   - quote lots = 17,500,000,000 rawUSDC / 1e1 = 1,750,000
@@ -208,43 +239,35 @@ Pricing in lots, based on the amount transacted and lot size in each market:
   - quote lots = 17,500,680,000 rawUSDC / 1e0 = 17,500,680,000
   - price = 692,000 (price level of the resting order)
 
-**Note that in the aggressed market, ETH/BTC, the price is not the ratio of the base/quote (50,580)
-because it accounts for the floated amount, which itself is compensating for the fact that
+**Note that in the aggressed market, ETH/BTC, the implied price is not the ratio of the base/quote (50,580)
+because it's inclusive of the Implied Match Fee.  This compensates for the fact that
 the exact price transacted in the implied market in inexpressible in the two source markets.**
 
 ### Subsequent Aggressing Order (API)
 
-#### Theoretical Price
+#### Implied Price
 
 The market conditions are same as the first trade, so the calculation is the same as the first trade (50,578.035).
 
 #### Matching Process
 
-The matching calculation diverges in step 3 due to the 680,000 rawUSDC available in the [Floated Asset Balance](./implied-matching.md#floated-asset-balance) from the previous trade:
+This match diverges in step 4 due to the Floated Balance generated by the fee collected in the previous trade:
 
-3. How much BTC will we have to sell in the BTC/USDC market to acquire the 1.75e10 rawUSDC needed to cover that purchase?
-    - Hit bid at price 692,000: for every 1000 satoshis, we will receive 692,000 * 1e0 = 692,000 rawUSDC (because quote lot size is 1)
-    - The Floated Asset Balance of 680,000 rawUSDC will be applied towards the purchase
-    - We only need to acquire 17,500,000,000 - 680,000 = 17,499,320,000 rawUSDC
-    - 17,499,320,000 rawUSDC / price of 692,000 = 25288.0347 base lots in the BTC/USDC market
-
-4. We can only transact in whole lots, so:
-    - We round up and sell 25289 lots of BTC into the BTC/USDC market
-        - Note that this is different from the first trade, where this would have been 25290
-    - This nets us 25289 * 692,000 / 1e0 = 17,499,988,000 rawUSDC
-    - Adding the amount of the Floated Asset Balance and subtracting the amount used to acquire our ETH, we have:
-        - 17,499,988,000 + 680,000 - 17,500,000,000 = 668,000 rawUSDC left over
-
-5. The 668,000 rawUSDC left over is the new Floated Asset Balance of the aggressing subaccount.
+4.
+    - Same as the previous trade, we need to acquire 25,289.0173 base lots in the BTC/USDC market
+    - This time, we have a Float Balance with a value equal to 0.9827 lots of BTC
+    - 0.9827 > 0.0173, so Cube rebates us the 0.0173 lots
+    - We need to sell only 25,289 lots of BTC into the BTC/USDC market (not 25,290 as before)
+    - The aggressing subaccount has a new Floated Balance equivalent to 0.9827 - 0.0173 = 0.9654 lots of BTC.
 
 #### Filled Legs
 
-**Emphasized** fields differ from the previous fill:
+**Emphasized** fields show how this fill differs from the first fill:
 
 - ETH/BTC:
   - base lots = 5e18 wei / 1e16 = 500
   - **quote lots = 25,289,000 satoshis / 1e0 = 25,289,000** (from step 4)
-  - price = 50,578 (theoretical price rounded to nearest integer)
+  - price = 50,579 (implied price rounded up, since this is a Bid)
 - ETH/USDC:
   - base lots = 5e18 wei / 1e15 = 5000
   - quote lots = 17,500,000,000 rawUSDC / 1e1 = 1,750,000
@@ -258,8 +281,8 @@ The matching calculation diverges in step 3 due to the 680,000 rawUSDC available
 - **The price given for the ETH/BTC trade is the same as the first trade**,
 since the characteristics of the trade are identical.
 - The base and quote lots transacted are different,
-since the application of the Floated Asset Balance allows the aggressor to receive the same amount of ETH in the ETH/USDC market
+since the rebate allows the aggressor to receive the same amount of ETH in the ETH/USDC market
 while spending one fewer lot of BTC in the BTC/USDC market.
-- The quote/base ratio is exactly 50,578,
-which happens to look the same as the rounded theoretical price (50,578.03 => 50,578),
+- The quote/base ratio in this example is exactly 50,578,
+which happens to look the same as the rounded implied price (50,578.03 => 50,578),
 but this is a coincidence.
