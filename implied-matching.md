@@ -56,7 +56,7 @@ implied price =
     * lot size factor
 ```
 
-More concretely, using the formulae above:
+More concretely, using the markets above:
 ```
 ETH/BTC implied price = (ETH/USDC price / BTC/USDC price) * lot size factor
 
@@ -157,7 +157,8 @@ for two reasons:
 - The `fill_price` reported is net of the implied asset fees/rebates
 - If the implied price is fractional, it will be rounded to the next worst level due to API limitations
 
-> Do not reply on the `fill_price` field when calculating `RawUnit` amounts for transacted assets.
+> ### Important
+> Do not rely on the `fill_price` field when calculating `RawUnit` amounts for transacted assets.
 >
 > Use the `fill_quantity * base lot size` for the base asset
 > and the `fill_quote_quantity * quote lot size` for the quote asset.
@@ -174,7 +175,7 @@ Consider a hypothetical aggressing order to buy 5 ETH on the ETH/BTC market, ass
 | ETH   | 18       | wei                |
 | USDC  | 6        | rawUSDC            |
 
-*referenced in description below
+*as referenced in description below
 
 | Market    | Role     | Base Lot Size | Quote Lot Size | Price of Best Order On Book*            |
 |-----------|----------|---------------|----------------|-----------------------------------------|
