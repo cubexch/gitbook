@@ -62,44 +62,6 @@ When calculating `RawUnit` amounts for transacted assets, e.g. for reconciliatio
 **use the `fill_quantity * base lot size` for the base asset
 and the `fill_quote_quantity * quote lot size` for the quote asset**.
 
-### Trading Fees
-
-Trading Fees are calculated on each individual trade as a ratio of the filled quantity,
-and are always charged as a deduction from the asset received in that trade.
-
-Fee ratios may vary from trade to trade based on the user's VIP level.
-For fee discounts based on Trading Volume, ratios are adjusted continuously
-at the time of each trade based on the user's trailing 30-day volume.
-
-To ensure that the client has enough information to determine the exact fee charged,
-the fee ratio is expressed as a fixed-point decimal number consisting of a mantissa and an exponent.
-Generally, the exponent will be "-4", indicating that the mantissa is equivalent to pips,
-Though some fees may be expressed with greater granularity.
-
-For example, consider the case of a trade where:
-- Asset received is BTC
-- `quantity` = 5
-- `fee_ratio.mantissa` = 11
-- `fee_ratio.exponent` = -4
-
-...in which case:
-- The fee ratio would be 0.0011, or 11 pips.
-- The fee would be equal to 0.0055 BTC.
-- The total amount credited at settlement would be 4.9945 BTC.
-
-If you need exact granularity at time of trade, you can replicate the fee calculation performed by the exchange.
-To avoid rounding errors, this entire process is performed in integer math using the exponent as a devisor.
-In the example above, the full fee amount in indivisible [RawUnits](#rawunits) would be calculated as:
-```text
-5 * 100_000_000 * 11 / 10_000 = 550_000 RawUnits
-
-(in the BTC case, that would be 550,000 Satoshi)
-```
-
-Since the fee is expressed with a decimal exponent, it's highly likely that this calculation results in a whole number.
-In the unlikely case that the final division results in a non-whole number, the result should be truncated,
-hence the division at the end: i.e. the fee is rounded down to the nearest `RawUnit`.
-
 ### Exchange Order ID
 
 Each order is assigned a unique ID by the exchange. This order ID is
@@ -113,6 +75,22 @@ queue priority, etc.
 The transact time is the matching engine timestamp for when an event is
 processed. Events that occur with the same transact time occur atomically
 from the perspective of the matching engine.
+
+
+
+## Adjustment
+Identifies a single fee or rebate.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| attribution | [AdjustmentAttribution](#adjustment-attribution) |  | THe source of the fee or rebate. |
+| asset_id | [uint64](#uint64) |  | The ID of the denominating asset. |
+| amount | [RawUnits](#raw-units) |  | Amount expressed in raw, indivisible units of the asset. When the amount is positive, Cube takes the magnitude as a fee. When the amount is negative, Cube credits the magnitude as a rebate. |
+
+
+
+
 
 
 
@@ -142,10 +120,10 @@ If the credentials provided are incorrect, the server will drop the connection w
 
 In the following examples, replace "cafecafecafe..." with your secret key.
 When calculated for:
-  secret key: "cafecafecafecafecafecafecafecafecafecafecafecafecafecafecafecafe"
-  timestamp: 1706546268
+- secret key: "cafecafecafecafecafecafecafecafecafecafecafecafecafecafecafecafe"
+- timestamp: 1706546268
 ...the resulting signature should be:
-  "tmtSP4NIzTLXyVUHIOfinotGnPWyfM8JefxivBdSjc8="
+- "tmtSP4NIzTLXyVUHIOfinotGnPWyfM8JefxivBdSjc8="
 
 #### Rust
 
@@ -164,13 +142,17 @@ let mut mac = Hmac::<sha2::Sha256>::new_from_slice(
 ).expect("new HMAC error");
 mac.update(b"cube.xyz");
 mac.update(&timestamp.to_le_bytes());
+
 let signature_bytes = <[u8; 32]>::from(mac.finalize().into_bytes());
 let signature = base64::general_purpose::STANDARD.encode(signature_bytes);
+
+println!("{}", signature);
 ```
 
 #### Typescript
-```
+```typescript
 import { createHmac } from 'crypto';
+
 const secretKey = "cafecafecafecafecafecafecafecafecafecafecafecafecafecafecafecafe";
 const timestampSecs = Math.floor(Date.now() / 1000);
 const timestampBytes = Buffer.alloc(8);
@@ -180,7 +162,29 @@ const signature = createHmac('sha256', Buffer.from(secretKey, 'hex'))
   .update(`cube.xyz`)
   .update(timestampBytes)
   .digest('base64');
+
+console.log(signature)
 ```
+
+#### Python
+```python
+import base64
+import hmac
+
+# Calculates "signature" field for "Credentials" message
+def calculate_signature(secret_key: bytes, timestamp_seconds: int) -> str:
+    h = hmac.new(secret_key, digestmod=hashlib.sha256)
+    h.update("cube.xyz".encode('utf-8'))
+    h.update(timestamp_seconds.to_bytes(8, byteorder="little", signed=False))
+    signature_bytes = h.digest()
+    return base64.standard_b64encode(signature_bytes).decode('utf-8')
+
+secret_key = bytes.fromhex("cafecafecafecafecafecafecafecafecafecafecafecafecafecafecafecafe")
+timestamp = int(time.time())
+signature = calculate_signature(secret_key, timestamp)
+
+print(signature)
+````
 
 
 | Field | Type | Label | Description |
@@ -551,8 +555,9 @@ A fill for an order.
 | cumulative_quantity | [uint64](#uint64) |  | The cumulative filled base quantity for this order after the fill is applied. |
 | side | [Side](#side) |  |  |
 | aggressor_indicator | [bool](#bool) |  |  |
-| fee_ratio | [FixedPointDecimal](#fixed-point-decimal) |  | Indicates the fee charged on this trade. See [Fees](#fees) for details. |
+| fee_ratio | [FixedPointDecimal](#fixed-point-decimal) |  | Indicates the ratio of the trading fee for this trade. This field is DEPRECATED and may be removed in a future version; please use the `adjustments` field instead. |
 | trade_id | [uint64](#uint64) |  | The unique trade ID associated with a match event. Each order participanting in the match event will receive this trade ID |
+| adjustments | [Adjustment](#adjustment) | repeated | Indicates any fees (positive values) and/or rebates (negative values) associated with this fill. See [Adjustments to Trades](../../trade-adjustments.md) for details. |
 
 
 
@@ -815,6 +820,19 @@ The ConnectionStatus may change during a single connection's lifetime.
 | ---- | ------ | ----------- |
 | READ_ONLY | 0 | This connection may query balances and see resting orders but may not create, modify, or cancel orders e.g. |
 | READ_WRITE | 1 | There are no restrictions imposed by this connection (though restrictions may apply from elsewhere in the system). |
+
+
+
+
+## AdjustmentAttribution
+Indicates the source of a fee or rebate.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| UNSPECIFIED | 0 | Should not appear on the API; used to detect errors or missing fields. |
+| TRADING_MAKER | 1 | Charged to the aggressor in the trade. Denominated in the received asset. Should be subtracted from the transacted quantities during reconciliation. |
+| TRADING_TAKER | 2 | Charged to the resting order in the trade. Denominated in the received asset. Should be subtracted from the transacted quantities during reconciliation. |
+| IMPLIED_MATCH | 3 | Appears on some fills in implied markets. Denominated in the received asset. This amount is included in the transacted quantities and should NOT be subtracted during reconciliation. |
 
 
 

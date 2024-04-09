@@ -1,3 +1,7 @@
+This page describes the various fees and rebates that can be applied to fills on Cube:
+- Trading Fees
+- Implied Match Fee or Rebate
+
 # Trading Fees
 
 ## Summary
@@ -39,3 +43,7 @@ In the example above, the full fee amount in indivisible [RawUnits](#rawunits) w
 Since the fee is expressed with a decimal exponent, it's highly likely that this calculation results in a whole number.
 In the unlikely case that the final division results in a non-whole number, the result should be truncated,
 hence the division at the end: i.e. the fee is rounded down to the nearest `RawUnit`.
+
+# Implied Match Fee or Rebate
+
+See the [documentation on Implied Matching](./implied-matching.md#ImpliedMatchFeeOrRebate).
