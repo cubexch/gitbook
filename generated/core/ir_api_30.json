@@ -145,10 +145,10 @@
                           "items": {
                             "type": "object",
                             "required": [
+                              "addresses",
                               "hasOrderHistory",
                               "id",
-                              "name",
-                              "pubkeys"
+                              "name"
                             ],
                             "properties": {
                               "id": {
@@ -158,7 +158,8 @@
                               "name": {
                                 "type": "string"
                               },
-                              "pubkeys": {
+                              "addresses": {
+                                "description": "Deposit address by source id",
                                 "type": "array",
                                 "items": {
                                   "type": "array",
@@ -359,7 +360,321 @@
         ]
       }
     },
-    "/users/positions": {
+    "/users/subaccounts": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "ids"
+                      ],
+                      "properties": {
+                        "ids": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer",
+                            "format": "int64"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "accountType",
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "accountType": {
+                    "type": "string",
+                    "enum": [
+                      "spot",
+                      "margin"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/subaccount/{subaccount_id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "addresses",
+                        "hasOrderHistory",
+                        "id",
+                        "name"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "addresses": {
+                          "description": "Deposit address by source id",
+                          "type": "array",
+                          "items": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ],
+                            "maxItems": 2,
+                            "minItems": 2
+                          }
+                        },
+                        "hasOrderHistory": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      },
+      "patch": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/subaccount/{subaccount_id}/positions": {
       "get": {
         "responses": {
           "200": {
@@ -466,7 +781,7 @@
         ]
       }
     },
-    "/users/transfers": {
+    "/users/subaccount/{subaccount_id}/transfers": {
       "get": {
         "responses": {
           "200": {
@@ -694,7 +1009,7 @@
         ]
       }
     },
-    "/users/deposits": {
+    "/users/subaccount/{subaccount_id}/deposits": {
       "get": {
         "responses": {
           "200": {
@@ -826,7 +1141,7 @@
         ]
       }
     },
-    "/users/withdrawals": {
+    "/users/subaccount/{subaccount_id}/withdrawals": {
       "get": {
         "responses": {
           "200": {
@@ -962,19 +1277,9 @@
         ]
       }
     },
-    "/users/orders": {
+    "/users/subaccount/{subaccount_id}/orders": {
       "get": {
         "parameters": [
-          {
-            "in": "query",
-            "name": "subaccountId",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "style": "form"
-          },
           {
             "in": "query",
             "name": "createdBefore",
@@ -1054,11 +1359,13 @@
                                 ]
                               },
                               "price": {
+                                "description": "Most recent price, including modifies",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0
                               },
                               "qty": {
+                                "description": "Most recent quantity, including modifies",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0
@@ -1068,7 +1375,14 @@
                                 "type": "integer",
                                 "format": "int64"
                               },
+                              "modifiedAt": {
+                                "description": "The matching-engine transact-time in nanoseconds of the most recent modify event. Empty if the order was never modified.",
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                              },
                               "canceledAt": {
+                                "description": "The matching-engine transact-time in nanoseconds when this order was cancelled. Empty if the order was never cancelled, e.g. is open or filled.",
                                 "type": "integer",
                                 "format": "int64",
                                 "nullable": true
@@ -1099,7 +1413,7 @@
                                     "type": "string",
                                     "format": "number"
                                   },
-                                  "feeAsset": {
+                                  "feeAssetId": {
                                     "type": "integer",
                                     "format": "int32",
                                     "nullable": true
@@ -1157,7 +1471,7 @@
                                       "type": "string",
                                       "format": "number"
                                     },
-                                    "feeAsset": {
+                                    "feeAssetId": {
                                       "type": "integer",
                                       "format": "int32",
                                       "nullable": true
@@ -1170,6 +1484,7 @@
                                 }
                               },
                               "modifies": {
+                                "description": "Any previous states of price/quantity associated with this order due to modifies. If the order has been modified, the original price/quantity will appear in this list.",
                                 "type": "array",
                                 "items": {
                                   "type": "object",
@@ -1287,19 +1602,9 @@
         ]
       }
     },
-    "/users/fills": {
+    "/users/subaccount/{subaccount_id}/fills": {
       "get": {
         "parameters": [
-          {
-            "in": "query",
-            "name": "subaccountId",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "style": "form"
-          },
           {
             "in": "query",
             "name": "startTime",
@@ -1424,7 +1729,7 @@
                                 "type": "string",
                                 "format": "number"
                               },
-                              "feeAsset": {
+                              "feeAssetId": {
                                 "type": "integer",
                                 "format": "int32",
                                 "nullable": true
@@ -1474,34 +1779,8 @@
         ]
       }
     },
-    "/users/subaccounts": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "accountType",
-                  "name"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "accountType": {
-                    "type": "string",
-                    "enum": [
-                      "spot",
-                      "margin"
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
+    "/users/fee-estimate/{market-id}": {
+      "get": {
         "responses": {
           "200": {
             "description": "",
@@ -1516,12 +1795,27 @@
                     "result": {
                       "type": "object",
                       "required": [
-                        "id"
+                        "makerFeeRatio",
+                        "marketId",
+                        "takerFeeRatio",
+                        "userKey"
                       ],
                       "properties": {
-                        "id": {
+                        "marketId": {
                           "type": "integer",
-                          "format": "int64"
+                          "format": "int32"
+                        },
+                        "userKey": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "makerFeeRatio": {
+                          "type": "number",
+                          "format": "double"
+                        },
+                        "takerFeeRatio": {
+                          "type": "number",
+                          "format": "double"
                         }
                       }
                     }
@@ -1561,7 +1855,233 @@
         ]
       }
     },
-    "/users/subaccounts/{subaccount_id}": {
+    "/users/address": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sourceIds",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "names",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "addresses",
+                        "settings"
+                      ],
+                      "properties": {
+                        "addresses": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "activeSince",
+                              "address",
+                              "approvedAt",
+                              "createdAt",
+                              "id",
+                              "name",
+                              "sourceId",
+                              "status"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "sourceId": {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "assetId": {
+                                "type": "integer",
+                                "format": "int32",
+                                "nullable": true
+                              },
+                              "address": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "pending",
+                                  "approved",
+                                  "active"
+                                ]
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "approvedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "activeSince": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "settings": {
+                          "type": "object",
+                          "required": [
+                            "whitelistStatus",
+                            "whitelisted"
+                          ],
+                          "properties": {
+                            "whitelisted": {
+                              "type": "boolean"
+                            },
+                            "whitelistStatus": {
+                              "type": "string",
+                              "enum": [
+                                "pending",
+                                "approved",
+                                "enabled",
+                                "disabled"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/address/settings": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "whitelistStatus",
+                        "whitelisted"
+                      ],
+                      "properties": {
+                        "whitelisted": {
+                          "type": "boolean"
+                        },
+                        "whitelistStatus": {
+                          "type": "string",
+                          "enum": [
+                            "pending",
+                            "approved",
+                            "enabled",
+                            "disabled"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/withdraw": {
       "post": {
         "requestBody": {
           "content": {
@@ -1569,10 +2089,32 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "name"
+                  "amount",
+                  "assetId",
+                  "destination",
+                  "subaccountId"
                 ],
                 "properties": {
-                  "name": {
+                  "subaccountId": {
+                    "description": "The subaccount to withdraw from.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "assetId": {
+                    "description": "The asset to withdraw. The network is determined by the asset ID.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "amount": {
+                    "description": "The amount to withdraw. This is denominated in the smallest unit of the asset (e.g. satoshis for BTC, wei for ETH, lamports for SOL). The amount must be greater than the dust limit for the asset.",
+                    "type": "integer",
+                    "format": "uint128",
+                    "minimum": 0
+                  },
+                  "destination": {
+                    "description": "The destination address for the withdrawal.",
                     "type": "string"
                   }
                 }
@@ -1595,12 +2137,32 @@
                     "result": {
                       "type": "object",
                       "required": [
-                        "id"
+                        "status"
                       ],
                       "properties": {
-                        "id": {
-                          "type": "integer",
-                          "format": "int64"
+                        "status": {
+                          "description": "The status of the external KYT check",
+                          "type": "string",
+                          "enum": [
+                            "pending",
+                            "reject",
+                            "failed",
+                            "pendingReview",
+                            "automaticAccept",
+                            "automaticReject",
+                            "manualAccept",
+                            "manualReject"
+                          ]
+                        },
+                        "approved": {
+                          "description": "Whether the withdrawal was approved by the system",
+                          "type": "boolean",
+                          "nullable": true
+                        },
+                        "reason": {
+                          "description": "The reason for the withdrawal being rejected",
+                          "type": "string",
+                          "nullable": true
                         }
                       }
                     }
@@ -1658,6 +2220,7 @@
                       "type": "object",
                       "required": [
                         "assets",
+                        "feeTables",
                         "markets",
                         "sources"
                       ],
@@ -1670,7 +2233,6 @@
                               "assetId",
                               "assetType",
                               "decimals",
-                              "disabled",
                               "displayDecimals",
                               "metadata",
                               "settles",
@@ -1717,21 +2279,17 @@
                               },
                               "metadata": {
                                 "description": "Additional metadata about this asset."
-                              },
-                              "disabled": {
-                                "description": "Whether this asset is currently supported by Cube. For crypto assets, this means that the asset is supported by the MPC Vault and tracked in Cube infrastructure. For fiat assets, this means that the asset appears in the currencies list.",
-                                "type": "boolean"
                               }
                             },
                             "example": {
                               "assetId": 1,
                               "assetType": "Crypto",
                               "decimals": 8,
-                              "disabled": false,
                               "displayDecimals": 5,
                               "metadata": {},
                               "settles": true,
                               "sourceId": 1,
+                              "status": 1,
                               "symbol": "BTC"
                             }
                           }
@@ -1791,7 +2349,7 @@
                             "required": [
                               "baseAssetId",
                               "baseLotSize",
-                              "disabled",
+                              "feeTableId",
                               "marketId",
                               "priceDisplayDecimals",
                               "priceTickSize",
@@ -1842,6 +2400,32 @@
                                 "format": "uint64",
                                 "minimum": 0
                               },
+                              "priceBandBidPct": {
+                                "description": "The percentage that a new bid can be placed below the current reference price.",
+                                "type": "integer",
+                                "format": "uint32",
+                                "minimum": 0,
+                                "nullable": true
+                              },
+                              "priceBandAskPct": {
+                                "description": "The percentage that a new ask can be placed above the current reference price.",
+                                "type": "integer",
+                                "format": "uint32",
+                                "minimum": 0,
+                                "nullable": true
+                              },
+                              "minOrderQty": {
+                                "description": "The minimum order quantity lots for this market. Inclusive.",
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                              },
+                              "maxOrderQty": {
+                                "description": "The maximum order quantity lots for this market. Inclusive.",
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                              },
                               "priceTickSize": {
                                 "description": "The human-readable minimum price increment.",
                                 "type": "string"
@@ -1850,23 +2434,107 @@
                                 "description": "The human-readable minimum quantity increment.",
                                 "type": "string"
                               },
-                              "disabled": {
-                                "description": "Whether this market can currently be traded.",
-                                "type": "boolean"
+                              "feeTableId": {
+                                "description": "ID of the fee table that will be used for lookups on this market.",
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "baseMarketIds": {
+                                "description": "If this is an implied market, this is the list of implied-through base markets. Otherwise, this is `None`.",
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0
+                                },
+                                "nullable": true
                               }
                             },
                             "example": {
                               "baseAssetId": 2,
                               "baseLotSize": "1000000000000000",
-                              "disabled": false,
+                              "baseMarketIds": [
+                                100004,
+                                100005
+                              ],
+                              "feeTableId": 1,
+                              "isPrimary": true,
                               "marketId": 100001,
+                              "minOrderQty": 10,
+                              "priceBandAskPct": 500,
+                              "priceBandBidPct": 20,
                               "priceDisplayDecimals": 5,
                               "priceTickSize": "0.00001",
                               "protectionPriceLevels": 1000,
                               "quantityTickSize": "0.001",
                               "quoteAssetId": 1,
                               "quoteLotSize": "1",
+                              "status": 1,
                               "symbol": "ETHBTC"
+                            }
+                          }
+                        },
+                        "feeTables": {
+                          "type": "array",
+                          "items": {
+                            "description": "A fee table consisting of one or more fee tiers. Each tier is applied in priority order and the first tier whose requirements match the characteristics of a given fill determines the fees for that fill. Each market is associated with a specific fee table via its \"feeTableId\".",
+                            "type": "object",
+                            "required": [
+                              "feeTableId",
+                              "feeTiers"
+                            ],
+                            "properties": {
+                              "feeTableId": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
+                              "feeTiers": {
+                                "type": "array",
+                                "items": {
+                                  "description": "A single row in a FeeTable.",
+                                  "type": "object",
+                                  "required": [
+                                    "makerFeeRatio",
+                                    "priority",
+                                    "takerFeeRatio"
+                                  ],
+                                  "properties": {
+                                    "priority": {
+                                      "description": "The order in which this tier is considered when applying the fee table that contains it.",
+                                      "type": "integer",
+                                      "format": "uint64",
+                                      "minimum": 0
+                                    },
+                                    "makerFeeRatio": {
+                                      "description": "The multiplicative fee ratio for the resting order",
+                                      "type": "number",
+                                      "format": "double"
+                                    },
+                                    "takerFeeRatio": {
+                                      "description": "The multiplicative fee ratio for the aggressing order",
+                                      "type": "number",
+                                      "format": "double"
+                                    }
+                                  },
+                                  "example": {
+                                    "makerFeeRatio": 0.0004,
+                                    "priority": 1,
+                                    "takerFeeRatio": 0.0008
+                                  }
+                                }
+                              }
+                            },
+                            "example": {
+                              "feeTableId": 1,
+                              "feeTiers": [
+                                {
+                                  "makerFeeRatio": 0.0004,
+                                  "priority": 1,
+                                  "takerFeeRatio": 0.0008
+                                }
+                              ]
                             }
                           }
                         }

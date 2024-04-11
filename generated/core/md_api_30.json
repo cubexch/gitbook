@@ -60,9 +60,9 @@
                         {
                           "type": "object",
                           "required": [
-                            "lastTradePrice",
                             "lastTransactTime",
-                            "levels"
+                            "levels",
+                            "marketState"
                           ],
                           "properties": {
                             "levels": {
@@ -101,15 +101,42 @@
                             "lastTradePrice": {
                               "type": "integer",
                               "format": "uint64",
-                              "minimum": 0
+                              "minimum": 0,
+                              "nullable": true
+                            },
+                            "marketState": {
+                              "description": "The per-market matching engine state. Affects order-entry.",
+                              "oneOf": [
+                                {
+                                  "description": "Sentinel",
+                                  "type": "string",
+                                  "enum": [
+                                    "unspecified"
+                                  ]
+                                },
+                                {
+                                  "description": "The market is in its normal operating state. All order operations are supported.",
+                                  "type": "string",
+                                  "enum": [
+                                    "normalOperation"
+                                  ]
+                                },
+                                {
+                                  "description": "The market is in cancel-only mode. Existing orders are not automatically canceled, and may be filled when the market transitions back to normal-operation.",
+                                  "type": "string",
+                                  "enum": [
+                                    "cancelOnly"
+                                  ]
+                                }
+                              ]
                             }
                           }
                         },
                         {
                           "type": "object",
                           "required": [
-                            "lastTradePrice",
                             "lastTransactTime",
+                            "marketState",
                             "orders"
                           ],
                           "properties": {
@@ -163,7 +190,34 @@
                             "lastTradePrice": {
                               "type": "integer",
                               "format": "uint64",
-                              "minimum": 0
+                              "minimum": 0,
+                              "nullable": true
+                            },
+                            "marketState": {
+                              "description": "The per-market matching engine state. Affects order-entry.",
+                              "oneOf": [
+                                {
+                                  "description": "Sentinel",
+                                  "type": "string",
+                                  "enum": [
+                                    "unspecified"
+                                  ]
+                                },
+                                {
+                                  "description": "The market is in its normal operating state. All order operations are supported.",
+                                  "type": "string",
+                                  "enum": [
+                                    "normalOperation"
+                                  ]
+                                },
+                                {
+                                  "description": "The market is in cancel-only mode. Existing orders are not automatically canceled, and may be filled when the market transitions back to normal-operation.",
+                                  "type": "string",
+                                  "enum": [
+                                    "cancelOnly"
+                                  ]
+                                }
+                              ]
                             }
                           }
                         }
@@ -331,13 +385,8 @@
                             "description": "Top of book",
                             "type": "object",
                             "required": [
-                              "askPrice",
-                              "askQuantity",
-                              "bidPrice",
-                              "bidQuantity",
-                              "lastPrice",
                               "marketId",
-                              "rolling24hPrice",
+                              "marketState",
                               "transactTime"
                             ],
                             "properties": {
@@ -356,37 +405,71 @@
                                 "description": "The best bid price.",
                                 "type": "integer",
                                 "format": "uint64",
-                                "minimum": 0
+                                "minimum": 0,
+                                "nullable": true
                               },
                               "bidQuantity": {
                                 "description": "The total bid quantity at the best bid price.",
                                 "type": "integer",
                                 "format": "uint64",
-                                "minimum": 0
+                                "minimum": 0,
+                                "nullable": true
                               },
                               "askPrice": {
                                 "description": "The best ask price.",
                                 "type": "integer",
                                 "format": "uint64",
-                                "minimum": 0
+                                "minimum": 0,
+                                "nullable": true
                               },
                               "askQuantity": {
                                 "description": "The total ask quantity at the best ask price.",
                                 "type": "integer",
                                 "format": "uint64",
-                                "minimum": 0
+                                "minimum": 0,
+                                "nullable": true
                               },
                               "lastPrice": {
                                 "description": "The last trade price.",
                                 "type": "integer",
                                 "format": "uint64",
-                                "minimum": 0
+                                "minimum": 0,
+                                "nullable": true
                               },
                               "rolling24hPrice": {
                                 "description": "The 24h open price.",
                                 "type": "integer",
                                 "format": "uint64",
-                                "minimum": 0
+                                "minimum": 0,
+                                "nullable": true
+                              },
+                              "impliedBidPrice": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0,
+                                "nullable": true
+                              },
+                              "impliedBidQuantity": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0,
+                                "nullable": true
+                              },
+                              "impliedAskPrice": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0,
+                                "nullable": true
+                              },
+                              "impliedAskQuantity": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0,
+                                "nullable": true
+                              },
+                              "marketState": {
+                                "type": "integer",
+                                "format": "int32"
                               }
                             }
                           }
@@ -399,37 +482,43 @@
                             "required": [
                               "baseVolumeHi",
                               "baseVolumeLo",
-                              "close",
-                              "high",
-                              "low",
-                              "open",
+                              "marketId",
                               "quoteVolumeHi",
                               "quoteVolumeLo"
                             ],
                             "properties": {
+                              "marketId": {
+                                "type": "integer",
+                                "format": "uint64",
+                                "minimum": 0
+                              },
                               "open": {
                                 "description": "24h open price",
                                 "type": "integer",
                                 "format": "uint64",
-                                "minimum": 0
+                                "minimum": 0,
+                                "nullable": true
                               },
                               "close": {
                                 "description": "Latest price",
                                 "type": "integer",
                                 "format": "uint64",
-                                "minimum": 0
+                                "minimum": 0,
+                                "nullable": true
                               },
                               "low": {
                                 "description": "24h low price",
                                 "type": "integer",
                                 "format": "uint64",
-                                "minimum": 0
+                                "minimum": 0,
+                                "nullable": true
                               },
                               "high": {
                                 "description": "24h high price",
                                 "type": "integer",
                                 "format": "uint64",
-                                "minimum": 0
+                                "minimum": 0,
+                                "nullable": true
                               },
                               "baseVolumeLo": {
                                 "description": "Low 64-bits of the base quantity traded",
@@ -509,10 +598,10 @@
                         "required": [
                           "base_currency",
                           "base_volume",
-                          "last_price",
                           "quote_currency",
                           "quote_volume",
-                          "ticker_id"
+                          "ticker_id",
+                          "timestamp"
                         ],
                         "properties": {
                           "ticker_id": {
@@ -524,9 +613,17 @@
                           "quote_currency": {
                             "type": "string"
                           },
+                          "timestamp": {
+                            "description": "The millisecond timestamp of the latest update.",
+                            "type": "integer",
+                            "format": "uint64",
+                            "minimum": 0
+                          },
                           "last_price": {
+                            "description": "The last traded price. Also equal to the 24-hour closing price",
                             "type": "number",
-                            "format": "double"
+                            "format": "double",
+                            "nullable": true
                           },
                           "base_volume": {
                             "description": "The rolling 24-hour volume in the base currency.",
@@ -578,7 +675,8 @@
                           "open": 107.72,
                           "quote_currency": "USDC",
                           "quote_volume": 3062431.887,
-                          "ticker_id": "SOLUSDC"
+                          "ticker_id": "SOLUSDC",
+                          "timestamp": 1708521090000
                         }
                       }
                     }
