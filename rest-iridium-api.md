@@ -22,34 +22,50 @@ Endpoints in this section require [REST Authentication headers](README.md#rest-a
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/positions" method="get" %}
-[ir_api_30.json](generated/core/ir_api_30.json)
-{% endswagger %}
-
-{% swagger src="generated/core/ir_api_30.json" path="/users/transfers" method="get" %}
-[ir_api_30.json](generated/core/ir_api_30.json)
-{% endswagger %}
-
-{% swagger src="generated/core/ir_api_30.json" path="/users/deposits" method="get" %}
-[ir_api_30.json](generated/core/ir_api_30.json)
-{% endswagger %}
-
-{% swagger src="generated/core/ir_api_30.json" path="/users/withdrawals" method="get" %}
-[ir_api_30.json](generated/core/ir_api_30.json)
-{% endswagger %}
-
-{% swagger src="generated/core/ir_api_30.json" path="/users/orders" method="get" %}
-[ir_api_30.json](generated/core/ir_api_30.json)
-{% endswagger %}
-
-{% swagger src="generated/core/ir_api_30.json" path="/users/fills" method="get" %}
-[ir_api_30.json](generated/core/ir_api_30.json)
-{% endswagger %}
-
 {% swagger src="generated/core/ir_api_30.json" path="/users/subaccounts" method="post" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
 {% swagger src="generated/core/ir_api_30.json" path="/users/subaccounts/{subaccount_id}" method="post" %}
+[ir_api_30.json](generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/positions" method="get" %}
+[ir_api_30.json](generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/transfers" method="get" %}
+[ir_api_30.json](generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/deposits" method="get" %}
+[ir_api_30.json](generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/withdrawals" method="get" %}
+[ir_api_30.json](generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/orders" method="get" %}
+[ir_api_30.json](generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/fills" method="get" %}
+[ir_api_30.json](generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="generated/core/ir_api_30.json" path="/users/fee-estimate/{market-id}" method="get" %}
+[ir_api_30.json](generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="generated/core/ir_api_30.json" path="/users/address" method="get" %}
+[ir_api_30.json](generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="generated/core/ir_api_30.json" path="/users/address/settings" method="get" %}
+[ir_api_30.json](generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="generated/core/ir_api_30.json" path="/users/withdraw" method="post" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
