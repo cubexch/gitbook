@@ -2202,6 +2202,163 @@
         ]
       }
     },
+    "/history/klines": {
+      "get": {
+        "summary": "Aggregated historical price data (klines)",
+        "description": "Statistics about the price of an asset during a specific time interval.\nFields are: [\n    time (in seconds since epoch),\n    open price,\n    high price,\n    low price,\n    close price,\n    volume (in RawUnits)\n]",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "marketId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "interval",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1s",
+                "1m",
+                "15m",
+                "1h",
+                "4h",
+                "1d"
+              ]
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "startTime",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "nullable": true
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "endTime",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "nullable": true
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "format": "uint16",
+              "minimum": 0,
+              "nullable": true
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "description": "Statistics about the price of an asset during a specific time interval. Fields are: [time (in seconds since epoch), open price, high price, low price, close price, volume (in RawUnits)]",
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          {
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          {
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          {
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          {
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          {
+                            "type": "string",
+                            "format": "number"
+                          }
+                        ],
+                        "maxItems": 6,
+                        "minItems": 6
+                      },
+                      "example": [
+                        [
+                          1710944100,
+                          17263,
+                          17509,
+                          17247,
+                          17459,
+                          "23107"
+                        ],
+                        [
+                          1710943200,
+                          17203,
+                          17314,
+                          17156,
+                          17260,
+                          "55426"
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/markets": {
       "get": {
         "summary": "Fetch all asset, market, and source definitions",
