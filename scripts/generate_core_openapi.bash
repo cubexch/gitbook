@@ -8,11 +8,11 @@
 
 set -e
 
-# switch to script directory
-SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
-cd "$SCRIPT_DIR"
+# switch to root of repo
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
 
-# all relative to script directory
+# all relative to repo root directory
 CORE_OPENAPI_DIR="../core/build-http-api"
 OUT_DIR="./generated/core"
 
@@ -40,4 +40,4 @@ pnpm dlx @apiture/openapi-down-convert --input "$CORE_OPENAPI_DIR/iridium.openap
 pnpm dlx @apiture/openapi-down-convert --input "$CORE_OPENAPI_DIR/osmium.openapi.json" --output "$OUT_DIR/os_api_30.json"
 pnpm dlx @apiture/openapi-down-convert --input "$CORE_OPENAPI_DIR/mendelev.openapi.json" --output "$OUT_DIR/md_api_30.json"
 
-echo 'Success!'
+echo 'Success: generated/core'

@@ -8,15 +8,16 @@
 
 set -e
 
-# switch to script directory
-cd "$(dirname "${BASH_SOURCE[0]}")"
+# switch to root of repo
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
 
 if ! command -v protoc-gen-doc; then
   echo "Did not find protoc-gen-doc. Please update"
   exit 1
 fi
 
-
+# all relative to repo root directory
 PLUGIN="$(command -v protoc-gen-doc)"
 SCHEMAS="../ws-api/schema"
 OUT_DIR="./generated/ws-api"
@@ -111,4 +112,4 @@ for STRUCT in "${ONCE[@]}"; do
   sed -i '' "s/^\\(#*\\) $STRUCT\$/\\1# $STRUCT/" $OUT_DIR/websocket-market-data-api.md
 done
 
-echo 'Success!'
+echo 'Success: generated/ws-api'
