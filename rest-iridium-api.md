@@ -6,7 +6,7 @@ The base URL for endpoints described in this page of live trading API is `https:
 
 ## Endpoints, public
 
-{% swagger src="generated/core/ir_api_30.json" path="/markets" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/markets" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
@@ -14,58 +14,58 @@ The base URL for endpoints described in this page of live trading API is `https:
 
 Endpoints in this section require [REST Authentication headers](README.md#rest-authentication-headers).
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/check" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/check" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/info" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/info" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/subaccounts" method="post" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/subaccounts" method="post" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/subaccounts/{subaccount_id}" method="post" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/subaccounts/{subaccount_id}" method="post" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/positions" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/positions" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/transfers" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/transfers" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/deposits" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/deposits" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/withdrawals" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/withdrawals" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/orders" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/orders" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/fills" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/fills" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/fee-estimate/{market-id}" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/fee-estimate/{market-id}" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/address" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/address" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/address/settings" method="get" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/address/settings" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
 
-{% swagger src="generated/core/ir_api_30.json" path="/users/withdraw" method="post" %}
+{ swagger baseUrl="https://api.cube.exchange" src="generated/core/ir_api_30.json" path="/users/withdraw" method="post" %}
 [ir_api_30.json](generated/core/ir_api_30.json)
 {% endswagger %}
