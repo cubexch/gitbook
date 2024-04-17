@@ -6,5 +6,7 @@ Does this work though?
 
 ## Endpoints, loads of endpoints...
 
-{ swagger generated/core/ir_api_30.json %}
-{% endswagger %}
+With percent:
+
+{% swagger generated/core/ir_api_30.json %}
+<!-- {% endswagger %} -->
