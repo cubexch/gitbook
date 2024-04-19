@@ -1080,6 +1080,87 @@
           }
         }
       }
+    },
+    "/positions": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "subaccountId",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "assetId",
+                          "available",
+                          "total"
+                        ],
+                        "properties": {
+                          "assetId": {
+                            "type": "integer",
+                            "format": "uint64",
+                            "minimum": 0
+                          },
+                          "total": {
+                            "type": "string",
+                            "format": "number"
+                          },
+                          "available": {
+                            "type": "string",
+                            "format": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

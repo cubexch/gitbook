@@ -27,3 +27,7 @@ Endpoints in this section require [REST Authentication headers](README.md#rest-a
 {% swagger src="generated/core/os_api_30.json" path="/order" method="patch" %}
 [os_api_30.json](generated/core/os_api_30.json)
 {% endswagger %}
+
+{% swagger src="generated/core/os_api_30.json" path="/positions" method="get" %}
+[os_api_30.json](generated/core/os_api_30.json)
+{% endswagger %}

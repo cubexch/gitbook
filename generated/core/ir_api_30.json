@@ -2280,7 +2280,6 @@
                     "result": {
                       "type": "array",
                       "items": {
-                        "description": "Statistics about the price of an asset during a specific time interval. Fields are: [time (in seconds since epoch), open price, high price, low price, close price, volume (in RawUnits)]",
                         "type": "array",
                         "items": [
                           {
@@ -2507,6 +2506,7 @@
                               "baseAssetId",
                               "baseLotSize",
                               "feeTableId",
+                              "isImplied",
                               "marketId",
                               "priceDisplayDecimals",
                               "priceTickSize",
@@ -2606,6 +2606,10 @@
                                   "minimum": 0
                                 },
                                 "nullable": true
+                              },
+                              "isImplied": {
+                                "description": "If this market is currently enabled for implied matching, this will be `true`. Otherwise, this will be `false` or missing.",
+                                "type": "boolean"
                               }
                             },
                             "example": {
@@ -2616,6 +2620,7 @@
                                 100005
                               ],
                               "feeTableId": 1,
+                              "isImplied": true,
                               "isPrimary": true,
                               "marketId": 100001,
                               "minOrderQty": 10,
