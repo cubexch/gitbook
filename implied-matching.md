@@ -73,72 +73,63 @@ If selling ETH/BTC: implied price =
     / (ETH/USDC base lot size / ETH/USDC quote lot size)
 ```
 
-# Fees and Rebates
+## Implied Match Fee
 
 Two fees may be present on an implied fill:
 - An [Implied Match Fee or Rebate](./implied-matching.md#ImpliedMatchFeeOrRebate)
 - The usual [Trading Fee](./implied-matching.md#TradingFee)
 
-## Implied Match Fee or Rebate
+# Lot Size Mismatch
+Because trades in the spot markets are currency swaps and the tick size of an asset can vary between markets,
+it's common that the amount of the implied-through asset that can be acquired in the first source market (in this case, the USDC)
+is not evenly divisible into lots in the second market where that asset is divested.
 
-### Lot Size Mismatch
-Because trades in the spot markets are currency swaps and prices can vary with high granularity,
-it's common that the amount of the implied-through asset that can be acquired in the first step (in this case, the USDC)
-is not evenly divisible into lots in the target market.
+In the event of a lot size mismatch, the Cube matching engine will:
+- round out to the next worst price level (i.e. the next whole lot)
+- charge a fee equal to the amount of the rounding
 
-### Decision to Fee or Rebate
-
-In the event of a lot size mismatch, the Cube matching engine will either:
-- round up to the next lot of the divested asset and take a fee equal to the difference
-- round down to the previous lot of the divested asset and provide the shortfall in the form of a rebate
-
-Cube tracks the value of implied match fees paid by each individual subaccount across all markets in real-time,
-a value referred to as the **Floated Balance**.
-
-The decision to choose fee or rebate for any given trade is based on the Floated Balance at the time of the match.
 For example:
 ```text
-Aggressing Bid for 1 base lot, Implied Price is 6.7:
-
-If Floated Balance value < 0.7 quote lots,
-  Aggressor sells 7 quote lots; Cube takes implied fee equal to 0.3 quote lots
-If Floated Balance value >= 0.7 quote lots,
-  Aggressor sells 6 quote lots; Cube provides implied rebate equal to 0.7 quote lots
-
-The aggressor receives the same 1 base lot in either case.
+Aggressing Bid for 1 base lot matches when Implied Price is 6.7:
+  Aggressor is credited the 1 base lot
+  Aggressor is debited 7 quote lots
+  Cube takes implied match fee equal to 0.3 quote lots
 ```
 
-The value of the fee or rebate for any given trade will always be less than a single lot of either the base or quote asset.
+Since rounding is done to the lot, the value of the fee for any given trade
+will always be less than a single lot of either the base or quote asset.
+**Note that this is the lot size of the asset in the market providing the liquidity,
+not the market in which the aggressing order is placed.**
+
 The [implied match example](./implied-matching.md#Example) contains a more precise illustration of this behavior.
 
-Since any previously paid fees are rebated whenever possible on future implied trades,
-the assets settled are always within one lot of the implied price
-regardless of how many trades are filled via implied markets.
-
-### Asset for Fee or Rebate
-Like trading fees, the Implied Match Fee or Rebate is denominated in the asset received in the trade:
+## Notes on Implied Match Fee
+Like the per-fill trading fee, the Implied Match Fee is reported in the asset received in the trade:
 - Bid => fee paid/rebate received in base asset
 - Ask => fee paid/rebate received in quote asset
 
-## Trading Fee
-Implied fills incur trading fees in [the same way as direct fills](./trading_fees.md).
-This fee is charged on top of the implied match fee or rebate.
-All legs of the implied trade are treated the same way as a direct fill would be in their respective books.
+This conversion is done using the last filled price of the X/S source market, where:
+- X is the asset received (either BTC or ETH in above example)
+- S is the implied-through asset (USDC in above example)
 
-For the purposes of calculating the trading fees:
+Unlike the trading fee, which is charged per-fill,
+the implied match fee is charged once on the entire match,
+i.e. once per-order.
+
+If the lot sizes of the source markets happen to line up perfectly,
+the amount of the implied match fee will be zero.
+
+## Note on Trading Fee
+Implied fills incur trading fees in [the same way as direct fills](./trading_fees.md).
+
+All legs of the implied trade are treated the same way as a direct fill would be in their respective books:
 - the aggressing order will be charged the taker fee rate
 - all resting orders involved in the match, on the books of any of the markets involved, will be charged the maker fee rate
 
-# Reconciling Fills (API)
-
-## Calculating Transacted Amount
-
-Due to current API limitations, the price and quantities are reported as whole integers.
-To avoid breaking this relationship:
-
-- The `quantity` fields in the `Fill` message reflect the amounts that will be settled:
-  - **Inclusive** of any implied asset fees
-  - **Exclusive** of any trading fees
+## Calculating Amount to be Settled
+The `quantity` fields in the `Fill` message reflect the amounts that will be settled:
+- **Inclusive** of any implied asset fees
+- **Exclusive** of any trading fees
 
 ...such that calculating the `RawUnit` amount filled remains the same as for a direct market, namely:
 
@@ -175,7 +166,7 @@ Consider a hypothetical aggressing order to buy 5 ETH on the ETH/BTC market, ass
 | ETH   | 18       | wei                |
 | USDC  | 6        | rawUSDC            |
 
-*as referenced in description below
+*referenced in description below to reduce ambiguity
 
 | Market    | Role     | Base Lot Size | Quote Lot Size | Price of Best Order On Book*            |
 |-----------|----------|---------------|----------------|-----------------------------------------|
@@ -211,16 +202,16 @@ The implied price in the implied market is:
     - Order amount = 5 ETH * 1e18 = 5e18 wei
 
 2. Need to acquire 5e18 wei in the ETH/USDC market:
-    - Hit ask at price 350,000: for every 1e15 wei, we will need to pay 350,000 * 1e1 = 3,500,000 rawUSDC
-    - 5e18 wei / 1e15 * 3,500,000 = 17,500,000,000 rawUSDC
+    - Hit ask at price 350,000: for every 1e15 wei, we will need to pay 350,000 * 1e1 = `3,500,000 rawUSDC`
+    - 5e18 wei / 1e15 * 3,500,000 = `17,500,000,000 rawUSDC`
 
 3. How much BTC will we have to sell in the BTC/USDC market to acquire the 1.75e10 rawUSDC needed to cover that purchase?
-    - Hit bid at price 692,000: for every 1000 satoshis, we will receive 692,000 * 1e0 = 692,000 rawUSDC (because quote lot size is 1)
-    - 17,500,000,000 rawUSDC / price of 692,000 = 25,289.0173 base lots in the BTC/USDC market
+    - Hit bid at price 692,000: for every 1000 satoshis, we will receive 692,000 * 1e0 = `692,000 rawUSDC` (because quote lot size is 1)
+    - 17,500,000,000 rawUSDC / price of 692,000 = `25,289.0173 base lots` in the BTC/USDC market
 
 4. This presents an issue as we can only transact in whole lots, which in this case means whole multiples of 1000 satoshis.  To compensate:
-    - We round up and oversell 25,290 lots of BTC into the BTC/USDC market
-    - The fractional 0.9827 lots of BTC will be taken as the Implied Match Fee
+    - We round up and oversell `25,290 lots` of BTC into the BTC/USDC market
+    - The fractional `0.9827 lots` of BTC will be taken as the Implied Match Fee
 
 #### Filled Legs
 
@@ -228,62 +219,18 @@ The resulting fill will consist of three legs, one in each market.
 
 Pricing in lots, based on the amount transacted and lot size in each market:
 - ETH/BTC:
-  - base lots = 5e18 wei / 1e16 = 500
-  - quote lots = 25,290,000 satoshis / 1e0 = 25,290,000 (from step 4)
-  - price = 50,579 (implied price rounded up, since this is a Bid)
+  - base lots = 5e18 wei / 1e16 = `500`
+  - quote lots = 25,290,000 satoshis / 1e0 = `25,290,000` (from step 4)
+  - price = `50,579` (implied price rounded up, since this is a Bid)
 - ETH/USDC:
-  - base lots = 5e18 wei / 1e15 = 5000
-  - quote lots = 17,500,000,000 rawUSDC / 1e1 = 1,750,000
-  - price = 350,000 (price level of the resting order)
+  - base lots = 5e18 wei / 1e15 = `5000`
+  - quote lots = 17,500,000,000 rawUSDC / 1e1 = `1,750,000`
+  - price = `350,000` (price level of the resting order)
 - BTC/USDC:
-  - base lots = 25290 (from step 4)
-  - quote lots = 17,500,680,000 rawUSDC / 1e0 = 17,500,680,000
-  - price = 692,000 (price level of the resting order)
+  - base lots = `25290` (from step 4)
+  - quote lots = 17,500,680,000 rawUSDC / 1e0 = `17,500,680,000`
+  - price = `692,000` (price level of the resting order)
 
-**Note that in the aggressed market, ETH/BTC, the implied price is not the ratio of the base/quote (50,580)
-because it's inclusive of the Implied Match Fee.  This compensates for the fact that
-the exact price transacted in the implied market in inexpressible in the two source markets.**
-
-### Subsequent Aggressing Order (API)
-
-#### Implied Price
-
-The market conditions are same as the first trade, so the calculation is the same as the first trade (50,578.035).
-
-#### Matching Process
-
-This match diverges in step 4 due to the Floated Balance generated by the fee collected in the previous trade:
-
-4.
-    - Same as the previous trade, we need to acquire 25,289.0173 base lots in the BTC/USDC market
-    - This time, we have a Float Balance with a value equal to 0.9827 lots of BTC
-    - 0.9827 > 0.0173, so Cube rebates us the 0.0173 lots
-    - We need to sell only 25,289 lots of BTC into the BTC/USDC market (not 25,290 as before)
-    - The aggressing subaccount has a new Floated Balance equivalent to 0.9827 - 0.0173 = 0.9654 lots of BTC.
-
-#### Filled Legs
-
-**Emphasized** fields show how this fill differs from the first fill:
-
-- ETH/BTC:
-  - base lots = 5e18 wei / 1e16 = 500
-  - **quote lots = 25,289,000 satoshis / 1e0 = 25,289,000** (from step 4)
-  - price = 50,579 (implied price rounded up, since this is a Bid)
-- ETH/USDC:
-  - base lots = 5e18 wei / 1e15 = 5000
-  - quote lots = 17,500,000,000 rawUSDC / 1e1 = 1,750,000
-  - price = 350,000 (price level of the resting order)
-- BTC/USDC:
-  - **base lots = 25289** (from step 4)
-  - **quote lots = 17,499,988,000 rawUSDC / 1e0 = 17,499,988,000**
-  - price = 692,000 (price level of the resting order)
-
-#### Points of Note for the Second Trade
-- **The price given for the ETH/BTC trade is the same as the first trade**,
-since the characteristics of the trade are identical.
-- The base and quote lots transacted are different,
-since the rebate allows the aggressor to receive the same amount of ETH in the ETH/USDC market
-while spending one fewer lot of BTC in the BTC/USDC market.
-- The quote/base ratio in this example is exactly 50,578,
-which happens to look the same as the rounded implied price (50,578.03 => 50,578),
-but this is a coincidence.
+Note that in the aggressed market, ETH/BTC,
+**the implied price is not the ratio of the base/quote (50,580)**
+because it's inclusive of the Implied Match Fee.

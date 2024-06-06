@@ -9,4 +9,4 @@
 * [WebSocket: Market Data API](generated/ws-api/websocket-market-data-api.md)
 * [WebSocket: Trade API](generated/ws-api/websocket-trade-api.md)
 * [Implied Matching](implied-matching.md)
-* [Adjustments to Trades](trade-adjustments.md)
+* [Cube Fees](cube-fees.md)
