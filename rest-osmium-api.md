@@ -2,7 +2,9 @@
 
 The base URL for endpoints described in this page of live trading API is `https://api.cube.exchange/os/v0`.
 
-[OpenAPI document for Trade API](generated/core/os_api_30.json)
+Definitions for requests and responses can be found in the [Trade OpenAPI Document](generated/core/os_api_30.json).
+
+Further specifics for field enums, reject codes, etc. can be found in the [Trade API Websocket Documentation](generated/ws-api/websocket-trade-api.md).
 
 ## Endpoints, authentication required
 

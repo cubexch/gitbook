@@ -2,7 +2,9 @@
 
 The base URL for endpoints described in this page of live trading API is `https://api.cube.exchange/md/v0`.
 
-[OpenAPI document for Market Data API](generated/core/md_api_30.json)
+Definitions for requests and responses can be found in the [Market Data OpenAPI Document](generated/core/md_api_30.json).
+
+Further specifics for field enums, reject codes, etc. can be found in the [Market Data API Websocket Documentation](generated/ws-api/websocket-market-data-api.md).
 
 ## Endpoints, public
 
