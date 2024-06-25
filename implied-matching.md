@@ -3,14 +3,18 @@ Certain markets will be enabled for Implied Matching.  In these markets, aggress
 when doing so would result in a better price than matching against resting orders in the market where the order was placed.
 
 ## Terminology and Concept
-Consider a trade in the ETH/BTC market where the price of ETH/BTC is implied via ETH/USDC and BTC/USDC.  In this case:
+Consider a trade in an ETH/BTC market where the price of ETH/BTC is implied via ETH/USDC and BTC/USDC.  In this case:
 - ETH is the base asset
 - BTC is the quote asset
 - USDC is the implied-through asset
 - ETH/USDC is the source market for the base asset
 - BTC/USDC is the source market for the quote asset
 
-The term "implied match" describes such a match against orders in other markets,
+In this case, there are two sets of orders for the ETH/BTC pair:
+- The direct market, consisting of the order book for the ETH/BTC market.
+- The implied market, calculated from the orders on the source base and source quote markets.
+
+The term "implied match" describes such a match against the orders in the source markets,
 while the term "direct match" describes a match against orders on the book
 in the same market as the aggressing order.
 
@@ -28,8 +32,11 @@ The same logic applies if the order is an Ask, with the markets reversed:
 
 ## Match Characteristics
 When a match takes place in a market with implied pricing enabled:
-- If a price level is exhausted during the match, both direct and implied books will be considered for matching further quantity
-- All legs of all trades in the match, direct and implied, are executed atomically in all relevant markets
+- The match will take place against whichever of the direct and implied books offers the best price.
+- If a price level is exhausted during the match, both direct and implied books will be considered again for the best price before matching further quantity
+- A single match could result in a combination of direct and implied fills, but regardless of the distribution, all fills in the match are executed atomically from the perspective of all relevant markets
+- Currently, only aggressing orders can match against the implied market.
+  This means that price movements in the implied market could cause it to cross resting orders on the book in the direct market, creating an arbitrage opportunity.
 
 # Implied Price
 
@@ -39,9 +46,14 @@ If the aggressing order trades against multiple levels, the price will be the av
 
 Since that value may be between price levels and the API requires an integer for price, the price reported on the API will be rounded to the next price level away from the market (i.e. up for bids, down for asks).
 
+The market data `TopOfBook` feed disseminates best bid and ask levels in separate fields for:
+- the direct market
+- the implied market
+- the better of the two considered together
+
 ## Example Calculation
 
-Since lot sizes can differ between markets, we need to adjust for them.  Here is one way to calculate the implied price:
+Since lot sizes can differ between markets, we need to adjust for them.  Here's one way to calculate the implied price:
 ```
 lot size ratio = base lot size / quote lot size
 
@@ -73,13 +85,7 @@ If selling ETH/BTC: implied price =
     / (ETH/USDC base lot size / ETH/USDC quote lot size)
 ```
 
-## Implied Match Fee
-
-Two fees may be present on an implied fill:
-- An [Implied Match Fee or Rebate](./implied-matching.md#ImpliedMatchFeeOrRebate)
-- The usual [Trading Fee](./implied-matching.md#TradingFee)
-
-# Lot Size Mismatch
+# Implied Match Fee
 Because trades in the spot markets are currency swaps and the tick size of an asset can vary between markets,
 it's common that the amount of the implied-through asset that can be acquired in the first source market (in this case, the USDC)
 is not evenly divisible into lots in the second market where that asset is divested.
@@ -98,15 +104,17 @@ Aggressing Bid for 1 base lot matches when Implied Price is 6.7:
 
 Since rounding is done to the lot, the value of the fee for any given trade
 will always be less than a single lot of either the base or quote asset.
-**Note that this is the lot size of the asset in the market providing the liquidity,
+**Note that this is the lot size of the asset in the source market providing the liquidity,
 not the market in which the aggressing order is placed.**
 
-The [implied match example](./implied-matching.md#Example) contains a more precise illustration of this behavior.
+The [implied match example](implied-matching.md#example) contains a more precise illustration of this behavior.
 
 ## Notes on Implied Match Fee
+When an aggressing order results in an implied match, the Order Service will send an `ImpliedMatchFee` message after the match completes.  This information has no effect on settlement as the amount of the fee is already accounted for in the quantities reported in each `Fill` message.
+
 Like the per-fill trading fee, the Implied Match Fee is reported in the asset received in the trade:
-- Bid => fee paid/rebate received in base asset
-- Ask => fee paid/rebate received in quote asset
+- Bid => fee paid in base asset
+- Ask => fee paid in quote asset
 
 This conversion is done using the last filled price of the X/S source market, where:
 - X is the asset received (either BTC or ETH in above example)
@@ -119,8 +127,8 @@ i.e. once per-order.
 If the lot sizes of the source markets happen to line up perfectly,
 the amount of the implied match fee will be zero.
 
-## Note on Trading Fee
-Implied fills incur trading fees in [the same way as direct fills](./trading_fees.md).
+## Notes on Trading Fee
+Implied fills incur trading fees in [the same way as direct fills](cube-fees.md).
 
 All legs of the implied trade are treated the same way as a direct fill would be in their respective books:
 - the aggressing order will be charged the taker fee rate
@@ -142,10 +150,10 @@ Received Asset:
 
 ## Relationship to `fill_price`
 
-Note that for trades resulting in an [Implied Match Fee or Rebate](./implied-matching.md#ImpliedMatchFeeOrRebate),
+Note that for trades resulting in an [Implied Match Fee](implied-matching.md#implied-match-fee),
 **the price reported in the fill message will not equal the ratio of the quote quantity to the base quantity**,
 for two reasons:
-- The `fill_price` reported is net of the implied asset fees/rebates
+- The `fill_price` reported is net of the implied asset fee, if any
 - If the implied price is fractional, it will be rounded to the next worst level due to API limitations
 
 > ### Important
@@ -153,6 +161,12 @@ for two reasons:
 >
 > Use the `fill_quantity * base lot size` for the base asset
 > and the `fill_quote_quantity * quote lot size` for the quote asset.
+
+## Opting Out
+Implied Match is a feature of the market, so there's no way to disable it for your account.
+
+If you don't wish to participate in implied matching, or to be subject to the implied match fee,
+you can still trade on these markets by sending orders as POST_ONLY.
 
 # Detailed Example
 Consider a hypothetical aggressing order to buy 5 ETH on the ETH/BTC market, assuming:
