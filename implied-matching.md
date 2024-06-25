@@ -102,7 +102,7 @@ Aggressing Bid for 1 base lot matches when Implied Price is 6.7:
   Cube takes implied match fee equal to 0.3 quote lots
 ```
 
-Since rounding is done to the lot, the value of the fee for any given trade
+Since rounding is done to the lot, the value of the fee for any given order
 will always be less than a single lot of either the base or quote asset.
 **Note that this is the lot size of the asset in the source market providing the liquidity,
 not the market in which the aggressing order is placed.**
