@@ -12,8 +12,12 @@ a given market at `wss://api.cube.exchange/md/book/:market_id`. The order
 book can be consumed by both
 price level through the Market by Price (MBP) and order-by-order through the
 Market by Order (MBO). In addition, clients can subscribe to the trade stream
-and price candlesticks. Clients should submit a [`Config`](#config) and then
-process [`MdMessage`](#mdmessage)'s.
+and price candlesticks.
+
+Upon connection, clients should submit a [`Config`](#config) and then
+process a stream of [`MdMessages`](#mdmessages).
+Note that this message type is distinct from the [`MdMessage`](#mdmessage),
+where the former is a wrapper containing one or more of the latter.
 
 ### Aggregate Book Tops Data
 
@@ -316,7 +320,8 @@ value, comes from the market data service.
 
 
 ### MdMessages
-
+A wrapper containing one or more Market Data messages,
+each of which will be an [`MdMessage`](#mdmessage).
 
 
 | Field | Type | Label | Description |

@@ -55,11 +55,11 @@ def verify_routes_match(oapi: RouteMap, md: RouteMap) -> bool:
         oapi_methods = oapi.get(path)
         md_methods = md.get(path)
         if not md_methods:
-            print(f'Warning: "{path}" found in OpenAPI but not in Markdown')
+            print(f'Warning: "{path}" {oapi_methods} found in OpenAPI but not in Markdown')
             does_match = False
             continue
         if not oapi_methods:
-            print(f'Warning: "{path}" found in Markdown but not in OpenAPI')
+            print(f'Warning: "{path}" {md_methods} found in Markdown but not in OpenAPI')
             does_match = False
             continue
 
