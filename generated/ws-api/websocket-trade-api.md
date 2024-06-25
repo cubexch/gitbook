@@ -508,7 +508,7 @@ this message will still be delivered and the fee_amount will be zero.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | msg_seq_num | [uint64](#uint64) |  |  |
-| transact_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | market_id | [uint64](#uint64) |  | The ID of the market in which the order was placed |
 | subaccount_id | [uint64](#uint64) |  | The ID of the subaccount which placed the aggressing order that resulted in the implied match. |
 | client_order_id | [uint64](#uint64) |  | The ID assigned by the client that placed the aggressing order that resulted in the implied match. |
