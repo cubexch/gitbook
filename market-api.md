@@ -4,7 +4,7 @@
 
 Definitions are [available as JSON](https://api.cube.exchange/ir/v0/markets)
 and provide all of the information needed to convert between on-chain amounts
-and the values used on the exchange.  For further details, see the [Trade Api](trade_api.md).
+and the values used on the exchange.  For further details, see the [Trade Api](trade-api.md).
 
 ### Market Status Field
 

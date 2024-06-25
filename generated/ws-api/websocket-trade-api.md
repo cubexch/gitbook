@@ -317,14 +317,14 @@ any fills for this order.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
 | request_id | [uint64](#uint64) |  | The request ID specified in the new-order request. |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade_api.md#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade-api.md#exchange-order-id) |
 | market_id | [uint64](#uint64) |  |  |
 | price | [uint64](#uint64) | optional | If the order ultimately rests, the `price` field will include the resting price. |
 | quantity | [uint64](#uint64) |  | The quantity submitted in the new-order request. |
 | side | [Side](#side) |  |  |
 | time_in_force | [TimeInForce](#time-in-force) |  |  |
 | order_type | [OrderType](#order-type) |  |  |
-| transact_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | cancel_on_disconnect | [bool](#bool) |  |  |
 
@@ -344,11 +344,11 @@ canceled as the result of a different user-initiated reason.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  |  |
 | request_id | [uint64](#uint64) |  | If the Reason is `DISCONNECT`, `IOC`, `STP_RESTING`, or `STP_AGGRESSING`, this request ID will be `u64::MAX`. Otherwise, it will be the request ID of the initiated cancel action. For a mass cancel, each cancel order ack will have the MassCancel's request_id. |
-| transact_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | reason | [CancelOrderAck.Reason](#cancel-order-ack-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade_api.md#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade-api.md#exchange-order-id) |
 
 
 
@@ -367,14 +367,14 @@ this order.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  |  |
 | request_id | [uint64](#uint64) |  | The request ID specified in the modify request. |
-| transact_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | remaining_quantity | [uint64](#uint64) |  | The quantity remaining on the book after applying the modify request. |
 | subaccount_id | [uint64](#uint64) |  |  |
 | market_id | [uint64](#uint64) |  |  |
 | price | [uint64](#uint64) |  |  |
 | quantity | [uint64](#uint64) |  | The quantity submitted in the modify request. |
 | cumulative_quantity | [uint64](#uint64) |  | The cumulative filled quantity for this order. |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade_api.md#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade-api.md#exchange-order-id) |
 
 
 
@@ -393,7 +393,7 @@ CancelOrderAck's will be sent for each order that was affected.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | subaccount_id | [uint64](#uint64) |  |  |
 | request_id | [uint64](#uint64) |  | The request ID specified in the mass-cancel request. |
-| transact_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | reason | [MassCancelAck.Reason](#mass-cancel-ack-reason) | optional |  |
 | total_affected_orders | [uint32](#uint32) |  | The total number of orders that were canceled. |
 
@@ -412,7 +412,7 @@ New-order-reject indicates that a new-order request was not applied.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
 | request_id | [uint64](#uint64) |  | The request ID specified in the new-order request. |
-| transact_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | reason | [NewOrderReject.Reason](#new-order-reject-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
@@ -437,7 +437,7 @@ Cancel-order-reject indicates that a cancel-order request was not applied.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the cancel-order request. |
 | request_id | [uint64](#uint64) |  | The request ID specified in the cancel-order request. |
-| transact_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | reason | [CancelOrderReject.Reason](#cancel-order-reject-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
@@ -457,7 +457,7 @@ Modify-order-reject indicates that a modify-order request was not applied.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the modify-order request. |
 | request_id | [uint64](#uint64) |  | The request ID specified in the modify-order request. |
-| transact_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | reason | [ModifyOrderReject.Reason](#modify-order-reject-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
@@ -477,17 +477,17 @@ A fill for an order.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | market_id | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade_api.md#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade-api.md#exchange-order-id) |
 | fill_price | [uint64](#uint64) |  | The price at which this trade occured. In the case of an implied fill, this price may be fractional, and will be truncated in that case. To determine the exact amount of the assets exchanged in the fill, use the fill_quantity and fill_quote_quantity fields. |
 | fill_quantity | [uint64](#uint64) |  | The quantity of the base asset that was traded in this fill, expressed in lots of the base asset. |
 | leaves_quantity | [uint64](#uint64) |  | The remaining base quantity for this order after the fill is applied. |
 | fill_quote_quantity | [uint64](#uint64) |  | The quantity of the quote asset that was traded in this fill, expressed in lots of the quote asset. This will generally be the same as the base fill_quantity * fill_price, but may be different in the case of an implied fill. |
-| transact_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | cumulative_quantity | [uint64](#uint64) |  | The cumulative filled base quantity for this order after the fill is applied. |
 | side | [Side](#side) |  |  |
 | aggressor_indicator | [bool](#bool) |  |  |
-| fee_ratio | [FixedPointDecimal](#fixed-point-decimal) |  | Indicates the fee charged on this trade. See [Trading Fees](trade_api.md#trading-fees) for details. |
+| fee_ratio | [FixedPointDecimal](#fixed-point-decimal) |  | Indicates the fee charged on this trade. See [Trading Fees](cube-fees.md#trading-fees) for details. |
 | trade_id | [uint64](#uint64) |  | The unique trade ID associated with a match event. Each order participanting in the match event will receive this trade ID |
 
 
@@ -612,7 +612,7 @@ An indication that bootstrap is complete.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| latest_transact_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) |
+| latest_transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | read_only | [bool](#bool) |  | DEPRECATED: will be removed in a future version; read the "connection_status" field in the "Bootstrap.TradingStatus" message that arrives before the "Done" message |
 
 
@@ -643,7 +643,7 @@ A resting order. Sent on bootstrap in `RestingOrders`.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade_api.md#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade-api.md#exchange-order-id) |
 | market_id | [uint64](#uint64) |  |  |
 | price | [uint64](#uint64) |  |  |
 | order_quantity | [uint64](#uint64) |  | The quantity submitted in the latest quantity-modifying request. If the order has not been modified, then it is the quantity on the new-order-ack. If it has been modified, then it is the quantity of the latest modify-order-ack. |
@@ -651,7 +651,7 @@ A resting order. Sent on bootstrap in `RestingOrders`.
 | time_in_force | [TimeInForce](#time-in-force) |  |  |
 | order_type | [OrderType](#order-type) |  |  |
 | remaining_quantity | [uint64](#uint64) |  | The current remaining quantity on the book. |
-| rest_time | [uint64](#uint64) |  | [Transact time](trade_api.md#transact-time) of the NewOrderAck |
+| rest_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) of the NewOrderAck |
 | subaccount_id | [uint64](#uint64) |  |  |
 | cumulative_quantity | [uint64](#uint64) |  | The cumulative filled quantity for this order. |
 | cancel_on_disconnect | [bool](#bool) |  |  |
