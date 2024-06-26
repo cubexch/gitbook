@@ -44,7 +44,8 @@ the value of which will always be less than a single lot of either the base or q
 using the lot sizes from the source markets providing the implied liquidity.
 
 Unlike the Trading Fee, the Implied Match Fee is calculated per-order rather than per-fill.
-The fee is based entirely on the prices and quantities executed,
+The amount is based on the prices and quantities executed,
+as well as the relationship between the lot sizes in the different markets,
 i.e. the number of fills in the match does not affect the amount of the fee.
 
 See the [documentation on Implied Matching](./implied-matching.md#ImpliedMatchFee) for a detailed desciption.
