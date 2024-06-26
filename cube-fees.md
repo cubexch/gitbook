@@ -39,11 +39,12 @@ so it's rounded down to the nearest `RawUnit` during the final truncating divisi
 
 # Implied Match Fee
 
+Each aggressing order into a market enabled for implied match may incur a fee,
+the value of which will always be less than a single lot of either the base or quote asset from that market,
+using the lot sizes from the source markets providing the implied liquidity.
+
 Unlike the Trading Fee, the Implied Match Fee is calculated per-order rather than per-fill.
 The fee is based entirely on the prices and quantities executed,
 i.e. the number of fills in the match does not affect the amount of the fee.
-
-Each aggressing order into a market enabled for implied match may incur a fee, the value of which will always be less than
-**a single lot of either the base or quote asset in the source markets providing the implied liquidity**.
 
 See the [documentation on Implied Matching](./implied-matching.md#ImpliedMatchFee) for a detailed desciption.
