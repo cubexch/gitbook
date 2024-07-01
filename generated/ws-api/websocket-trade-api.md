@@ -2,9 +2,13 @@
 
 ## trade.proto
 This schema defines the Protobuf messages used for communication with the
-Cube Order Service (Osmium, OS). The base URL for channels described in this
-page is `wss://api.cube.exchange/os`. The `proto` definition file can be found
-[here](https://github.com/cubexch/ws-api/blob/main/schema/trade.proto).
+Cube Order Service (OS, or "Osmium").
+
+- The connection URL for this Websocket API is `wss://api.cube.exchange/os`.
+
+- See also:
+  - The [Protobuf definition file for the Websocket connection](https://github.com/cubexch/ws-api/blob/main/schema/trade.proto)
+  - [General documentation pertaining to the Trade API](https://cubexch.gitbook.io/cube-api/websocket-trade-api)
 
 ### Connection
 
@@ -19,100 +23,6 @@ and positions, and then can begin submitting
 
 Application-level heartbeats are expected every 30 seconds. If more than one
 interval is missed, the order service will disconnect the websocket.
-
-### Price, Quantity, and Lots
-
-All orders are placed on a single market, specified by the market-id. The
-market definition specifies the base and quote assets and their respective
-lot sizes for the particular market. Prices and quantities in this API are in
-units of base and quote _lots_. That is, a quantity of 1 equals 1 base lot,
-and a price of 10 equals 10 quote lots / base lot (read as quote lots per
-base lot).
-
-For example, consider an ETH/BTC market. ETH is the base asset and BTC is the
-quote asset. ETH has 18 decimal places (`1 ETH = 10^18 WEI`) and BTC has 8
-decimal places (`1 BTC = 10^8 SAT`). Suppose that in this example, the ETH/BTC
-market has a base lot size of `10^15` and a quote lot size of `10^0` (`1`).
-Then an order placed with `quantity = 230` and `limit price = 6300` in
-market-agnostic terms is an order for `0.23 ETH` at a price of `0.06300 BTC /
-ETH`, calculated from:
-
-```text
-230 base lots
-  * (10^15 WEI / base lot)
-  / (10^18 WEI / ETH)
-  = 0.230 ETH
-
-6300 quote lots / base lot
-  * (1 SAT / quote lot)
-  / (10^15 WEI / base lot)
-  * (10^18 WEI / ETH)
-  / (10^8 SAT / BTC)
-  = 0.06300 BTC / ETH
-```
-#### Important Note about Fill Price
-The above example applies to the quantities expected at the limit price,
-but the order might be filled at a different, better price.
-
-When orders are filled in a market enabled for implied matching,
-**the price may not reflect the exact ratio between the base and quote asset transacted**.
-See [Implied Matching](/implied-matching.md) for more details.
-
-When calculating `RawUnit` amounts for transacted assets, e.g. for reconciliation,
-**use the `fill_quantity * base lot size` for the base asset
-and the `fill_quote_quantity * quote lot size` for the quote asset**.
-
-### Trading Fees
-
-Trading Fees are calculated on each individual trade as a ratio of the filled quantity,
-and are always charged as a deduction from the asset received in that trade.
-
-Fee ratios may vary from trade to trade based on the user's VIP level.
-For fee discounts based on Trading Volume, ratios are adjusted continuously
-at the time of each trade based on the user's trailing 30-day volume.
-
-To ensure that the client has enough information to determine the exact fee charged,
-the fee ratio is expressed as a fixed-point decimal number consisting of a mantissa and an exponent.
-Generally, the exponent will be "-4", indicating that the mantissa is equivalent to pips,
-Though some fees may be expressed with greater granularity.
-
-For example, consider the case of a trade where:
-- Asset received is BTC
-- `quantity` = 5
-- `fee_ratio.mantissa` = 11
-- `fee_ratio.exponent` = -4
-
-...in which case:
-- The fee ratio would be 0.0011, or 11 pips.
-- The fee would be equal to 0.0055 BTC.
-- The total amount credited at settlement would be 4.9945 BTC.
-
-If you need exact granularity at time of trade, you can replicate the fee calculation performed by the exchange.
-To avoid rounding errors, this entire process is performed in integer math using the exponent as a devisor.
-In the example above, the full fee amount in indivisible [RawUnits](#rawunits) would be calculated as:
-```text
-5 * 100_000_000 * 11 / 10_000 = 550_000 RawUnits
-
-(in the BTC case, that would be 550,000 Satoshi)
-```
-
-Since the fee is expressed with a decimal exponent, it's highly likely that this calculation results in a whole number.
-In the unlikely case that the final division results in a non-whole number, the result should be truncated,
-hence the division at the end: i.e. the fee is rounded down to the nearest `RawUnit`.
-
-### Exchange Order ID
-
-Each order is assigned a unique ID by the exchange. This order ID is
-consistent across modifies (including cancel-replace), and other operations.
-The exchange order ID can be used to find a particular order in the
-market-by-order market data feed, which allows the determination of FIFO
-queue priority, etc.
-
-### Transact Time
-
-The transact time is the matching engine timestamp for when an event is
-processed. Events that occur with the same transact time occur atomically
-from the perspective of the matching engine.
 
 
 
@@ -407,14 +317,14 @@ any fills for this order.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
 | request_id | [uint64](#uint64) |  | The request ID specified in the new-order request. |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade-api.md#exchange-order-id) |
 | market_id | [uint64](#uint64) |  |  |
 | price | [uint64](#uint64) | optional | If the order ultimately rests, the `price` field will include the resting price. |
 | quantity | [uint64](#uint64) |  | The quantity submitted in the new-order request. |
 | side | [Side](#side) |  |  |
 | time_in_force | [TimeInForce](#time-in-force) |  |  |
 | order_type | [OrderType](#order-type) |  |  |
-| transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | cancel_on_disconnect | [bool](#bool) |  |  |
 
@@ -434,11 +344,11 @@ canceled as the result of a different user-initiated reason.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  |  |
 | request_id | [uint64](#uint64) |  | If the Reason is `DISCONNECT`, `IOC`, `STP_RESTING`, or `STP_AGGRESSING`, this request ID will be `u64::MAX`. Otherwise, it will be the request ID of the initiated cancel action. For a mass cancel, each cancel order ack will have the MassCancel's request_id. |
-| transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | reason | [CancelOrderAck.Reason](#cancel-order-ack-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade-api.md#exchange-order-id) |
 
 
 
@@ -457,14 +367,14 @@ this order.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  |  |
 | request_id | [uint64](#uint64) |  | The request ID specified in the modify request. |
-| transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | remaining_quantity | [uint64](#uint64) |  | The quantity remaining on the book after applying the modify request. |
 | subaccount_id | [uint64](#uint64) |  |  |
 | market_id | [uint64](#uint64) |  |  |
 | price | [uint64](#uint64) |  |  |
 | quantity | [uint64](#uint64) |  | The quantity submitted in the modify request. |
 | cumulative_quantity | [uint64](#uint64) |  | The cumulative filled quantity for this order. |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade-api.md#exchange-order-id) |
 
 
 
@@ -483,7 +393,7 @@ CancelOrderAck's will be sent for each order that was affected.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | subaccount_id | [uint64](#uint64) |  |  |
 | request_id | [uint64](#uint64) |  | The request ID specified in the mass-cancel request. |
-| transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | reason | [MassCancelAck.Reason](#mass-cancel-ack-reason) | optional |  |
 | total_affected_orders | [uint32](#uint32) |  | The total number of orders that were canceled. |
 
@@ -502,7 +412,7 @@ New-order-reject indicates that a new-order request was not applied.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
 | request_id | [uint64](#uint64) |  | The request ID specified in the new-order request. |
-| transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | reason | [NewOrderReject.Reason](#new-order-reject-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
@@ -527,7 +437,7 @@ Cancel-order-reject indicates that a cancel-order request was not applied.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the cancel-order request. |
 | request_id | [uint64](#uint64) |  | The request ID specified in the cancel-order request. |
-| transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | reason | [CancelOrderReject.Reason](#cancel-order-reject-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
@@ -547,7 +457,7 @@ Modify-order-reject indicates that a modify-order request was not applied.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the modify-order request. |
 | request_id | [uint64](#uint64) |  | The request ID specified in the modify-order request. |
-| transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | reason | [ModifyOrderReject.Reason](#modify-order-reject-reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
@@ -567,17 +477,17 @@ A fill for an order.
 | msg_seq_num | [uint64](#uint64) |  |  |
 | market_id | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade-api.md#exchange-order-id) |
 | fill_price | [uint64](#uint64) |  | The price at which this trade occured. In the case of an implied fill, this price may be fractional, and will be truncated in that case. To determine the exact amount of the assets exchanged in the fill, use the fill_quantity and fill_quote_quantity fields. |
 | fill_quantity | [uint64](#uint64) |  | The quantity of the base asset that was traded in this fill, expressed in lots of the base asset. |
 | leaves_quantity | [uint64](#uint64) |  | The remaining base quantity for this order after the fill is applied. |
 | fill_quote_quantity | [uint64](#uint64) |  | The quantity of the quote asset that was traded in this fill, expressed in lots of the quote asset. This will generally be the same as the base fill_quantity * fill_price, but may be different in the case of an implied fill. |
-| transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | subaccount_id | [uint64](#uint64) |  |  |
 | cumulative_quantity | [uint64](#uint64) |  | The cumulative filled base quantity for this order after the fill is applied. |
 | side | [Side](#side) |  |  |
 | aggressor_indicator | [bool](#bool) |  |  |
-| fee_ratio | [FixedPointDecimal](#fixed-point-decimal) |  | Indicates the fee charged on this trade. See [Fees](#fees) for details. |
+| fee_ratio | [FixedPointDecimal](#fixed-point-decimal) |  | Indicates the fee charged on this trade. See [Trading Fees](cube-fees.md#trading-fees) for details. |
 | trade_id | [uint64](#uint64) |  | The unique trade ID associated with a match event. Each order participanting in the match event will receive this trade ID |
 
 
@@ -702,7 +612,7 @@ An indication that bootstrap is complete.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| latest_transact_time | [uint64](#uint64) |  | [Transact time](#transact-time) |
+| latest_transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
 | read_only | [bool](#bool) |  | DEPRECATED: will be removed in a future version; read the "connection_status" field in the "Bootstrap.TradingStatus" message that arrives before the "Done" message |
 
 
@@ -733,7 +643,7 @@ A resting order. Sent on bootstrap in `RestingOrders`.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](trade-api.md#exchange-order-id) |
 | market_id | [uint64](#uint64) |  |  |
 | price | [uint64](#uint64) |  |  |
 | order_quantity | [uint64](#uint64) |  | The quantity submitted in the latest quantity-modifying request. If the order has not been modified, then it is the quantity on the new-order-ack. If it has been modified, then it is the quantity of the latest modify-order-ack. |
@@ -741,7 +651,7 @@ A resting order. Sent on bootstrap in `RestingOrders`.
 | time_in_force | [TimeInForce](#time-in-force) |  |  |
 | order_type | [OrderType](#order-type) |  |  |
 | remaining_quantity | [uint64](#uint64) |  | The current remaining quantity on the book. |
-| rest_time | [uint64](#uint64) |  | [Transact time](#transact-time) of the NewOrderAck |
+| rest_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) of the NewOrderAck |
 | subaccount_id | [uint64](#uint64) |  |  |
 | cumulative_quantity | [uint64](#uint64) |  | The cumulative filled quantity for this order. |
 | cancel_on_disconnect | [bool](#bool) |  |  |
@@ -963,4 +873,3 @@ corresponding field did not take a valid value.
 | bool |  | bool | bool | boolean | bool |
 | string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | String | string | str/unicode | string |
 | bytes | May contain any arbitrary sequence of bytes. | Vec<u8> | string | str | []byte |
-

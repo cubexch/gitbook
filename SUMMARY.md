@@ -1,6 +1,8 @@
 # Table of contents
 
 * [Introduction](README.md)
+* [Market & User API](market-api.md)
+* [Trade API](trade-api.md)
 * [REST: Market & User API](rest-iridium-api.md)
 * [REST: Market Data API](rest-mendelev-api.md)
 * [REST: Trade API](rest-osmium-api.md)

@@ -71,308 +71,6 @@
         ]
       }
     },
-    "/users/info": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "result"
-                  ],
-                  "properties": {
-                    "result": {
-                      "type": "object",
-                      "required": [
-                        "apiKeys",
-                        "email",
-                        "hasApprovedKyc",
-                        "hasGuardianQuorum",
-                        "id",
-                        "kycStatus",
-                        "maxSubaccounts",
-                        "points",
-                        "status",
-                        "subaccounts",
-                        "vipLevel"
-                      ],
-                      "properties": {
-                        "apiKeys": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "required": [
-                              "accessLevel",
-                              "apiKey",
-                              "createdAt",
-                              "isMasterKey",
-                              "subaccountIds"
-                            ],
-                            "properties": {
-                              "isMasterKey": {
-                                "type": "boolean"
-                              },
-                              "subaccountIds": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer",
-                                  "format": "int64"
-                                }
-                              },
-                              "accessLevel": {
-                                "type": "string",
-                                "enum": [
-                                  "read",
-                                  "write"
-                                ]
-                              },
-                              "apiKey": {
-                                "type": "string",
-                                "format": "uuid"
-                              },
-                              "createdAt": {
-                                "type": "string",
-                                "format": "date-time"
-                              }
-                            }
-                          }
-                        },
-                        "subaccounts": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "required": [
-                              "addresses",
-                              "hasOrderHistory",
-                              "id",
-                              "name"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "integer",
-                                "format": "int64"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "addresses": {
-                                "description": "Deposit address by source id",
-                                "type": "array",
-                                "items": {
-                                  "type": "array",
-                                  "items": [
-                                    {
-                                      "type": "integer",
-                                      "format": "int32"
-                                    },
-                                    {
-                                      "type": "string"
-                                    }
-                                  ],
-                                  "maxItems": 2,
-                                  "minItems": 2
-                                }
-                              },
-                              "hasOrderHistory": {
-                                "type": "boolean"
-                              }
-                            },
-                            "example": {
-                              "addresses": {
-                                "101": "tb1p5gw5zm938qql65l2kqke5hx3tpmr4xkjrgy4g93qurer8eq9l2js0g6a9w",
-                                "103": "4t2XDAGnuePMj8QUjGxr8zSVbjztwzVVZP8Su9mn1DTV",
-                                "105": "nrceaqQdBp2PGiidq5FYe7YzsHZv9U5Yd5",
-                                "106": "5DNHinCkxF42JUFpQGZiwof8g6SEdhYfDehRjG5ukfgZVhe6",
-                                "107": "tltc1q7h6xgpcf7q685at7jzx74cud6a0j72yn2wsgkr",
-                                "108": "cosmos17h6xgpcf7q685at7jzx74cud6a0j72yn06hwe5"
-                              },
-                              "hasOrderHistory": true,
-                              "id": 48,
-                              "name": "working_capital"
-                            }
-                          }
-                        },
-                        "id": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "email": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "string",
-                          "enum": [
-                            "waitlist",
-                            "active",
-                            "disabled"
-                          ]
-                        },
-                        "vipLevel": {
-                          "type": "integer",
-                          "format": "int32"
-                        },
-                        "points": {
-                          "type": "integer",
-                          "format": "int64"
-                        },
-                        "mpcKeyId": {
-                          "type": "integer",
-                          "format": "int64",
-                          "nullable": true
-                        },
-                        "guardianHasKey": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "required": [
-                              "id",
-                              "name"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "integer",
-                                "format": "int32"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "hasKey": {
-                                "type": "boolean",
-                                "nullable": true
-                              }
-                            }
-                          },
-                          "nullable": true
-                        },
-                        "hasGuardianQuorum": {
-                          "type": "boolean"
-                        },
-                        "phoneNumber": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "kycStatus": {
-                          "type": "object",
-                          "additionalProperties": {
-                            "type": "object",
-                            "required": [
-                              "approved",
-                              "level",
-                              "state"
-                            ],
-                            "properties": {
-                              "level": {
-                                "type": "integer",
-                                "format": "int32"
-                              },
-                              "state": {
-                                "type": "string",
-                                "enum": [
-                                  "init",
-                                  "pending",
-                                  "prechecked",
-                                  "queued",
-                                  "onHold",
-                                  "completed"
-                                ]
-                              },
-                              "approved": {
-                                "type": "boolean"
-                              }
-                            }
-                          }
-                        },
-                        "hasApprovedKyc": {
-                          "type": "boolean"
-                        },
-                        "registration": {
-                          "type": "object",
-                          "required": [
-                            "newlyStarted",
-                            "startedAt",
-                            "windowSeconds"
-                          ],
-                          "properties": {
-                            "newlyStarted": {
-                              "type": "boolean"
-                            },
-                            "startedAt": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "windowSeconds": {
-                              "type": "integer",
-                              "format": "int32"
-                            }
-                          },
-                          "nullable": true
-                        },
-                        "firstName": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "lastName": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "country": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "inviteId": {
-                          "type": "string",
-                          "format": "uuid",
-                          "nullable": true
-                        },
-                        "referralCode": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "maxSubaccounts": {
-                          "type": "integer",
-                          "format": "int32"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "An error occurred while processing the request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "example": {
-                    "error": "example error string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "ApiKey": [],
-            "ApiSignature": [],
-            "ApiTimestamp": []
-          }
-        ]
-      }
-    },
     "/users/subaccounts": {
       "get": {
         "responses": {
@@ -1361,6 +1059,7 @@
                               "fills",
                               "marketId",
                               "modifies",
+                              "orderFees",
                               "price",
                               "qty",
                               "side",
@@ -1557,6 +1256,34 @@
                                   "p-filled",
                                   "canceled"
                                 ]
+                              },
+                              "orderFees": {
+                                "description": "Any fees applied to the order as a whole, which are distinct from any fees applied to each fill.",
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "required": [
+                                    "amount",
+                                    "assetId",
+                                    "name"
+                                  ],
+                                  "properties": {
+                                    "name": {
+                                      "type": "string",
+                                      "enum": [
+                                        "impliedMatchFee"
+                                      ]
+                                    },
+                                    "assetId": {
+                                      "type": "integer",
+                                      "format": "int32"
+                                    },
+                                    "amount": {
+                                      "type": "string",
+                                      "format": "number"
+                                    }
+                                  }
+                                }
                               },
                               "clientOrderId": {
                                 "type": "integer",
@@ -1805,8 +1532,38 @@
         ]
       }
     },
-    "/users/fee-estimate/{market-id}": {
-      "get": {
+    "/users/apikeys": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "accessLevel",
+                  "subaccountId"
+                ],
+                "properties": {
+                  "accessLevel": {
+                    "type": "string",
+                    "enum": [
+                      "read",
+                      "write"
+                    ]
+                  },
+                  "subaccountId": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "format": "int64"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "",
@@ -1821,28 +1578,253 @@
                     "result": {
                       "type": "object",
                       "required": [
-                        "makerFeeRatio",
-                        "marketId",
-                        "takerFeeRatio",
-                        "userKey"
+                        "accessLevel",
+                        "apiKey",
+                        "secret",
+                        "subaccountId"
                       ],
                       "properties": {
-                        "marketId": {
-                          "type": "integer",
-                          "format": "int32"
-                        },
-                        "userKey": {
+                        "apiKey": {
                           "type": "string",
                           "format": "uuid"
                         },
-                        "makerFeeRatio": {
-                          "type": "number",
-                          "format": "double"
+                        "secret": {
+                          "type": "string"
                         },
-                        "takerFeeRatio": {
-                          "type": "number",
-                          "format": "double"
+                        "subaccountId": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer",
+                            "format": "int64"
+                          }
+                        },
+                        "accessLevel": {
+                          "type": "string",
+                          "enum": [
+                            "read",
+                            "write"
+                          ]
                         }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/apikeys/{api_key}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "apiKey"
+                      ],
+                      "properties": {
+                        "apiKey": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/fee-estimates": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "marketId",
+                  "postOnly",
+                  "price",
+                  "quantity",
+                  "side",
+                  "subaccountId"
+                ],
+                "properties": {
+                  "marketId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "subaccountId": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "side": {
+                    "type": "string",
+                    "enum": [
+                      "Bid",
+                      "Ask"
+                    ]
+                  },
+                  "postOnly": {
+                    "type": "string",
+                    "enum": [
+                      "Disabled",
+                      "Enabled"
+                    ]
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "price": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  }
+                },
+                "example": {
+                  "marketId": 100086,
+                  "postOnly": "Disabled",
+                  "price": 14332,
+                  "quantity": 10,
+                  "side": "Bid",
+                  "subaccountId": 42
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "estimatedFees"
+                      ],
+                      "properties": {
+                        "estimatedFees": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "amount",
+                              "assetId",
+                              "name"
+                            ],
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "enum": [
+                                  "tradeFee",
+                                  "impliedMatchFee"
+                                ]
+                              },
+                              "assetId": {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "amount": {
+                                "type": "string",
+                                "format": "number"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "example": {
+                        "estimatedFees": [
+                          {
+                            "amount": "1200",
+                            "assetId": 5,
+                            "name": "tradeFee"
+                          },
+                          {
+                            "amount": "100000",
+                            "assetId": 5,
+                            "name": "impliedMatchFee"
+                          }
+                        ]
                       }
                     }
                   }
@@ -2142,6 +2124,19 @@
                   "destination": {
                     "description": "The destination address for the withdrawal.",
                     "type": "string"
+                  },
+                  "timestamp": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "verificationKey": {
+                    "description": "Base-64 encoded `cube_ov_utils::ov_schema::PublicKey`",
+                    "type": "string"
+                  },
+                  "signature": {
+                    "description": "Base-64 encoded signature of this withdrawal request",
+                    "type": "string"
                   }
                 }
               }
@@ -2246,7 +2241,6 @@
           {
             "in": "query",
             "name": "interval",
-            "required": true,
             "schema": {
               "type": "string",
               "enum": [
@@ -2255,8 +2249,10 @@
                 "15m",
                 "1h",
                 "4h",
-                "1d"
-              ]
+                "1d",
+                "7d"
+              ],
+              "nullable": true
             },
             "style": "form"
           },
