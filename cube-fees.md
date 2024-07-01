@@ -36,3 +36,16 @@ In the example above, the full fee amount in indivisible [RawUnits](#rawunits) w
 Since the fee is expressed with a decimal exponent, it's possible that this calculation results in a non-whole number.
 Since `RawUnit`s are indivisible, the fee must be a whole number,
 so it's rounded down to the nearest `RawUnit` during the final truncating division.
+
+# Implied Match Fee
+
+Each aggressing order into a market enabled for implied match may incur a fee,
+the value of which will always be less than a single lot of either the base or quote asset from that market,
+using the lot sizes from the source markets providing the implied liquidity.
+
+Unlike the Trading Fee, the Implied Match Fee is calculated per-order rather than per-fill.
+The amount is based on the prices and quantities executed,
+as well as the relationship between the lot sizes in the different markets,
+i.e. the number of fills in the match does not affect the amount of the fee.
+
+See the [documentation on Implied Matching](./implied-matching.md#ImpliedMatchFee) for a detailed desciption.

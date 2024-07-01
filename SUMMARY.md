@@ -8,3 +8,5 @@
 * [REST: Trade API](rest-osmium-api.md)
 * [WebSocket: Market Data API](generated/ws-api/websocket-market-data-api.md)
 * [WebSocket: Trade API](generated/ws-api/websocket-trade-api.md)
+* [Implied Matching](implied-matching.md)
+* [Cube Fees](cube-fees.md)

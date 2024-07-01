@@ -36,6 +36,10 @@ When calculating `RawUnit` amounts for transacted assets, e.g. for reconciliatio
 **use the `fill_quantity * base lot size` for the base asset
 and the `fill_quote_quantity * quote lot size` for the quote asset**.
 
+When orders are filled in a market enabled for implied matching,
+**the price may not reflect the exact ratio between the base and quote asset transacted**.
+See [Implied Matching](implied-matching.md) for more details.
+
 ## Exchange Order ID
 
 Each order is assigned a unique ID by the exchange. This order ID is
