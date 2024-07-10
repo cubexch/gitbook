@@ -358,17 +358,13 @@ Top of book
 | ----- | ---- | ----- | ----------- |
 | market_id | [uint64](#uint64) |  |  |
 | transact_time | [uint64](#uint64) |  | The [transact time](./websocket-trade-api.md#transact-time) of the latest book update on this market. |
-| bid_price | [uint64](#uint64) | optional | The best bid price. |
+| bid_price | [uint64](#uint64) | optional | The best bid price of the direct or implied book, whichever is better. |
 | bid_quantity | [uint64](#uint64) | optional | The total bid quantity at the best bid price. |
-| ask_price | [uint64](#uint64) | optional | The best ask price. |
+| ask_price | [uint64](#uint64) | optional | The best ask price of the direct or implied book, whichever is better. |
 | ask_quantity | [uint64](#uint64) | optional | The total ask quantity at the best ask price. |
 | last_price | [uint64](#uint64) | optional | The last trade price. |
 | rolling24h_price | [uint64](#uint64) | optional | The 24h open price. |
-| implied_bid_price | [uint64](#uint64) | optional |  |
-| implied_bid_quantity | [uint64](#uint64) | optional |  |
-| implied_ask_price | [uint64](#uint64) | optional |  |
-| implied_ask_quantity | [uint64](#uint64) | optional |  |
-| market_state | [MarketState](#market-state) |  |  |
+| market_state | [MarketState](#market-state) |  | Which trading operations are currently allowed on this market. |
 
 
 

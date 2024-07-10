@@ -300,6 +300,7 @@ OrderResponse.
 | position | [AssetPosition](#asset-position) |  |  |
 | mass_cancel_ack | [MassCancelAck](#mass-cancel-ack) |  |  |
 | trading_status | [TradingStatus](#trading-status) |  |  |
+| implied_match_fee | [ImpliedMatchFee](#implied-match-fee) |  |  |
 
 
 
@@ -489,6 +490,31 @@ A fill for an order.
 | aggressor_indicator | [bool](#bool) |  |  |
 | fee_ratio | [FixedPointDecimal](#fixed-point-decimal) |  | Indicates the fee charged on this trade. See [Trading Fees](cube-fees.md#trading-fees) for details. |
 | trade_id | [uint64](#uint64) |  | The unique trade ID associated with a match event. Each order participanting in the match event will receive this trade ID |
+
+
+
+
+
+
+
+## ImpliedMatchFee
+Indicates the implied match fee for a trade.
+This message will be delivered once for each aggressing NewOrder (taker order)
+that results in one or more implied fills.
+If an implied match occurs but the implied match fee is zero,
+this message will still be delivered and the fee_amount will be zero.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| msg_seq_num | [uint64](#uint64) |  |  |
+| transact_time | [uint64](#uint64) |  | [Transact time](trade-api.md#transact-time) |
+| market_id | [uint64](#uint64) |  | The ID of the market in which the order was placed |
+| subaccount_id | [uint64](#uint64) |  | The ID of the subaccount which placed the aggressing order that resulted in the implied match. |
+| client_order_id | [uint64](#uint64) |  | The ID assigned by the client that placed the aggressing order that resulted in the implied match. |
+| exchange_order_id | [uint64](#uint64) |  | The ID assigned by the exchange to the agressing order that resulted in the implied match. |
+| fee_asset_id | [uint64](#uint64) |  | The ID of the asset demoninating the fee_amount. |
+| fee_amount | [RawUnits](#raw-units) |  | The amount of the implied match fee in indivisible RawUnits. For details on how this is calculated, reference the documentation related to Implied Matching. Note that, unlike trading fees, this value is already accounted for in the quantities reported by the fill_quantity and fill_quote_quantity fields and does not need to be subtracted from the total when reconciling the associated trade against on-chain settlement. |
 
 
 
@@ -873,3 +899,4 @@ corresponding field did not take a valid value.
 | bool |  | bool | bool | boolean | bool |
 | string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | String | string | str/unicode | string |
 | bytes | May contain any arbitrary sequence of bytes. | Vec<u8> | string | str | []byte |
+
