@@ -402,7 +402,7 @@
                                 "minimum": 0
                               },
                               "bidPrice": {
-                                "description": "The best bid price.",
+                                "description": "The best bid price of the direct or implied book, whichever is better.",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0,
@@ -416,7 +416,7 @@
                                 "nullable": true
                               },
                               "askPrice": {
-                                "description": "The best ask price.",
+                                "description": "The best ask price of the direct or implied book, whichever is better.",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0,
@@ -443,31 +443,8 @@
                                 "minimum": 0,
                                 "nullable": true
                               },
-                              "impliedBidPrice": {
-                                "type": "integer",
-                                "format": "uint64",
-                                "minimum": 0,
-                                "nullable": true
-                              },
-                              "impliedBidQuantity": {
-                                "type": "integer",
-                                "format": "uint64",
-                                "minimum": 0,
-                                "nullable": true
-                              },
-                              "impliedAskPrice": {
-                                "type": "integer",
-                                "format": "uint64",
-                                "minimum": 0,
-                                "nullable": true
-                              },
-                              "impliedAskQuantity": {
-                                "type": "integer",
-                                "format": "uint64",
-                                "minimum": 0,
-                                "nullable": true
-                              },
                               "marketState": {
+                                "description": "Which trading operations are currently allowed on this market.",
                                 "type": "integer",
                                 "format": "int32"
                               }
