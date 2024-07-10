@@ -2889,6 +2889,17 @@
                               "isImplied": {
                                 "description": "If this market is currently enabled for implied matching, this will be `true`. Otherwise, this will be `false` or missing.",
                                 "type": "boolean"
+                              },
+                              "impliedScheme": {
+                                "description": "The implied scheme for this market. eg. If BsQs scheme, given assets ETH, BTC, and USDC, and let B be ETH, S be USDC, and Q be BTC then given base markets ETH/USDC and BTC/USDC, we can have implied market ETH/BTC.",
+                                "type": "string",
+                                "enum": [
+                                  "bsqs",
+                                  "bssq",
+                                  "sbqs",
+                                  "sbsq"
+                                ],
+                                "nullable": true
                               }
                             },
                             "example": {
@@ -2899,6 +2910,7 @@
                                 100005
                               ],
                               "feeTableId": 1,
+                              "impliedScheme": "bsqs",
                               "isImplied": true,
                               "isPrimary": true,
                               "marketId": 100001,
