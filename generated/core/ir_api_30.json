@@ -97,6 +97,13 @@
                             "format": "int64"
                           }
                         }
+                      },
+                      "example": {
+                        "ids": [
+                          1,
+                          2,
+                          3
+                        ]
                       }
                     }
                   }
@@ -155,6 +162,10 @@
                       "margin"
                     ]
                   }
+                },
+                "example": {
+                  "accountType": "spot",
+                  "name": "example subaccount"
                 }
               }
             }
@@ -182,6 +193,9 @@
                           "type": "integer",
                           "format": "int64"
                         }
+                      },
+                      "example": {
+                        "id": 11
                       }
                     }
                   }
@@ -222,6 +236,18 @@
     },
     "/users/subaccount/{subaccount_id}": {
       "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subaccount_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "simple"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -321,6 +347,18 @@
         ]
       },
       "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subaccount_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "simple"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -333,6 +371,9 @@
                   "name": {
                     "type": "string"
                   }
+                },
+                "example": {
+                  "name": "subaccount new name"
                 }
               }
             }
@@ -360,6 +401,9 @@
                           "type": "integer",
                           "format": "int64"
                         }
+                      },
+                      "example": {
+                        "id": 11
                       }
                     }
                   }
@@ -400,6 +444,18 @@
     },
     "/users/subaccount/{subaccount_id}/positions": {
       "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subaccount_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "simple"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -467,6 +523,27 @@
                             }
                           }
                         }
+                      },
+                      "example": {
+                        "8": {
+                          "inner": [
+                            {
+                              "accountingType": "asset",
+                              "amount": "502500000",
+                              "assetId": 1,
+                              "pendingDeposits": "0",
+                              "receivedAmount": "502500000"
+                            },
+                            {
+                              "accountingType": "asset",
+                              "amount": "5999780000000000000",
+                              "assetId": 2,
+                              "pendingDeposits": "0",
+                              "receivedAmount": "5999780000000000000"
+                            }
+                          ],
+                          "name": "primary"
+                        }
                       }
                     }
                   }
@@ -507,6 +584,18 @@
     },
     "/users/subaccount/{subaccount_id}/transactions": {
       "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subaccount_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "simple"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -556,7 +645,8 @@
                                       "format": "int32"
                                     },
                                     "amount": {
-                                      "type": "string"
+                                      "type": "string",
+                                      "format": "number"
                                     },
                                     "txnHash": {
                                       "description": "Deposits that are found on-chain will have a `txn_hash` and `txn_index`. If it is a pending deposit determined by some external payment system, these can be empty",
@@ -605,6 +695,37 @@
                                   }
                                 }
                               }
+                            }
+                          },
+                          "example": {
+                            "8": {
+                              "inner": [
+                                {
+                                  "address": "bcrt1qfsf0tfcw0qvtxnm8qmktwpxpt8v0hk4rawh0n7",
+                                  "amount": "1100000000",
+                                  "assetId": 1,
+                                  "createdAt": "2023-07-30T14:30:00-05:00",
+                                  "fiatToCrypto": false,
+                                  "kytStatus": "accept",
+                                  "txnHash": "faae74ae3700cdea62f51930d489a34f3bc4ee2521a017a9bad72dbd0a5156b4",
+                                  "txnIndex": 1,
+                                  "txnState": "confirmed",
+                                  "updatedAt": "2023-07-30T14:30:00-05:00"
+                                },
+                                {
+                                  "address": "0x313E3566cE1Db6672287ccE000cf0c617Dc369af",
+                                  "amount": "111780000000000000",
+                                  "assetId": 2,
+                                  "createdAt": "2023-07-30T14:30:00-05:00",
+                                  "fiatToCrypto": false,
+                                  "kytStatus": "accept",
+                                  "txnHash": "0xd2f7b34100d66835565fc598bfac7469881a3db5d1a9e926813853d73a6f16c8",
+                                  "txnIndex": 0,
+                                  "txnState": "confirmed",
+                                  "updatedAt": "2023-07-30T14:30:00-05:00"
+                                }
+                              ],
+                              "name": "primary"
                             }
                           }
                         },
@@ -693,6 +814,105 @@
                                 }
                               }
                             }
+                          },
+                          "example": {
+                            "8": {
+                              "inner": [
+                                {
+                                  "address": "bcrt1qfsf0tfcw0qvtxnm8qmktwpxpt8v0hk4rawh0n7",
+                                  "amount": "12000000",
+                                  "approved": true,
+                                  "assetId": 1,
+                                  "attemptId": 112,
+                                  "createdAt": "2023-07-30T14:30:00-05:00",
+                                  "kytStatus": "accept",
+                                  "txnHash": "faae74ae3700cdea62f51930d489a34f3bc4ee2521a017a9bad72dbd0a5156b4",
+                                  "txnIndex": 1,
+                                  "txnState": "confirmed",
+                                  "updatedAt": "2023-07-30T14:30:00-05:00"
+                                },
+                                {
+                                  "address": "0x313E3566cE1Db6672287ccE000cf0c617Dc369af",
+                                  "amount": "11178000000000000000",
+                                  "approved": true,
+                                  "assetId": 2,
+                                  "attemptId": 234,
+                                  "createdAt": "2023-07-30T14:30:00-05:00",
+                                  "kytStatus": "accept",
+                                  "txnHash": "0xd2f7b34100d66835565fc598bfac7469881a3db5d1a9e926813853d73a6f16c8",
+                                  "txnIndex": 0,
+                                  "txnState": "confirmed",
+                                  "updatedAt": "2023-07-30T14:30:00-05:00"
+                                }
+                              ],
+                              "name": "primary"
+                            }
+                          }
+                        }
+                      },
+                      "example": {
+                        "deposits": {
+                          "8": {
+                            "inner": [
+                              {
+                                "address": "bcrt1qfsf0tfcw0qvtxnm8qmktwpxpt8v0hk4rawh0n7",
+                                "amount": "1100000000",
+                                "assetId": 1,
+                                "createdAt": "2023-07-30T14:30:00-05:00",
+                                "fiatToCrypto": false,
+                                "kytStatus": "accept",
+                                "txnHash": "faae74ae3700cdea62f51930d489a34f3bc4ee2521a017a9bad72dbd0a5156b4",
+                                "txnIndex": 1,
+                                "txnState": "confirmed",
+                                "updatedAt": "2023-07-30T14:30:00-05:00"
+                              },
+                              {
+                                "address": "0x313E3566cE1Db6672287ccE000cf0c617Dc369af",
+                                "amount": "111780000000000000",
+                                "assetId": 2,
+                                "createdAt": "2023-07-30T14:30:00-05:00",
+                                "fiatToCrypto": false,
+                                "kytStatus": "accept",
+                                "txnHash": "0xd2f7b34100d66835565fc598bfac7469881a3db5d1a9e926813853d73a6f16c8",
+                                "txnIndex": 0,
+                                "txnState": "confirmed",
+                                "updatedAt": "2023-07-30T14:30:00-05:00"
+                              }
+                            ],
+                            "name": "primary"
+                          }
+                        },
+                        "withdrawals": {
+                          "8": {
+                            "inner": [
+                              {
+                                "address": "bcrt1qfsf0tfcw0qvtxnm8qmktwpxpt8v0hk4rawh0n7",
+                                "amount": "12000000",
+                                "approved": true,
+                                "assetId": 1,
+                                "attemptId": 112,
+                                "createdAt": "2023-07-30T14:30:00-05:00",
+                                "kytStatus": "accept",
+                                "txnHash": "faae74ae3700cdea62f51930d489a34f3bc4ee2521a017a9bad72dbd0a5156b4",
+                                "txnIndex": 1,
+                                "txnState": "confirmed",
+                                "updatedAt": "2023-07-30T14:30:00-05:00"
+                              },
+                              {
+                                "address": "0x313E3566cE1Db6672287ccE000cf0c617Dc369af",
+                                "amount": "11178000000000000000",
+                                "approved": true,
+                                "assetId": 2,
+                                "attemptId": 234,
+                                "createdAt": "2023-07-30T14:30:00-05:00",
+                                "kytStatus": "accept",
+                                "txnHash": "0xd2f7b34100d66835565fc598bfac7469881a3db5d1a9e926813853d73a6f16c8",
+                                "txnIndex": 0,
+                                "txnState": "confirmed",
+                                "updatedAt": "2023-07-30T14:30:00-05:00"
+                              }
+                            ],
+                            "name": "primary"
                           }
                         }
                       }
@@ -735,6 +955,18 @@
     },
     "/users/subaccount/{subaccount_id}/deposits": {
       "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subaccount_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "simple"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -777,7 +1009,8 @@
                                   "format": "int32"
                                 },
                                 "amount": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "format": "number"
                                 },
                                 "txnHash": {
                                   "description": "Deposits that are found on-chain will have a `txn_hash` and `txn_index`. If it is a pending deposit determined by some external payment system, these can be empty",
@@ -827,6 +1060,37 @@
                             }
                           }
                         }
+                      },
+                      "example": {
+                        "8": {
+                          "inner": [
+                            {
+                              "address": "bcrt1qfsf0tfcw0qvtxnm8qmktwpxpt8v0hk4rawh0n7",
+                              "amount": "1100000000",
+                              "assetId": 1,
+                              "createdAt": "2023-07-30T14:30:00-05:00",
+                              "fiatToCrypto": false,
+                              "kytStatus": "accept",
+                              "txnHash": "faae74ae3700cdea62f51930d489a34f3bc4ee2521a017a9bad72dbd0a5156b4",
+                              "txnIndex": 1,
+                              "txnState": "confirmed",
+                              "updatedAt": "2023-07-30T14:30:00-05:00"
+                            },
+                            {
+                              "address": "0x313E3566cE1Db6672287ccE000cf0c617Dc369af",
+                              "amount": "111780000000000000",
+                              "assetId": 2,
+                              "createdAt": "2023-07-30T14:30:00-05:00",
+                              "fiatToCrypto": false,
+                              "kytStatus": "accept",
+                              "txnHash": "0xd2f7b34100d66835565fc598bfac7469881a3db5d1a9e926813853d73a6f16c8",
+                              "txnIndex": 0,
+                              "txnState": "confirmed",
+                              "updatedAt": "2023-07-30T14:30:00-05:00"
+                            }
+                          ],
+                          "name": "primary"
+                        }
                       }
                     }
                   }
@@ -867,6 +1131,18 @@
     },
     "/users/subaccount/{subaccount_id}/withdrawals": {
       "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subaccount_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "simple"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -963,6 +1239,208 @@
                             }
                           }
                         }
+                      },
+                      "example": {
+                        "8": {
+                          "inner": [
+                            {
+                              "address": "bcrt1qfsf0tfcw0qvtxnm8qmktwpxpt8v0hk4rawh0n7",
+                              "amount": "12000000",
+                              "approved": true,
+                              "assetId": 1,
+                              "attemptId": 112,
+                              "createdAt": "2023-07-30T14:30:00-05:00",
+                              "kytStatus": "accept",
+                              "txnHash": "faae74ae3700cdea62f51930d489a34f3bc4ee2521a017a9bad72dbd0a5156b4",
+                              "txnIndex": 1,
+                              "txnState": "confirmed",
+                              "updatedAt": "2023-07-30T14:30:00-05:00"
+                            },
+                            {
+                              "address": "0x313E3566cE1Db6672287ccE000cf0c617Dc369af",
+                              "amount": "11178000000000000000",
+                              "approved": true,
+                              "assetId": 2,
+                              "attemptId": 234,
+                              "createdAt": "2023-07-30T14:30:00-05:00",
+                              "kytStatus": "accept",
+                              "txnHash": "0xd2f7b34100d66835565fc598bfac7469881a3db5d1a9e926813853d73a6f16c8",
+                              "txnIndex": 0,
+                              "txnState": "confirmed",
+                              "updatedAt": "2023-07-30T14:30:00-05:00"
+                            }
+                          ],
+                          "name": "primary"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/subaccount/{subaccount_id}/transfers": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subaccount_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "required": [
+                        "inner",
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "inner": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "amount",
+                              "assetId",
+                              "attemptId",
+                              "createdAt",
+                              "fromAddress",
+                              "fromSubaccountId",
+                              "toAddress",
+                              "toSubaccountId"
+                            ],
+                            "properties": {
+                              "attemptId": {
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "fromSubaccountId": {
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "fromAddress": {
+                                "type": "string"
+                              },
+                              "toSubaccountId": {
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "toAddress": {
+                                "type": "string"
+                              },
+                              "assetId": {
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "amount": {
+                                "type": "string",
+                                "format": "number"
+                              },
+                              "approved": {
+                                "type": "boolean",
+                                "nullable": true
+                              },
+                              "reason": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "txnHash": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "txnIndex": {
+                                "type": "integer",
+                                "format": "int64",
+                                "nullable": true
+                              },
+                              "txnState": {
+                                "type": "string",
+                                "enum": [
+                                  "pending",
+                                  "received",
+                                  "confirmed",
+                                  "dropped",
+                                  "failed"
+                                ],
+                                "nullable": true
+                              },
+                              "createdAt": {
+                                "description": "When the transfer request was created.",
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "example": {
+                        "inner": [
+                          {
+                            "amount": "220000000",
+                            "approved": true,
+                            "assetId": 5,
+                            "attemptId": 134,
+                            "createdAt": "2023-07-30T14:30:00-05:00",
+                            "fromAddress": "2CakzUzWpQKmx9GGexMMRTtRcjtSdjCRB68vpUKM4obk",
+                            "fromSubaccountId": 8,
+                            "toAddress": "8j5i8msVWLkTP2ff3bmTLK3k2m3XtW1zdJPYovon55YS",
+                            "toSubaccountId": 9,
+                            "txnHash": "3ojghQjhimYEiFCyy6bGvJsRnX54X1rHuR1eBhVHdF4z",
+                            "txnIndex": 0,
+                            "txnState": "pending"
+                          }
+                        ],
+                        "name": "primary account"
                       }
                     }
                   }
@@ -1142,6 +1620,16 @@
     "/users/subaccount/{subaccount_id}/orders": {
       "get": {
         "parameters": [
+          {
+            "in": "path",
+            "name": "subaccount_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "simple"
+          },
           {
             "in": "query",
             "name": "createdBefore",
@@ -1455,6 +1943,46 @@
                             }
                           }
                         }
+                      },
+                      "example": {
+                        "name": "primary",
+                        "orders": [
+                          {
+                            "cancelOnDisconnect": false,
+                            "clientOrderId": 1720791493653,
+                            "createdAt": 1720791493673997000,
+                            "filledAt": 1720933004211574000,
+                            "filledTotal": {
+                              "baseAmount": "3300000",
+                              "feeAmount": "0",
+                              "feeAssetId": 1,
+                              "filledAt": 1720933004211574000,
+                              "quoteAmount": "1800000000"
+                            },
+                            "fills": [
+                              {
+                                "baseAmount": "3300000",
+                                "baseSettled": true,
+                                "feeAmount": "0",
+                                "feeAssetId": 1,
+                                "filledAt": 1720933004211574000,
+                                "quoteAmount": "1800000000",
+                                "quoteSettled": true,
+                                "tradeId": 620011
+                              }
+                            ],
+                            "marketId": 100004,
+                            "orderId": 610001,
+                            "orderType": 0,
+                            "postOnly": false,
+                            "price": 600000,
+                            "qty": 3000,
+                            "selfTradePrevention": 0,
+                            "side": "Bid",
+                            "status": "filled",
+                            "timeInForce": 1
+                          }
+                        ]
                       }
                     }
                   }
@@ -1496,6 +2024,16 @@
     "/users/subaccount/{subaccount_id}/fills": {
       "get": {
         "parameters": [
+          {
+            "in": "path",
+            "name": "subaccount_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "style": "simple"
+          },
           {
             "in": "query",
             "name": "startTime",
@@ -1632,6 +2170,25 @@
                             }
                           }
                         }
+                      },
+                      "example": {
+                        "fills": [
+                          {
+                            "aggressingSide": "Ask",
+                            "baseAmount": "3300000",
+                            "feeAmount": "0",
+                            "feeAssetId": 1,
+                            "filledAt": 1720933004211574000,
+                            "marketId": 100004,
+                            "orderId": 610001,
+                            "price": 700000,
+                            "quantity": 3000,
+                            "quoteAmount": "2100000000",
+                            "side": "Bid",
+                            "tradeId": 620011
+                          }
+                        ],
+                        "name": "primary"
                       }
                     }
                   }
@@ -1696,6 +2253,13 @@
                       "format": "int64"
                     }
                   }
+                },
+                "example": {
+                  "accessLevel": "read",
+                  "subaccountId": [
+                    1,
+                    2
+                  ]
                 }
               }
             }
@@ -1743,6 +2307,15 @@
                             "write"
                           ]
                         }
+                      },
+                      "example": {
+                        "accessLevel": "read",
+                        "apiKey": "173de89b-ff98-9711-479c-09d4f54f2177",
+                        "secret": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                        "subaccountId": [
+                          1,
+                          2
+                        ]
                       }
                     }
                   }
@@ -2117,7 +2690,30 @@
                                 "disabled"
                               ]
                             }
+                          },
+                          "example": {
+                            "whitelistStatus": "enabled",
+                            "whitelisted": true
                           }
+                        }
+                      },
+                      "example": {
+                        "addresses": [
+                          {
+                            "activeSince": "2024-06-14T20:33:17.79384Z",
+                            "address": "CNf2sYNM8iH4aGtDSvmRRWEQorVvG3cMWzumtQo7Q8h8",
+                            "approvedAt": "2024-06-13T20:33:17.79384Z",
+                            "assetId": 5,
+                            "createdAt": "2024-06-13T20:32:17.79384Z",
+                            "id": "b4054981-600b-4ae1-858e-01f65f09dd60",
+                            "name": "My Address 1",
+                            "sourceId": 3,
+                            "status": "active"
+                          }
+                        ],
+                        "settings": {
+                          "whitelistStatus": "enabled",
+                          "whitelisted": true
                         }
                       }
                     }
@@ -2189,6 +2785,10 @@
                             "disabled"
                           ]
                         }
+                      },
+                      "example": {
+                        "whitelistStatus": "enabled",
+                        "whitelisted": true
                       }
                     }
                   }
@@ -2276,6 +2876,12 @@
                     "description": "Base-64 encoded signature of this withdrawal request",
                     "type": "string"
                   }
+                },
+                "example": {
+                  "amount": "220000000000000",
+                  "assetId": 2,
+                  "destination": "0x403244EcfafF17c31e39fc67848d61d9b6637Ee2",
+                  "subaccountId": 8
                 }
               }
             }
@@ -2320,6 +2926,129 @@
                         },
                         "reason": {
                           "description": "The reason for the withdrawal being rejected",
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "example": {
+                        "approved": true,
+                        "status": "accept"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "example error string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSignature": [],
+            "ApiTimestamp": []
+          }
+        ]
+      }
+    },
+    "/users/transfer": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount",
+                  "assetId",
+                  "fromSubaccountId",
+                  "toSubaccountId"
+                ],
+                "properties": {
+                  "fromSubaccountId": {
+                    "description": "The subaccount to transfer from.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "toSubaccountId": {
+                    "description": "The subaccount to transfer to.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "assetId": {
+                    "description": "The asset to transfer. The network is determined by the asset ID.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "amount": {
+                    "description": "The amount to transfer. This is denominated in the smallest unit of the asset (e.g. satoshis for BTC, wei for ETH, lamports for SOL). The amount must be greater than the dust limit for the asset.",
+                    "type": "integer",
+                    "format": "uint128",
+                    "minimum": 0
+                  },
+                  "timestamp": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "verificationKey": {
+                    "description": "Base-64 encoded `cube_ov_utils::ov_schema::PublicKey`",
+                    "type": "string"
+                  },
+                  "signature": {
+                    "description": "Base-64 encoded signature of this withdrawal request",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "approved": {
+                          "description": "Whether the transfer was approved by the system",
+                          "type": "boolean",
+                          "nullable": true
+                        },
+                        "reason": {
+                          "description": "The reason for the transfer being rejected",
                           "type": "string",
                           "nullable": true
                         }

@@ -14,6 +14,17 @@
       "get": {
         "parameters": [
           {
+            "in": "path",
+            "name": "market_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            },
+            "style": "simple"
+          },
+          {
             "in": "query",
             "name": "mbp",
             "schema": {
@@ -221,7 +232,24 @@
                             }
                           }
                         }
-                      ]
+                      ],
+                      "example": {
+                        "lastTradePrice": 646930,
+                        "lastTransactTime": 1721102467166459400,
+                        "levels": [
+                          {
+                            "price": 647520,
+                            "quantity": 76600,
+                            "side": 0
+                          },
+                          {
+                            "price": 647530,
+                            "quantity": 60100,
+                            "side": 1
+                          }
+                        ],
+                        "marketState": "normalOperation"
+                      }
                     }
                   }
                 }
@@ -254,6 +282,19 @@
     },
     "/book/{market_id}/recent-trades": {
       "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "market_id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            },
+            "style": "simple"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -328,6 +369,19 @@
                             }
                           }
                         }
+                      },
+                      "example": {
+                        "trades": [
+                          {
+                            "aggressingExchangeOrderId": 2431752712,
+                            "aggressingSide": 1,
+                            "fillQuantity": 26316,
+                            "price": 637050,
+                            "restingExchangeOrderId": 2431752357,
+                            "tradeId": 2434680,
+                            "transactTime": 1721071666518348500
+                          }
+                        ]
                       }
                     }
                   }
@@ -524,6 +578,56 @@
                             }
                           }
                         }
+                      },
+                      "example": {
+                        "summaries": [
+                          {
+                            "baseVolumeHi": 0,
+                            "baseVolumeLo": 471,
+                            "close": 1494,
+                            "high": 1507,
+                            "low": 1494,
+                            "marketId": 100022,
+                            "open": 1507,
+                            "quoteVolumeHi": 0,
+                            "quoteVolumeLo": 707108
+                          },
+                          {
+                            "baseVolumeHi": 0,
+                            "baseVolumeLo": 357,
+                            "close": 6751,
+                            "high": 6751,
+                            "low": 6127,
+                            "marketId": 100030,
+                            "open": 6319,
+                            "quoteVolumeHi": 0,
+                            "quoteVolumeLo": 2286072
+                          }
+                        ],
+                        "tops": [
+                          {
+                            "askPrice": 1571,
+                            "askQuantity": 19771,
+                            "bidPrice": 1556,
+                            "bidQuantity": 21427,
+                            "lastPrice": 1494,
+                            "marketId": 100022,
+                            "marketState": 1,
+                            "rolling24hPrice": 1507,
+                            "transactTime": 1721103999522960600
+                          },
+                          {
+                            "askPrice": 7870,
+                            "askQuantity": 3240,
+                            "bidPrice": 7561,
+                            "bidQuantity": 5622,
+                            "lastPrice": 6751,
+                            "marketId": 100030,
+                            "marketState": 1,
+                            "rolling24hPrice": 6319,
+                            "transactTime": 1721103999911184000
+                          }
+                        ]
                       }
                     }
                   }
@@ -690,6 +794,15 @@
       "get": {
         "parameters": [
           {
+            "in": "path",
+            "name": "market_symbol",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
             "in": "query",
             "name": "depth",
             "schema": {
@@ -841,6 +954,17 @@
     },
     "/parsed/book/{market_symbol}/recent-trades": {
       "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "market_symbol",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
