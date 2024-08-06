@@ -132,6 +132,40 @@
                             }
                           }
                         }
+                      },
+                      "example": {
+                        "orders": [
+                          {
+                            "cancelOnDisconnect": false,
+                            "clientOrderId": 1720791407860,
+                            "cumulativeQuantity": 0,
+                            "exchangeOrderId": 610000,
+                            "marketId": 100004,
+                            "orderQuantity": 3300,
+                            "orderType": 0,
+                            "price": 656000,
+                            "remainingQuantity": 3300,
+                            "restTime": 1720791407909233000,
+                            "side": 0,
+                            "subaccountId": 8,
+                            "timeInForce": 1
+                          },
+                          {
+                            "cancelOnDisconnect": false,
+                            "clientOrderId": 1721139361991,
+                            "cumulativeQuantity": 500,
+                            "exchangeOrderId": 630003,
+                            "marketId": 100022,
+                            "orderQuantity": 1500,
+                            "orderType": 0,
+                            "price": 1560,
+                            "remainingQuantity": 1000,
+                            "restTime": 1721139361998122000,
+                            "side": 1,
+                            "subaccountId": 8,
+                            "timeInForce": 1
+                          }
+                        ]
                       }
                     }
                   }
@@ -200,6 +234,12 @@
                     "format": "int32",
                     "nullable": true
                   }
+                },
+                "example": {
+                  "marketId": 100004,
+                  "requestId": 1721194173903564000,
+                  "side": 0,
+                  "subaccountId": 8
                 }
               }
             }
@@ -261,6 +301,14 @@
                           "format": "uint32",
                           "minimum": 0
                         }
+                      },
+                      "example": {
+                        "msgSeqNum": 10,
+                        "reason": null,
+                        "requestId": 1721194173903564000,
+                        "subaccountId": 8,
+                        "totalAffectedOrders": 3,
+                        "transactTime": 1721564617171865000
                       }
                     }
                   }
@@ -373,6 +421,20 @@
                     "description": "If true, this order will be automatically cancelled after the closure of the network connection between Cube's servers and the client that placed the order.\n\nIf the client initiates the disconnect or network instability drops the connection, the order will be cancelled when Cube's servers recognize the disconnection.\n\nIn the event of a server-side disconnect that causes a halt in trading, such as scheduled downtime, the order will be cancelled before trading resumes.",
                     "type": "boolean"
                   }
+                },
+                "example": {
+                  "cancelOnDisconnect": false,
+                  "clientOrderId": 1721188848244274000,
+                  "marketId": 100004,
+                  "orderType": 0,
+                  "postOnly": 0,
+                  "price": 656000,
+                  "quantity": 3300,
+                  "requestId": 1721188848288393000,
+                  "selfTradePrevention": 1,
+                  "side": 0,
+                  "subaccountId": 8,
+                  "timeInForce": 1
                 }
               }
             }
@@ -576,7 +638,24 @@
                           },
                           "additionalProperties": false
                         }
-                      ]
+                      ],
+                      "example": {
+                        "Ack": {
+                          "cancelOnDisconnect": false,
+                          "clientOrderId": 1721188848244274000,
+                          "exchangeOrderId": 630005,
+                          "marketId": 100004,
+                          "msgSeqNum": 10,
+                          "orderType": 0,
+                          "price": 656000,
+                          "quantity": 3300,
+                          "requestId": 1721188848288393000,
+                          "side": 0,
+                          "subaccountId": 8,
+                          "timeInForce": 1,
+                          "transactTime": 1721193327116302000
+                        }
+                      }
                     }
                   }
                 }
@@ -644,6 +723,12 @@
                     "format": "uint64",
                     "minimum": 0
                   }
+                },
+                "example": {
+                  "clientOrderId": 1721188848244274000,
+                  "marketId": 100004,
+                  "requestId": 1721188848288393000,
+                  "subaccountId": 8
                 }
               }
             }
@@ -791,7 +876,19 @@
                           },
                           "additionalProperties": false
                         }
-                      ]
+                      ],
+                      "example": {
+                        "Ack": {
+                          "clientOrderId": 1721188848244274000,
+                          "exchangeOrderId": 630005,
+                          "marketId": 100004,
+                          "msgSeqNum": 10,
+                          "reason": 2,
+                          "requestId": 1721188848288393000,
+                          "subaccountId": 8,
+                          "transactTime": 1721188848329501000
+                        }
+                      }
                     }
                   }
                 }
@@ -881,6 +978,16 @@
                     "type": "integer",
                     "format": "int32"
                   }
+                },
+                "example": {
+                  "clientOrderId": 1721212575078893000,
+                  "marketId": 100004,
+                  "newPrice": 656000,
+                  "newQuantity": 3300,
+                  "postOnly": 0,
+                  "requestId": 1721212575263679000,
+                  "selfTradePrevention": 1,
+                  "subaccountId": 8
                 }
               }
             }
@@ -1050,7 +1157,22 @@
                           },
                           "additionalProperties": false
                         }
-                      ]
+                      ],
+                      "example": {
+                        "Ack": {
+                          "clientOrderId": 1721212575078893000,
+                          "cumulativeQuantity": 0,
+                          "exchangeOrderId": 630009,
+                          "marketId": 100004,
+                          "msgSeqNum": 21,
+                          "price": 656000,
+                          "quantity": 3300,
+                          "remainingQuantity": 3300,
+                          "requestId": 1721212575263679000,
+                          "subaccountId": 8,
+                          "transactTime": 1721212575309118000
+                        }
+                      }
                     }
                   }
                 }
@@ -1130,6 +1252,11 @@
                             "type": "string",
                             "format": "number"
                           }
+                        },
+                        "example": {
+                          "assetId": 100004,
+                          "available": "12780000",
+                          "total": "13050000"
                         }
                       }
                     }
