@@ -41,7 +41,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -51,11 +51,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -112,7 +127,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -122,11 +137,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -204,7 +234,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -214,11 +244,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -317,7 +362,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -327,11 +372,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -412,7 +472,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -422,11 +482,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -552,7 +627,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -562,11 +637,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -611,6 +701,7 @@
                       "type": "object",
                       "required": [
                         "deposits",
+                        "transfers",
                         "withdrawals"
                       ],
                       "properties": {
@@ -848,6 +939,127 @@
                               "name": "primary"
                             }
                           }
+                        },
+                        "transfers": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "object",
+                            "required": [
+                              "inner",
+                              "name"
+                            ],
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "inner": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "required": [
+                                    "amount",
+                                    "assetId",
+                                    "attemptId",
+                                    "createdAt",
+                                    "fromAddress",
+                                    "fromSubaccountId",
+                                    "toAddress",
+                                    "toSubaccountId"
+                                  ],
+                                  "properties": {
+                                    "attemptId": {
+                                      "type": "integer",
+                                      "format": "int64"
+                                    },
+                                    "fromSubaccountId": {
+                                      "type": "integer",
+                                      "format": "int64"
+                                    },
+                                    "fromAddress": {
+                                      "type": "string"
+                                    },
+                                    "toSubaccountId": {
+                                      "type": "integer",
+                                      "format": "int64"
+                                    },
+                                    "toAddress": {
+                                      "type": "string"
+                                    },
+                                    "assetId": {
+                                      "type": "integer",
+                                      "format": "int32"
+                                    },
+                                    "amount": {
+                                      "type": "string",
+                                      "format": "number"
+                                    },
+                                    "approved": {
+                                      "type": "boolean",
+                                      "nullable": true
+                                    },
+                                    "reason": {
+                                      "type": "string",
+                                      "nullable": true
+                                    },
+                                    "batchId": {
+                                      "type": "string",
+                                      "format": "uuid",
+                                      "nullable": true
+                                    },
+                                    "txnState": {
+                                      "anyOf": [
+                                        {
+                                          "oneOf": [
+                                            {
+                                              "description": "A transfer where funds have been credited, but the reifying transaction has not been confirmed.",
+                                              "type": "string",
+                                              "enum": [
+                                                "accepted"
+                                              ]
+                                            },
+                                            {
+                                              "description": "The transfer is fully confirmed on-chain.",
+                                              "type": "string",
+                                              "enum": [
+                                                "confirmed"
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "createdAt": {
+                                      "description": "When the transfer request was created.",
+                                      "type": "string",
+                                      "format": "date-time"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "example": {
+                            "8": {
+                              "inner": [
+                                {
+                                  "amount": "220000000",
+                                  "approved": true,
+                                  "assetId": 5,
+                                  "attemptId": 134,
+                                  "createdAt": "2023-07-30T14:30:00-05:00",
+                                  "fromAddress": "2CakzUzWpQKmx9GGexMMRTtRcjtSdjCRB68vpUKM4obk",
+                                  "fromSubaccountId": 8,
+                                  "toAddress": "8j5i8msVWLkTP2ff3bmTLK3k2m3XtW1zdJPYovon55YS",
+                                  "toSubaccountId": 9,
+                                  "txnState": "accepted"
+                                }
+                              ],
+                              "name": "primary account"
+                            }
+                          }
                         }
                       },
                       "example": {
@@ -880,6 +1092,25 @@
                               }
                             ],
                             "name": "primary"
+                          }
+                        },
+                        "transfers": {
+                          "8": {
+                            "inner": [
+                              {
+                                "amount": "220000000",
+                                "approved": true,
+                                "assetId": 5,
+                                "attemptId": 134,
+                                "createdAt": "2023-07-30T14:30:00-05:00",
+                                "fromAddress": "2CakzUzWpQKmx9GGexMMRTtRcjtSdjCRB68vpUKM4obk",
+                                "fromSubaccountId": 8,
+                                "toAddress": "8j5i8msVWLkTP2ff3bmTLK3k2m3XtW1zdJPYovon55YS",
+                                "toSubaccountId": 9,
+                                "txnState": "accepted"
+                              }
+                            ],
+                            "name": "primary account"
                           }
                         },
                         "withdrawals": {
@@ -923,7 +1154,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -933,11 +1164,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -1099,7 +1345,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1109,11 +1355,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -1280,7 +1541,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1290,11 +1551,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -1337,110 +1613,123 @@
                   "properties": {
                     "result": {
                       "type": "object",
-                      "required": [
-                        "inner",
-                        "name"
-                      ],
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        },
-                        "inner": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "required": [
-                              "amount",
-                              "assetId",
-                              "attemptId",
-                              "createdAt",
-                              "fromAddress",
-                              "fromSubaccountId",
-                              "toAddress",
-                              "toSubaccountId"
-                            ],
-                            "properties": {
-                              "attemptId": {
-                                "type": "integer",
-                                "format": "int64"
-                              },
-                              "fromSubaccountId": {
-                                "type": "integer",
-                                "format": "int64"
-                              },
-                              "fromAddress": {
-                                "type": "string"
-                              },
-                              "toSubaccountId": {
-                                "type": "integer",
-                                "format": "int64"
-                              },
-                              "toAddress": {
-                                "type": "string"
-                              },
-                              "assetId": {
-                                "type": "integer",
-                                "format": "int32"
-                              },
-                              "amount": {
-                                "type": "string",
-                                "format": "number"
-                              },
-                              "approved": {
-                                "type": "boolean",
-                                "nullable": true
-                              },
-                              "reason": {
-                                "type": "string",
-                                "nullable": true
-                              },
-                              "txnHash": {
-                                "type": "string",
-                                "nullable": true
-                              },
-                              "txnIndex": {
-                                "type": "integer",
-                                "format": "int64",
-                                "nullable": true
-                              },
-                              "txnState": {
-                                "type": "string",
-                                "enum": [
-                                  "pending",
-                                  "received",
-                                  "confirmed",
-                                  "dropped",
-                                  "failed"
-                                ],
-                                "nullable": true
-                              },
-                              "createdAt": {
-                                "description": "When the transfer request was created.",
-                                "type": "string",
-                                "format": "date-time"
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "inner",
+                          "name"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "inner": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "amount",
+                                "assetId",
+                                "attemptId",
+                                "createdAt",
+                                "fromAddress",
+                                "fromSubaccountId",
+                                "toAddress",
+                                "toSubaccountId"
+                              ],
+                              "properties": {
+                                "attemptId": {
+                                  "type": "integer",
+                                  "format": "int64"
+                                },
+                                "fromSubaccountId": {
+                                  "type": "integer",
+                                  "format": "int64"
+                                },
+                                "fromAddress": {
+                                  "type": "string"
+                                },
+                                "toSubaccountId": {
+                                  "type": "integer",
+                                  "format": "int64"
+                                },
+                                "toAddress": {
+                                  "type": "string"
+                                },
+                                "assetId": {
+                                  "type": "integer",
+                                  "format": "int32"
+                                },
+                                "amount": {
+                                  "type": "string",
+                                  "format": "number"
+                                },
+                                "approved": {
+                                  "type": "boolean",
+                                  "nullable": true
+                                },
+                                "reason": {
+                                  "type": "string",
+                                  "nullable": true
+                                },
+                                "batchId": {
+                                  "type": "string",
+                                  "format": "uuid",
+                                  "nullable": true
+                                },
+                                "txnState": {
+                                  "anyOf": [
+                                    {
+                                      "oneOf": [
+                                        {
+                                          "description": "A transfer where funds have been credited, but the reifying transaction has not been confirmed.",
+                                          "type": "string",
+                                          "enum": [
+                                            "accepted"
+                                          ]
+                                        },
+                                        {
+                                          "description": "The transfer is fully confirmed on-chain.",
+                                          "type": "string",
+                                          "enum": [
+                                            "confirmed"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "createdAt": {
+                                  "description": "When the transfer request was created.",
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
                               }
                             }
                           }
                         }
                       },
                       "example": {
-                        "inner": [
-                          {
-                            "amount": "220000000",
-                            "approved": true,
-                            "assetId": 5,
-                            "attemptId": 134,
-                            "createdAt": "2023-07-30T14:30:00-05:00",
-                            "fromAddress": "2CakzUzWpQKmx9GGexMMRTtRcjtSdjCRB68vpUKM4obk",
-                            "fromSubaccountId": 8,
-                            "toAddress": "8j5i8msVWLkTP2ff3bmTLK3k2m3XtW1zdJPYovon55YS",
-                            "toSubaccountId": 9,
-                            "txnHash": "3ojghQjhimYEiFCyy6bGvJsRnX54X1rHuR1eBhVHdF4z",
-                            "txnIndex": 0,
-                            "txnState": "pending"
-                          }
-                        ],
-                        "name": "primary account"
+                        "8": {
+                          "inner": [
+                            {
+                              "amount": "220000000",
+                              "approved": true,
+                              "assetId": 5,
+                              "attemptId": 134,
+                              "createdAt": "2023-07-30T14:30:00-05:00",
+                              "fromAddress": "2CakzUzWpQKmx9GGexMMRTtRcjtSdjCRB68vpUKM4obk",
+                              "fromSubaccountId": 8,
+                              "toAddress": "8j5i8msVWLkTP2ff3bmTLK3k2m3XtW1zdJPYovon55YS",
+                              "toSubaccountId": 9,
+                              "txnState": "accepted"
+                            }
+                          ],
+                          "name": "primary account"
+                        }
                       }
                     }
                   }
@@ -1449,7 +1738,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1459,11 +1748,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -1647,6 +1951,7 @@
                                     "baseSettled",
                                     "feeAmount",
                                     "filledAt",
+                                    "isAggressor",
                                     "quoteAmount",
                                     "quoteSettled",
                                     "tradeId"
@@ -1670,6 +1975,10 @@
                                       "type": "boolean"
                                     },
                                     "quoteSettled": {
+                                      "type": "boolean"
+                                    },
+                                    "isAggressor": {
+                                      "description": "If this order was an aggressor in this fill.",
                                       "type": "boolean"
                                     },
                                     "baseAmount": {
@@ -1753,6 +2062,7 @@
                                   "required": [
                                     "amount",
                                     "assetId",
+                                    "direction",
                                     "name"
                                   ],
                                   "properties": {
@@ -1769,6 +2079,13 @@
                                     "amount": {
                                       "type": "string",
                                       "format": "number"
+                                    },
+                                    "direction": {
+                                      "type": "string",
+                                      "enum": [
+                                        "fee",
+                                        "rebate"
+                                      ]
                                     }
                                   }
                                 }
@@ -1828,6 +2145,7 @@
                                 "feeAmount": "0",
                                 "feeAssetId": 1,
                                 "filledAt": 1720933004211574000,
+                                "isAggressor": true,
                                 "quoteAmount": "1800000000",
                                 "quoteSettled": true,
                                 "tradeId": 620011
@@ -1853,7 +2171,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1863,11 +2181,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -1964,6 +2297,7 @@
                               "baseAmount",
                               "feeAmount",
                               "filledAt",
+                              "isAggressor",
                               "marketId",
                               "orderId",
                               "quoteAmount",
@@ -1991,6 +2325,7 @@
                                 ]
                               },
                               "aggressingSide": {
+                                "deprecated": true,
                                 "type": "string",
                                 "enum": [
                                   "Bid",
@@ -2007,6 +2342,10 @@
                                 "type": "integer",
                                 "format": "int64",
                                 "nullable": true
+                              },
+                              "isAggressor": {
+                                "description": "If this order was an aggressor in this fill.",
+                                "type": "boolean"
                               },
                               "baseAmount": {
                                 "type": "string",
@@ -2059,7 +2398,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2069,11 +2408,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -2186,7 +2540,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2196,11 +2550,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -2247,7 +2616,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2257,11 +2626,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -2288,7 +2672,6 @@
                   "marketId",
                   "postOnly",
                   "price",
-                  "quantity",
                   "side",
                   "subaccountId"
                 ],
@@ -2318,7 +2701,14 @@
                   "quantity": {
                     "type": "integer",
                     "format": "uint64",
-                    "minimum": 0
+                    "minimum": 0,
+                    "nullable": true
+                  },
+                  "quoteQuantity": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0,
+                    "nullable": true
                   },
                   "price": {
                     "type": "integer",
@@ -2363,6 +2753,7 @@
                             "required": [
                               "amount",
                               "assetId",
+                              "direction",
                               "name"
                             ],
                             "properties": {
@@ -2380,6 +2771,13 @@
                               "amount": {
                                 "type": "string",
                                 "format": "number"
+                              },
+                              "direction": {
+                                "type": "string",
+                                "enum": [
+                                  "fee",
+                                  "rebate"
+                                ]
                               }
                             }
                           }
@@ -2390,11 +2788,13 @@
                           {
                             "amount": "1200",
                             "assetId": 5,
+                            "direction": "fee",
                             "name": "tradeFee"
                           },
                           {
                             "amount": "100000",
                             "assetId": 5,
+                            "direction": "rebate",
                             "name": "impliedMatchFee"
                           }
                         ]
@@ -2406,7 +2806,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2416,11 +2816,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -2585,7 +3000,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2595,11 +3010,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -2659,7 +3089,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2669,11 +3099,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -2803,7 +3248,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2813,11 +3258,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -2922,7 +3382,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2932,11 +3392,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -3086,7 +3561,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3096,11 +3571,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -3259,6 +3749,8 @@
                               "feeTableId",
                               "isImplied",
                               "marketId",
+                              "maxOrderQuoteAmt",
+                              "minOrderQuoteAmt",
                               "priceDisplayDecimals",
                               "priceTickSize",
                               "protectionPriceLevels",
@@ -3322,17 +3814,15 @@
                                 "minimum": 0,
                                 "nullable": true
                               },
-                              "minOrderQty": {
-                                "description": "The minimum order quantity lots for this market. Inclusive.",
-                                "type": "integer",
-                                "format": "int64",
-                                "nullable": true
+                              "minOrderQuoteAmt": {
+                                "description": "The minimum notional amount for which an order will be accepted, expressed in RawUnits of the quote asset.  Inclusive. Note that this value is price-dependent.",
+                                "type": "string",
+                                "format": "number"
                               },
-                              "maxOrderQty": {
-                                "description": "The maximum order quantity lots for this market. Inclusive.",
-                                "type": "integer",
-                                "format": "int64",
-                                "nullable": true
+                              "maxOrderQuoteAmt": {
+                                "description": "The maximum notional amount for which an order will be accepted, expressed in RawUnits of the quote asset.  Inclusive. Note that this value is price-dependent.",
+                                "type": "string",
+                                "format": "number"
                               },
                               "priceTickSize": {
                                 "description": "The human-readable minimum price increment.",
@@ -3386,7 +3876,7 @@
                               "isImplied": true,
                               "isPrimary": true,
                               "marketId": 100001,
-                              "minOrderQty": 10,
+                              "minOrderQuoteAmt": "1000000000000000000",
                               "priceBandAskPct": 500,
                               "priceBandBidPct": 20,
                               "priceDisplayDecimals": 5,
@@ -3471,7 +3961,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3481,11 +3971,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }

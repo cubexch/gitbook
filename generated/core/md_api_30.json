@@ -257,7 +257,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -267,11 +267,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -390,7 +405,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -400,11 +415,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -636,7 +666,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -646,11 +676,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -767,7 +812,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -777,11 +822,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -929,7 +989,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -939,11 +999,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -1046,7 +1121,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1056,11 +1131,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }

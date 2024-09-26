@@ -70,7 +70,7 @@
                                 "minimum": 0
                               },
                               "exchangeOrderId": {
-                                "description": "[Exchange order ID](#exchange-order-id)",
+                                "description": "[Exchange order ID](trade-api.md#exchange-order-id)",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0
@@ -110,7 +110,7 @@
                                 "minimum": 0
                               },
                               "restTime": {
-                                "description": "[Transact time](#transact-time) of the NewOrderAck",
+                                "description": "[Transact time](trade-api.md#transact-time) of the NewOrderAck",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0
@@ -174,7 +174,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -184,11 +184,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -285,7 +300,7 @@
                           "minimum": 0
                         },
                         "transactTime": {
-                          "description": "[Transact time](#transact-time)",
+                          "description": "[Transact time](trade-api.md#transact-time)",
                           "type": "integer",
                           "format": "uint64",
                           "minimum": 0
@@ -317,7 +332,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -327,11 +342,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -343,11 +373,11 @@
     "/order": {
       "post": {
         "requestBody": {
-          "description": "Place a new order.",
+          "description": "Place a new order.\n\nExecution details: - For market orders, exactly one of `quantity` or `quote_quantity` must be specified. - For MARKET_WITH_PROTECTION, if `price` is specified, it will override the default protection price. - Matching will stop upon reaching the protection price, or `quantity` (or `quote_quantity`) filled. - When specifying `quote_quantity`, the order is considered 'fully filled' when there is insufficient remaining quote quantity to fill 1 lot at the next trade price. In that case, there will _not_ be a `CancelOrderAck` published.",
           "content": {
             "application/json": {
               "schema": {
-                "description": "Place a new order.",
+                "description": "Place a new order.\n\nExecution details: - For market orders, exactly one of `quantity` or `quote_quantity` must be specified. - For MARKET_WITH_PROTECTION, if `price` is specified, it will override the default protection price. - Matching will stop upon reaching the protection price, or `quantity` (or `quote_quantity`) filled. - When specifying `quote_quantity`, the order is considered 'fully filled' when there is insufficient remaining quote quantity to fill 1 lot at the next trade price. In that case, there will _not_ be a `CancelOrderAck` published.",
                 "type": "object",
                 "required": [
                   "cancelOnDisconnect",
@@ -355,7 +385,6 @@
                   "marketId",
                   "orderType",
                   "postOnly",
-                  "quantity",
                   "requestId",
                   "side",
                   "subaccountId",
@@ -386,9 +415,11 @@
                     "nullable": true
                   },
                   "quantity": {
+                    "description": "Required for LIMIT orders.",
                     "type": "integer",
                     "format": "uint64",
-                    "minimum": 0
+                    "minimum": 0,
+                    "nullable": true
                   },
                   "side": {
                     "type": "integer",
@@ -420,6 +451,13 @@
                   "cancelOnDisconnect": {
                     "description": "If true, this order will be automatically cancelled after the closure of the network connection between Cube's servers and the client that placed the order.\n\nIf the client initiates the disconnect or network instability drops the connection, the order will be cancelled when Cube's servers recognize the disconnection.\n\nIn the event of a server-side disconnect that causes a halt in trading, such as scheduled downtime, the order will be cancelled before trading resumes.",
                     "type": "boolean"
+                  },
+                  "quoteQuantity": {
+                    "description": "The quantity of the quote asset that the user wants to spend (for a BID) or receive (for an ASK). For limit orders, this is immediately converted to a base quantity using the provided price. For market orders, this is the maximum quantity that will be executed.\n\nNote that lot size rules will be respected, and the actual quantity executed will be expressed in base quantity units.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0,
+                    "nullable": true
                   }
                 },
                 "example": {
@@ -430,6 +468,7 @@
                   "postOnly": 0,
                   "price": 656000,
                   "quantity": 3300,
+                  "quoteQuantity": null,
                   "requestId": 1721188848288393000,
                   "selfTradePrevention": 1,
                   "side": 0,
@@ -470,6 +509,7 @@
                                 "marketId",
                                 "msgSeqNum",
                                 "orderType",
+                                "price",
                                 "quantity",
                                 "requestId",
                                 "side",
@@ -496,7 +536,7 @@
                                   "minimum": 0
                                 },
                                 "exchangeOrderId": {
-                                  "description": "[Exchange order ID](#exchange-order-id)",
+                                  "description": "[Exchange order ID](trade-api.md#exchange-order-id)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -507,14 +547,13 @@
                                   "minimum": 0
                                 },
                                 "price": {
-                                  "description": "If the order ultimately rests, the `price` field will include the resting price.",
+                                  "description": "The price that matching completed at. For limit orders, this will be the limit price. For market orders, this will be the protection price.",
                                   "type": "integer",
                                   "format": "uint64",
-                                  "minimum": 0,
-                                  "nullable": true
+                                  "minimum": 0
                                 },
                                 "quantity": {
-                                  "description": "The quantity submitted in the new-order request.",
+                                  "description": "If `quote_quantity` was not specified, the quantity submitted in the new-order request. Otherwise, the quantity of the base asset that was executed.",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -532,7 +571,7 @@
                                   "format": "int32"
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](#transact-time)",
+                                  "description": "[Transact time](trade-api.md#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -544,6 +583,12 @@
                                 },
                                 "cancelOnDisconnect": {
                                   "type": "boolean"
+                                },
+                                "quoteQuantity": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0,
+                                  "nullable": true
                                 }
                               }
                             }
@@ -564,7 +609,6 @@
                                 "marketId",
                                 "msgSeqNum",
                                 "orderType",
-                                "quantity",
                                 "reason",
                                 "requestId",
                                 "side",
@@ -591,7 +635,7 @@
                                   "minimum": 0
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](#transact-time)",
+                                  "description": "[Transact time](trade-api.md#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -619,7 +663,8 @@
                                 "quantity": {
                                   "type": "integer",
                                   "format": "uint64",
-                                  "minimum": 0
+                                  "minimum": 0,
+                                  "nullable": true
                                 },
                                 "side": {
                                   "type": "integer",
@@ -632,6 +677,12 @@
                                 "orderType": {
                                   "type": "integer",
                                   "format": "int32"
+                                },
+                                "quoteQuantity": {
+                                  "type": "integer",
+                                  "format": "uint64",
+                                  "minimum": 0,
+                                  "nullable": true
                                 }
                               }
                             }
@@ -649,6 +700,7 @@
                           "orderType": 0,
                           "price": 656000,
                           "quantity": 3300,
+                          "quoteQuantity": null,
                           "requestId": 1721188848288393000,
                           "side": 0,
                           "subaccountId": 8,
@@ -663,7 +715,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -673,11 +725,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -785,7 +852,7 @@
                                   "minimum": 0
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](#transact-time)",
+                                  "description": "[Transact time](trade-api.md#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -805,7 +872,7 @@
                                   "minimum": 0
                                 },
                                 "exchangeOrderId": {
-                                  "description": "[Exchange order ID](#exchange-order-id)",
+                                  "description": "[Exchange order ID](trade-api.md#exchange-order-id)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -852,7 +919,7 @@
                                   "minimum": 0
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](#transact-time)",
+                                  "description": "[Transact time](trade-api.md#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -896,7 +963,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -906,11 +973,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -1047,7 +1129,7 @@
                                   "minimum": 0
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](#transact-time)",
+                                  "description": "[Transact time](trade-api.md#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -1086,7 +1168,7 @@
                                   "minimum": 0
                                 },
                                 "exchangeOrderId": {
-                                  "description": "[Exchange order ID](#exchange-order-id)",
+                                  "description": "[Exchange order ID](trade-api.md#exchange-order-id)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -1133,7 +1215,7 @@
                                   "minimum": 0
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](#transact-time)",
+                                  "description": "[Transact time](trade-api.md#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -1180,7 +1262,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1190,11 +1272,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -1266,7 +1363,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1276,11 +1373,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
