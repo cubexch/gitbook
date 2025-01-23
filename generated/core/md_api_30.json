@@ -175,7 +175,7 @@
                                     "minimum": 0
                                   },
                                   "exchangeOrderId": {
-                                    "description": "[Exchange order ID](./websocket-trade-api.md#exchange-order-id)",
+                                    "description": "[Exchange order ID](./trade-api.md#exchange-order-id)",
                                     "type": "integer",
                                     "format": "uint64",
                                     "minimum": 0
@@ -257,7 +257,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -267,11 +267,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -344,7 +359,7 @@
                                 "format": "int32"
                               },
                               "restingExchangeOrderId": {
-                                "description": "The [Exchange order ID](./websocket-trade-api.md#exchange-order-id) of the resting order.",
+                                "description": "The [Exchange order ID](./trade-api.md#exchange-order-id) of the resting order.",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0
@@ -355,13 +370,13 @@
                                 "minimum": 0
                               },
                               "transactTime": {
-                                "description": "The [transact time](./websocket-trade-api.md#transact-time) assigned by the matching engine for this trade. All trades that occur from the same event will be assigned the same transact time.",
+                                "description": "The [transact time](./trade-api.md#transact-time) assigned by the matching engine for this trade. All trades that occur from the same event will be assigned the same transact time.",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0
                               },
                               "aggressingExchangeOrderId": {
-                                "description": "The [Exchange order ID](./websocket-trade-api.md#exchange-order-id) of the aggressing order.",
+                                "description": "The [Exchange order ID](./trade-api.md#exchange-order-id) of the aggressing order.",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0
@@ -390,7 +405,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -400,11 +415,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -450,7 +480,7 @@
                                 "minimum": 0
                               },
                               "transactTime": {
-                                "description": "The [transact time](./websocket-trade-api.md#transact-time) of the latest book update on this market.",
+                                "description": "The [transact time](./trade-api.md#transact-time) of the latest book update on this market.",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0
@@ -636,7 +666,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -646,11 +676,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -767,7 +812,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -777,11 +822,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -929,7 +989,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -939,11 +999,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }
@@ -1046,7 +1121,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while processing the request",
+            "description": "An error was encountered while processing the request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1056,11 +1131,26 @@
                   ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "reason"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "error": "example error string"
+                    "error": {
+                      "code": "E10000",
+                      "reason": "Reason"
+                    }
                   }
                 }
               }

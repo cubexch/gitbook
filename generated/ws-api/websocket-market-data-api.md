@@ -1,4 +1,5 @@
-## market_data.proto
+# WebSocket: Market Data API
+
 This schema defines the Protobuf messages used for communication with the
 Cube Market Data Service (Mendelev, MD). The `proto` definition file can be
 found [here](https://github.com/cubexch/ws-api/blob/main/schema/market_data.proto).
@@ -40,12 +41,15 @@ Every exchange message from `/book/:market_id` will be wrapped as an
 | heartbeat | [Heartbeat](#heartbeat) |  | Server heartbeat reply |
 | summary | [Summary](#summary) |  | 24h summary |
 | trades | [Trades](#trades) |  | Recent trades |
-| mbo_snapshot | [MarketByOrder](#market-by-order) |  | Market by order snapshot |
-| mbo_diff | [MarketByOrderDiff](#market-by-order-diff) |  | Market by order diff |
-| mbp_snapshot | [MarketByPrice](#market-by-price) |  | Market by price snapshot |
-| mbp_diff | [MarketByPriceDiff](#market-by-price-diff) |  | Market by price diff |
+| mbo_snapshot | [MarketByOrder](#marketbyorder) |  | Market by order snapshot |
+| mbo_diff | [MarketByOrderDiff](#marketbyorderdiff) |  | Market by order diff |
+| mbp_snapshot | [MarketByPrice](#marketbyprice) |  | Market by price snapshot |
+| mbp_diff | [MarketByPriceDiff](#marketbypricediff) |  | Market by price diff |
 | kline | [Kline](#kline) |  | Candlestick |
-| market_status | [MarketStatus](#market-status) |  |  |
+| market_status | [MarketStatus](#marketstatus) |  |  |
+| funding_calculation | [FundingCalculation](#fundingcalculation) |  | Funding calculation |
+| funding_application | [FundingApplication](#fundingapplication) |  | Funding application |
+| contract_statistics | [ContractStatistics](#contractstatistics) |  |  |
 | market_id | [uint64](#uint64) | optional | The market ID that this message is for. Null for `MdMessage.Heartbeat`. |
 
 
@@ -64,7 +68,7 @@ levels, but no ordering is guaranteed.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| levels | [MarketByPrice.Level](#market-by-price-level) | repeated |  |
+| levels | [MarketByPrice.Level](#marketbyprice.level) | repeated |  |
 | chunk | [uint32](#uint32) |  |  |
 | num_chunks | [uint32](#uint32) |  |  |
 
@@ -99,7 +103,7 @@ reconciliation.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| diffs | [MarketByPriceDiff.Diff](#market-by-price-diff-diff) | repeated |  |
+| diffs | [MarketByPriceDiff.Diff](#marketbypricediff.diff) | repeated |  |
 | total_bid_levels | [uint32](#uint32) |  | Total number of bid levels after this diff is applied. |
 | total_ask_levels | [uint32](#uint32) |  | Total number of ask levels after this diff is applied. |
 
@@ -118,7 +122,7 @@ A price level diff overwrites the existing price level.
 | price | [uint64](#uint64) |  |  |
 | quantity | [uint64](#uint64) |  |  |
 | side | [Side](#side) |  |  |
-| op | [MarketByPriceDiff.DiffOp](#market-by-price-diff-diff-op) |  |  |
+| op | [MarketByPriceDiff.DiffOp](#marketbypricediff.diffop) |  |  |
 
 
 
@@ -136,7 +140,7 @@ matched when that level is aggressed.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| orders | [MarketByOrder.Order](#market-by-order-order) | repeated |  |
+| orders | [MarketByOrder.Order](#marketbyorder.order) | repeated |  |
 | chunk | [uint32](#uint32) |  |  |
 | num_chunks | [uint32](#uint32) |  |  |
 
@@ -154,7 +158,7 @@ A resting order.
 | ----- | ---- | ----- | ----------- |
 | price | [uint64](#uint64) |  |  |
 | quantity | [uint64](#uint64) |  |  |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](./websocket-trade-api.md#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](./trade-api.md#exchange-order-id) |
 | side | [Side](#side) |  |  |
 | priority | [uint64](#uint64) |  | Order priority for execution. Valid within a price level and side. That is, orders must first be sorted by side and price (in descending order for bids and ascending for asks), and then the OrderPriority within the level. A lower value is a higher priority. |
 
@@ -176,7 +180,7 @@ exchange order ID will not change.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| diffs | [MarketByOrderDiff.Diff](#market-by-order-diff-diff) | repeated |  |
+| diffs | [MarketByOrderDiff.Diff](#marketbyorderdiff.diff) | repeated |  |
 | total_bid_levels | [uint32](#uint32) |  | Total number of bid levels after this diff is applied. |
 | total_ask_levels | [uint32](#uint32) |  | Total number of ask levels after this diff is applied. |
 | total_bid_orders | [uint32](#uint32) |  | Total number of bid orders after this diff is applied. |
@@ -197,9 +201,9 @@ An order diff creates, updates, or deletes a resting order based on the
 | ----- | ---- | ----- | ----------- |
 | price | [uint64](#uint64) |  |  |
 | quantity | [uint64](#uint64) |  |  |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](./websocket-trade-api.md#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](./trade-api.md#exchange-order-id) |
 | side | [Side](#side) |  |  |
-| op | [MarketByOrderDiff.DiffOp](#market-by-order-diff-diff-op) |  |  |
+| op | [MarketByOrderDiff.DiffOp](#marketbyorderdiff.diffop) |  |  |
 | priority | [uint64](#uint64) |  | See [`MarketByOrder.Order`](#marketbyorder.order) |
 
 
@@ -215,7 +219,83 @@ An order diff creates, updates, or deletes a resting order based on the
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | transact_time | [uint64](#uint64) |  |  |
-| market_state | [MarketState](#market-state) |  |  |
+| market_state | [MarketState](#marketstate) |  |  |
+
+
+
+
+
+
+
+## FundingCalculation
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| transact_time | [uint64](#uint64) |  | Server time that this funding calculation was made. |
+| predicted_funding_rate | [int64](#int64) |  | Predicted funding rate percentage for the next funding interval. See `FundingApplication.funding_rate` for details on calculation. |
+| next_funding_application_time | [uint64](#uint64) |  | The server target time for the next funding application. Expressed in nanoseconds.
+
+ countdown = next_funding_application_time - transact_time |
+| premium_index | [int64](#int64) |  | Premium (or discount) percentage relative to the index price.
+
+ mark_price = (1 + premium_index) * index_price
+
+Expressed with 9 decimals. |
+| index_price | [uint64](#uint64) |  | The index price used for the premium index calculation. Expressed with 9 decimals. |
+| latest_funding_rate | [int64](#int64) |  | The latest funding application's `funding_rate`. |
+
+
+
+
+
+
+
+## FundingApplication
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| transact_time | [uint64](#uint64) |  |  |
+| funding_rate | [int64](#int64) |  | Funding rate percentage for this interval, calculated based on the average premium index over the funding interval.
+
+ funding_rate = premium_index + clamp(interest_rate - premium_index, -clamp, +clamp) |
+| funding_delta | [FundingDelta](#fundingdelta) |  | The quote amount to be paid (or received) based on the given funding rate, funding interval duration, and current index price. |
+| next_funding_application_time | [uint64](#uint64) |  | The server target time for the next funding application. |
+
+
+
+
+
+
+
+## ContractStatistics
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| transact_time | [uint64](#uint64) |  |  |
+| open_interest | [int64](#int64) |  | The total number of open contracts for this product. Counts both longs and shorts |
+
+
+
+
+
+
+
+## FundingDelta
+Funding delta to be applied per open contract unit, for a particular funding
+interval. The delta is expressed as a signed (twos-complement) fixed point
+number with 18 decimal places.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| word0 | [uint64](#uint64) |  |  |
+| word1 | [uint64](#uint64) |  |  |
 
 
 
@@ -231,7 +311,7 @@ orders and levels, respectively.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| trades | [Trades.Trade](#trades-trade) | repeated |  |
+| trades | [Trades.Trade](#trades.trade) | repeated |  |
 
 
 
@@ -247,11 +327,11 @@ orders and levels, respectively.
 | ----- | ---- | ----- | ----------- |
 | tradeId | [uint64](#uint64) |  | The ID assigned to this trade. All trades that occur from the same event will be assigned the same ID, and are considered to be an atomic batch. |
 | price | [uint64](#uint64) |  | The price that this trade occurred at. |
-| aggressing_side | [AggressingSide](#aggressing-side) |  | The side of the aggressing order. |
-| resting_exchange_order_id | [uint64](#uint64) |  | The [Exchange order ID](./websocket-trade-api.md#exchange-order-id) of the resting order. |
+| aggressing_side | [AggressingSide](#aggressingside) |  | The side of the aggressing order. |
+| resting_exchange_order_id | [uint64](#uint64) |  | The [Exchange order ID](./trade-api.md#exchange-order-id) of the resting order. |
 | fill_quantity | [uint64](#uint64) |  |  |
-| transact_time | [uint64](#uint64) |  | The [transact time](./websocket-trade-api.md#transact-time) assigned by the matching engine for this trade. All trades that occur from the same event will be assigned the same transact time. |
-| aggressing_exchange_order_id | [uint64](#uint64) |  | The [Exchange order ID](./websocket-trade-api.md#exchange-order-id) of the aggressing order. |
+| transact_time | [uint64](#uint64) |  | The [transact time](./trade-api.md#transact-time) assigned by the matching engine for this trade. All trades that occur from the same event will be assigned the same transact time. |
+| aggressing_exchange_order_id | [uint64](#uint64) |  | The [Exchange order ID](./trade-api.md#exchange-order-id) of the aggressing order. |
 
 
 
@@ -286,7 +366,7 @@ Candlestick bar.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| interval | [KlineInterval](#kline-interval) |  |  |
+| interval | [KlineInterval](#klineinterval) |  |  |
 | start_time | [uint64](#uint64) |  | The unix nanosecond timestamp that this kline covers. |
 | open | [uint64](#uint64) | optional | Kline open price. |
 | close | [uint64](#uint64) | optional | Kline close price. |
@@ -324,7 +404,7 @@ each of which will be an [`MdMessage`](#mdmessage).
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| messages | [MdMessage](#md-message) | repeated |  |
+| messages | [MdMessage](#mdmessage) | repeated |  |
 
 
 
@@ -339,8 +419,8 @@ Every exchange message from `/tops` will be wrapped as an `AggMessage`.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | heartbeat | [Heartbeat](#heartbeat) |  | Server heartbeat reply |
-| top_of_books | [TopOfBooks](#top-of-books) |  | Top of books |
-| rate_updates | [RateUpdates](#rate-updates) |  | Rates for all assets |
+| top_of_books | [TopOfBooks](#topofbooks) |  | Top of books |
+| rate_updates | [RateUpdates](#rateupdates) |  | Rates for all assets |
 
 
 
@@ -355,14 +435,14 @@ Top of book
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | market_id | [uint64](#uint64) |  |  |
-| transact_time | [uint64](#uint64) |  | The [transact time](./websocket-trade-api.md#transact-time) of the latest book update on this market. |
+| transact_time | [uint64](#uint64) |  | The [transact time](./trade-api.md#transact-time) of the latest book update on this market. |
 | bid_price | [uint64](#uint64) | optional | The best bid price of the direct or implied book, whichever is better. |
 | bid_quantity | [uint64](#uint64) | optional | The total bid quantity at the best bid price. |
 | ask_price | [uint64](#uint64) | optional | The best ask price of the direct or implied book, whichever is better. |
 | ask_quantity | [uint64](#uint64) | optional | The total ask quantity at the best ask price. |
 | last_price | [uint64](#uint64) | optional | The last trade price. |
 | rolling24h_price | [uint64](#uint64) | optional | The 24h open price. |
-| market_state | [MarketState](#market-state) |  | Which trading operations are currently allowed on this market. |
+| market_state | [MarketState](#marketstate) |  | Which trading operations are currently allowed on this market. |
 
 
 
@@ -377,7 +457,7 @@ message.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| tops | [TopOfBook](#top-of-book) | repeated |  |
+| tops | [TopOfBook](#topofbook) | repeated |  |
 
 
 
@@ -397,7 +477,7 @@ EUR, updateSide = QUOTE` of `r2`, the BTC-EUR price estimate is `r1 * r2`.
 | asset_id | [uint64](#uint64) |  |  |
 | timestamp | [uint64](#uint64) |  | The nanosecond timestamp of the update. |
 | rate | [uint64](#uint64) |  | The asset rate at the given timestamp. |
-| side | [RateUpdateSide](#rate-update-side) |  |  |
+| side | [RateUpdateSide](#rateupdateside) |  |  |
 
 
 
@@ -412,7 +492,7 @@ rate-updates message.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| updates | [RateUpdate](#rate-update) | repeated |  |
+| updates | [RateUpdate](#rateupdate) | repeated |  |
 
 
 
@@ -448,7 +528,7 @@ and `mbo` can be set.
 | mbo | [bool](#bool) |  | Enable MBO feeds |
 | trades | [bool](#bool) |  | Enable recent trades |
 | summary | [bool](#bool) |  | Enable 24h summary |
-| klines | [KlineInterval](#kline-interval) | repeated | Enable price klines |
+| klines | [KlineInterval](#klineinterval) | repeated | Enable price klines |
 | market_ids | [uint64](#uint64) | repeated | Market's to subscribe to. Limit 3. |
 
 
@@ -460,8 +540,7 @@ and `mbo` can be set.
 ## Enums
 
 
-
-## Side
+### Side
 Side specifies whether the level, order, or diff, is for buying or selling
 the base asset.
 
@@ -473,7 +552,7 @@ the base asset.
 
 
 
-## KlineInterval
+### KlineInterval
 The candlestick interval.
 
 | Name | Number | Description |
@@ -488,7 +567,7 @@ The candlestick interval.
 
 
 
-## MarketState
+### MarketState
 The per-market matching engine state. Affects order-entry.
 
 | Name | Number | Description |
@@ -500,7 +579,7 @@ The per-market matching engine state. Affects order-entry.
 
 
 
-## AggressingSide
+### AggressingSide
 The side of the aggressing order. This also indicates if the aggressing order
 was an implied order (i.e aggressed into a different market and executed into
 this one through implieds)
@@ -515,7 +594,7 @@ this one through implieds)
 
 
 
-## RateUpdateSide
+### RateUpdateSide
 The side of the rate update. Given a `BASE` rate of `r`, the `QUOTE` rate is
 `1 / r`, and vice versa.
 
@@ -527,7 +606,7 @@ The side of the rate update. Given a `BASE` rate of `r`, the `QUOTE` rate is
 
 
 
-## MarketByPriceDiff.DiffOp
+### MarketByPriceDiff.DiffOp
 The operation to apply for this price level. Currently, new price levels
 are created with `REPLACE`.
 
@@ -540,7 +619,7 @@ are created with `REPLACE`.
 
 
 
-## MarketByOrderDiff.DiffOp
+### MarketByOrderDiff.DiffOp
 The operation to apply for this price level. For example, an resting order
 that gets filled will be `REPLACE`'d with the new resting quantity. An
 order is `REMOVE`'d when it is fully filled or canceled.
