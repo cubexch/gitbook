@@ -1,5 +1,3 @@
-# REST: Market Data API
-
 The base URL for endpoints described in this page of live trading API is `https://api.cube.exchange/md/v0`.
 
 Definitions for requests and responses can be found in the [Market Data OpenAPI Document](generated/core/md_api_30.json).

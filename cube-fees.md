@@ -1,5 +1,3 @@
-# Fees
-
 This page describes the various fees charged by Cube.
 
 ## Trading Fees

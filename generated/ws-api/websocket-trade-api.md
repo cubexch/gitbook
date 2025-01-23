@@ -1,5 +1,3 @@
-# WebSocket: Trade API
-
 ## trade.proto
 This schema defines the Protobuf messages used for communication with the
 Cube Order Service (OS, or "Osmium").

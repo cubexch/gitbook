@@ -1,5 +1,3 @@
-# WebSocket: Market Data API
-
 ## market_data.proto
 This schema defines the Protobuf messages used for communication with the
 Cube Market Data Service (Mendelev, MD). The `proto` definition file can be

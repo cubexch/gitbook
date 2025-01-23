@@ -1,6 +1,4 @@
 
-# Cube Exchange Trade API
-
 ## Price, Quantity, and Lots
 
 All orders are placed on a single market, specified by the market-id. The
