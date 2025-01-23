@@ -235,14 +235,8 @@ An order diff creates, updates, or deletes a resting order based on the
 | ----- | ---- | ----- | ----------- |
 | transact_time | [uint64](#uint64) |  | Server time that this funding calculation was made. |
 | predicted_funding_rate | [int64](#int64) |  | Predicted funding rate percentage for the next funding interval. See `FundingApplication.funding_rate` for details on calculation. |
-| next_funding_application_time | [uint64](#uint64) |  | The server target time for the next funding application. Expressed in nanoseconds.
-
- countdown = next_funding_application_time - transact_time |
-| premium_index | [int64](#int64) |  | Premium (or discount) percentage relative to the index price.
-
- mark_price = (1 + premium_index) * index_price
-
-Expressed with 9 decimals. |
+| next_funding_application_time | [uint64](#uint64) |  | The server target time for the next funding application. Expressed in nanoseconds. <br> `countdown = next_funding_application_time - transact_time` |
+| premium_index | [int64](#int64) |  | Premium (or discount) percentage relative to the index price. <br> `mark_price = (1 + premium_index) * index_price` <br> Expressed with 9 decimals. |
 | index_price | [uint64](#uint64) |  | The index price used for the premium index calculation. Expressed with 9 decimals. |
 | latest_funding_rate | [int64](#int64) |  | The latest funding application's `funding_rate`. |
 
@@ -259,9 +253,7 @@ Expressed with 9 decimals. |
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | transact_time | [uint64](#uint64) |  |  |
-| funding_rate | [int64](#int64) |  | Funding rate percentage for this interval, calculated based on the average premium index over the funding interval.
-
- funding_rate = premium_index + clamp(interest_rate - premium_index, -clamp, +clamp) |
+| funding_rate | [int64](#int64) |  | Funding rate percentage for this interval, calculated based on the average premium index over the funding interval. <br> `funding_rate = premium_index + clamp(interest_rate - premium_index, -clamp, +clamp)` |
 | funding_delta | [FundingDelta](#fundingdelta) |  | The quote amount to be paid (or received) based on the given funding rate, funding interval duration, and current index price. |
 | next_funding_application_time | [uint64](#uint64) |  | The server target time for the next funding application. |
 

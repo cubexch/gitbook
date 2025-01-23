@@ -593,7 +593,7 @@ messages will reflect those changes.
 
 The unsettled PnL of the position is calculated as:
 
-```text
+```rust compile_file
 // the contract multiplier as defined in the contract specification
 let contract_decimals = ...;
 
@@ -622,20 +622,10 @@ let unsettled_pnl = base_notional + quote;
 | quote | [HealthValue](#healthvalue) |  |  |
 | bids | [RawUnits](#rawunits) |  |  |
 | asks | [RawUnits](#rawunits) |  |  |
-| cost_basis | [HealthValue](#healthvalue) |  | The cost basis paid for the current position. Lots are averaged together.
-
-The cost basis will be the same sign as `net_contract_units`.
-
-Display only. Reset when the position is closed or the position direction changes. |
-| realized_pnl | [HealthValue](#healthvalue) |  | The realized PnL for the current position. Calculated as the sum of differences between contract value at time of close and average cost basis.
-
-Display only. Reset when the position is closed or the position direction changes. |
-| funding | [HealthValue](#healthvalue) |  | Total funding paid (positive) or received (negative) by this position.
-
-Display only. Reset when the position is closed or the position direction changes. |
-| leverage | [uint32](#uint32) |  | The leverage override applied to the contract. (0 if there is no override)
-
-Leverage ratio affects the maximum notional position size as well as the initial margin requirements for the position. Note that this does not directly affect the maintenance margin requirements. |
+| cost_basis | [HealthValue](#healthvalue) |  | The cost basis paid for the current position. Lots are averaged together. <br> The cost basis will be the same sign as `net_contract_units`. <br> Display only. Reset when the position is closed or the position direction changes. |
+| realized_pnl | [HealthValue](#healthvalue) |  | The realized PnL for the current position. Calculated as the sum of differences between contract value at time of close and average cost basis. <br> Display only. Reset when the position is closed or the position direction changes. |
+| funding | [HealthValue](#healthvalue) |  | Total funding paid (positive) or received (negative) by this position. <br> Display only. Reset when the position is closed or the position direction changes. |
+| leverage | [uint32](#uint32) |  | The leverage override applied to the contract. (0 if there is no override) <br> Leverage ratio affects the maximum notional position size as well as the initial margin requirements for the position. Note that this does not directly affect the maintenance margin requirements. |
 
 
 
