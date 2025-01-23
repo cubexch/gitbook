@@ -15,3 +15,11 @@
 
 * Fees
   * [Cube Fees](cube-fees.md)
+
+* Perpetual Futures
+  * [Introduction](perpetual-futures/README.md)
+  * [Contract Specifications](perpetual-futures/contracts.md)
+  * [Margin](perpetual-futures/margin.md)
+  * [PNL and Settlement](perpetual-futures/pnl-and-settlement.md)
+  * [Funding](perpetual-futures/funding.md)
+  * [Liquidation](perpetual-futures/liquidation.md)
