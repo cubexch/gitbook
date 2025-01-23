@@ -50,7 +50,7 @@ ONCE=(
   ModifyOrder
   Heartbeat
   MassCancel
-  # order response
+  # order response (also Heartbeat)
   NewOrderAck
   CancelOrderAck
   ModifyOrderAck
@@ -58,20 +58,32 @@ ONCE=(
   CancelOrderReject
   ModifyOrderReject
   Fill
-  FixedPointDecimal
   AssetPosition
-  RawUnits
   MassCancelAck
-  # bootstrap
+  TradingStatus
+  ImpliedMatchFee
+  ContractPosition
+  # bootstrap (also TradingStatus)
   Done
   RestingOrders
   RestingOrder
   AssetPositions
+  ContractPositions
+  # numeric types
+  FixedPointDecimal
+  RawUnits
+  HealthValue
 )
 
 for STRUCT in "${ONCE[@]}"; do
   sed -i '' "s/^\\(#*\\) $STRUCT\$/\\1# $STRUCT/" $OUT_DIR/websocket-trade-api.md
 done
+
+# Add numeric types heading
+sed -i '' '/^### FixedPointDecimal/i\
+\
+## Numeric Types\
+' $OUT_DIR/websocket-trade-api.md
 
 echo 'Generating markdown for Market Data API...'
 protoc \
@@ -97,6 +109,10 @@ ONCE=(
   Trades.Trade
   Summary
   Kline
+  MarketStatus
+  FundingCalculation
+  FundingApplication
+  ContractStatistics
   Heartbeat
   MdMessages
   # agg message
@@ -106,10 +122,18 @@ ONCE=(
   RateUpdates
   # client message
   Config
+  # numeric types
+  FundingDelta
 )
 
 for STRUCT in "${ONCE[@]}"; do
   sed -i '' "s/^\\(#*\\) $STRUCT\$/\\1# $STRUCT/" $OUT_DIR/websocket-market-data-api.md
 done
+
+# Add numeric types heading
+sed -i '' '/^### FundingDelta/i\
+\
+## Numeric Types\
+' $OUT_DIR/websocket-market-data-api.md
 
 echo 'Success: generated/ws-api'

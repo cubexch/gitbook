@@ -212,7 +212,7 @@ An order diff creates, updates, or deletes a resting order based on the
 
 
 
-## MarketStatus
+### MarketStatus
 
 
 
@@ -227,7 +227,7 @@ An order diff creates, updates, or deletes a resting order based on the
 
 
 
-## FundingCalculation
+### FundingCalculation
 
 
 
@@ -246,7 +246,7 @@ An order diff creates, updates, or deletes a resting order based on the
 
 
 
-## FundingApplication
+### FundingApplication
 
 
 
@@ -263,7 +263,7 @@ An order diff creates, updates, or deletes a resting order based on the
 
 
 
-## ContractStatistics
+### ContractStatistics
 
 
 
@@ -271,23 +271,6 @@ An order diff creates, updates, or deletes a resting order based on the
 | ----- | ---- | ----- | ----------- |
 | transact_time | [uint64](#uint64) |  |  |
 | open_interest | [int64](#int64) |  | The total number of open contracts for this product. Counts both longs and shorts |
-
-
-
-
-
-
-
-## FundingDelta
-Funding delta to be applied per open contract unit, for a particular funding
-interval. The delta is expressed as a signed (twos-complement) fixed point
-number with 18 decimal places.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| word0 | [uint64](#uint64) |  |  |
-| word1 | [uint64](#uint64) |  |  |
 
 
 
@@ -522,6 +505,25 @@ and `mbo` can be set.
 | summary | [bool](#bool) |  | Enable 24h summary |
 | klines | [KlineInterval](#klineinterval) | repeated | Enable price klines |
 | market_ids | [uint64](#uint64) | repeated | Market's to subscribe to. Limit 3. |
+
+
+
+
+
+
+
+
+## Numeric Types
+### FundingDelta
+Funding delta to be applied per open contract unit, for a particular funding
+interval. The delta is expressed as a signed (twos-complement) fixed point
+number with 18 decimal places.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| word0 | [uint64](#uint64) |  |  |
+| word1 | [uint64](#uint64) |  |  |
 
 
 

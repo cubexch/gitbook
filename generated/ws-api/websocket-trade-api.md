@@ -34,7 +34,7 @@ signature should be calculated as the concatenation of the byte string
 `cube.xyz` and the current unix epoch in seconds interpreted at a
 little-endian 64-bit number.
 
-### Implementation notes:
+### Implementation notes
 - The signature is base-64 encoded with the 'standard' alphabet and
   padding.
 
@@ -514,7 +514,7 @@ A fill for an order.
 
 
 
-## ImpliedMatchFee
+### ImpliedMatchFee
 Indicates the implied match fee for a trade.
 This message will be delivered once for each aggressing NewOrder (taker order)
 that results in one or more implied fills.
@@ -533,25 +533,6 @@ this message will still be delivered and the fee_amount will be zero.
 | fee_asset_id | [uint64](#uint64) |  | The ID of the asset demoninating the fee_amount. |
 | fee_amount | [RawUnits](#rawunits) |  | The magnitude of the implied match fee in indivisible RawUnits. For details on how this is calculated, reference the documentation related to Implied Matching. Note that, unlike trading fees, this value is already accounted for in the quantities reported by the fill_quantity and fill_quote_quantity fields. It does not need to be subtracted when reconciling the associated order's fills against on-chain settlement. |
 | fee_direction | [AdjustmentDirection](#adjustmentdirection) |  | Which way the fee_amount funds are moving, from the perspective of the client. |
-
-
-
-
-
-
-
-### FixedPointDecimal
-A fixed-point decimal number.
-Matches the representation preferred by the FIX protocol,
-except that the exponent is int32 since Protobuf does not have an int8 type.
-The value is computed as `mantissa * 10^exponent`;
-for example, `mantissa = 1234` and `exponent = -2` is `12.34`.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| mantissa | [int64](#int64) |  |  |
-| exponent | [int32](#int32) |  |  |
 
 
 
@@ -578,7 +559,7 @@ can also be tracked by applying other OrderResponse messages individually.
 
 
 
-## ContractPosition
+### ContractPosition
 The user's open contract position and open orders. Also see `AssetPosition`
 
 `quote` is the settled offsetting quote balance for the open contract
@@ -591,7 +572,8 @@ immediately reflected in the `quote` balance. These are all settled at time
 of PnL settlement, and subsequent `ContractPosition` and `AssetPosition`
 messages will reflect those changes.
 
-The unsettled PnL of the position is calculated as:
+The unsettled PnL (different from the unrealized pnl) of the position,
+which includes funding payments et al, is calculated as:
 
 ```rust compile_file
 // the contract multiplier as defined in the contract specification
@@ -602,7 +584,7 @@ let index_price = ...;
 
 // base notional with 18 digits of precision
 let base_notional
-  = net_contract_units * 10^9 / 10^contract_decimals
+  = net_contract_units * 10.pow(9) / 10.pow(contract_decimals)
   * index_price
   ;
 
@@ -626,45 +608,6 @@ let unsettled_pnl = base_notional + quote;
 | realized_pnl | [HealthValue](#healthvalue) |  | The realized PnL for the current position. Calculated as the sum of differences between contract value at time of close and average cost basis. <br> Display only. Reset when the position is closed or the position direction changes. |
 | funding | [HealthValue](#healthvalue) |  | Total funding paid (positive) or received (negative) by this position. <br> Display only. Reset when the position is closed or the position direction changes. |
 | leverage | [uint32](#uint32) |  | The leverage override applied to the contract. (0 if there is no override) <br> Leverage ratio affects the maximum notional position size as well as the initial margin requirements for the position. Note that this does not directly affect the maintenance margin requirements. |
-
-
-
-
-
-
-
-### RawUnits
-Raw-units is a 256-bit number for the amount of an asset. The precision is
-based on the underlying asset. For example, ETH is specified as if in
-fixed-point 10^18, while BTC is specified as if in fixed-point 10^8.
-
-The number is interpreted in 'little-endian' as `[word0, word1, word2,
-word3]`.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| word0 | [uint64](#uint64) |  |  |
-| word1 | [uint64](#uint64) |  |  |
-| word2 | [uint64](#uint64) |  |  |
-| word3 | [uint64](#uint64) |  |  |
-
-
-
-
-
-
-
-## HealthValue
-Signed (twos-complement), fixed point 18-decimal-digit value.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| word0 | [uint64](#uint64) |  |  |
-| word1 | [uint64](#uint64) |  |  |
-| word2 | [uint64](#uint64) |  |  |
-| word3 | [uint64](#uint64) |  |  |
 
 
 
@@ -723,7 +666,7 @@ A chunk of asset positions. Sent on bootstrap.
 
 
 
-## ContractPositions
+### ContractPositions
 A chunk of contract positions. Sent on bootstrap.
 
 
@@ -752,7 +695,7 @@ An indication that bootstrap is complete.
 
 
 
-## TradingStatus
+### TradingStatus
 Indicates the scope of the ability to trade via this connection.
 This message will be sent each time that scope changes.
 
@@ -786,6 +729,66 @@ A resting order. Sent on bootstrap in `RestingOrders`.
 | subaccount_id | [uint64](#uint64) |  |  |
 | cumulative_quantity | [uint64](#uint64) |  | The cumulative filled quantity for this order. |
 | cancel_on_disconnect | [bool](#bool) |  |  |
+
+
+
+
+
+
+
+
+## Numeric Types
+### FixedPointDecimal
+A fixed-point decimal number.
+Matches the representation preferred by the FIX protocol,
+except that the exponent is int32 since Protobuf does not have an int8 type.
+The value is computed as `mantissa * 10^exponent`;
+for example, `mantissa = 1234` and `exponent = -2` is `12.34`.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| mantissa | [int64](#int64) |  |  |
+| exponent | [int32](#int32) |  |  |
+
+
+
+
+
+
+
+### RawUnits
+Raw-units is a 256-bit number for the amount of an asset. The precision is
+based on the underlying asset. For example, ETH is specified as if in
+fixed-point 10^18, while BTC is specified as if in fixed-point 10^8.
+
+The number is interpreted in 'little-endian' as `[word0, word1, word2,
+word3]`.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| word0 | [uint64](#uint64) |  |  |
+| word1 | [uint64](#uint64) |  |  |
+| word2 | [uint64](#uint64) |  |  |
+| word3 | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+
+### HealthValue
+Signed (twos-complement), fixed point 18-decimal-digit value.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| word0 | [uint64](#uint64) |  |  |
+| word1 | [uint64](#uint64) |  |  |
+| word2 | [uint64](#uint64) |  |  |
+| word3 | [uint64](#uint64) |  |  |
 
 
 
