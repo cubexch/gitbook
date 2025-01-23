@@ -3752,6 +3752,96 @@
                                   "Perpetual"
                                 ]
                               },
+                              "params": {
+                                "description": "If this asset is a perpetual contract, the parameters for that perpetual contract.",
+                                "type": "object",
+                                "required": [
+                                  "fundingInterval",
+                                  "fundingPeriod",
+                                  "fundingRateCalculationInterval",
+                                  "fundingStart",
+                                  "impactAskQuantity",
+                                  "impactBidQuantity",
+                                  "liquidationFee",
+                                  "liquidationPriority",
+                                  "marginTierTableId",
+                                  "maximumFundingRate",
+                                  "minimumFundingRate",
+                                  "settlementAssetId",
+                                  "underlyingAssetId"
+                                ],
+                                "properties": {
+                                  "underlyingAssetId": {
+                                    "description": "The asset ID of the underlying asset.",
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "minimum": 0
+                                  },
+                                  "settlementAssetId": {
+                                    "description": "The asset ID of the settlement asset.",
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "minimum": 0
+                                  },
+                                  "marginTierTableId": {
+                                    "description": "The ID of the margin tier table that this asset uses.",
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "minimum": 0
+                                  },
+                                  "liquidationFee": {
+                                    "description": "The fee charged during liquidation, expressed in basis points (1 bps = 0.01%)",
+                                    "type": "string",
+                                    "format": "number"
+                                  },
+                                  "liquidationPriority": {
+                                    "description": "Priority level for liquidation processing, where lower numbers indicate higher priority\n\nDetermines the order in which different perpetual markets are liquidated",
+                                    "type": "integer",
+                                    "format": "int32"
+                                  },
+                                  "fundingStart": {
+                                    "description": "Unix timestamp (in seconds) when funding payments begin\n\nMarks the start of the first funding interval for the perpetual market",
+                                    "type": "integer",
+                                    "format": "int64"
+                                  },
+                                  "fundingPeriod": {
+                                    "description": "Total duration of a complete funding cycle in seconds.\n\nA funding cycle is broken down into further intervals for funding payments. Funding rates are calculated based on the length of the period and then prorated for the interval.",
+                                    "type": "integer",
+                                    "format": "int64"
+                                  },
+                                  "fundingInterval": {
+                                    "description": "Time between individual funding payments in seconds.",
+                                    "type": "integer",
+                                    "format": "int64"
+                                  },
+                                  "fundingRateCalculationInterval": {
+                                    "description": "Interval in seconds between premium index recalculations.",
+                                    "type": "integer",
+                                    "format": "int64"
+                                  },
+                                  "minimumFundingRate": {
+                                    "description": "Minimum funding rate (floor)",
+                                    "type": "string",
+                                    "format": "number"
+                                  },
+                                  "maximumFundingRate": {
+                                    "description": "Maximum funding rate (ceiling)",
+                                    "type": "string",
+                                    "format": "number"
+                                  },
+                                  "impactBidQuantity": {
+                                    "description": "Quantity of contracts on the bid side used for impact price calculation\n\nUsed to measure market impact and determine fair price for funding calculations",
+                                    "type": "integer",
+                                    "format": "int64"
+                                  },
+                                  "impactAskQuantity": {
+                                    "description": "Quantity of contracts on the ask side used for impact price calculation\n\nUsed to measure market impact and determine fair price for funding calculations",
+                                    "type": "integer",
+                                    "format": "int64"
+                                  }
+                                },
+                                "nullable": true
+                              },
                               "sourceId": {
                                 "description": "The source ID of this asset.",
                                 "type": "integer",
@@ -3778,27 +3868,6 @@
                                     "nullable": true
                                   }
                                 }
-                              },
-                              "underlyingAssetId": {
-                                "description": "For perpetuals, the asset ID of the underlying asset.",
-                                "type": "integer",
-                                "format": "uint64",
-                                "minimum": 0,
-                                "nullable": true
-                              },
-                              "settlementAssetId": {
-                                "description": "For perpetuals, the asset ID of the settlement asset.",
-                                "type": "integer",
-                                "format": "uint64",
-                                "minimum": 0,
-                                "nullable": true
-                              },
-                              "marginTierTableId": {
-                                "description": "For perpetuals, the ID of the margin tier table that this asset uses.",
-                                "type": "integer",
-                                "format": "uint64",
-                                "minimum": 0,
-                                "nullable": true
                               }
                             },
                             "example": {
@@ -3811,6 +3880,7 @@
                                 "snapshotPrice": 100000,
                                 "supply": 21000000
                               },
+                              "params": null,
                               "settles": true,
                               "sourceId": 1,
                               "status": 1,
@@ -3988,75 +4058,6 @@
                                   "sbqs",
                                   "sbsq"
                                 ],
-                                "nullable": true
-                              },
-                              "perpetualParams": {
-                                "description": "If the base asset is a perpetual contract, the parameters for that perpetual contract.",
-                                "type": "object",
-                                "required": [
-                                  "fundingInterval",
-                                  "fundingPeriod",
-                                  "fundingRateCalculationInterval",
-                                  "fundingStart",
-                                  "impactAskQuantity",
-                                  "impactBidQuantity",
-                                  "liquidationFee",
-                                  "liquidationPriority",
-                                  "maximumFundingRate",
-                                  "minimumFundingRate"
-                                ],
-                                "properties": {
-                                  "liquidationFee": {
-                                    "description": "The fee charged during liquidation, expressed in basis points (1 bps = 0.01%)",
-                                    "type": "string",
-                                    "format": "number"
-                                  },
-                                  "liquidationPriority": {
-                                    "description": "Priority level for liquidation processing, where lower numbers indicate higher priority\n\nDetermines the order in which different perpetual markets are liquidated",
-                                    "type": "integer",
-                                    "format": "int32"
-                                  },
-                                  "fundingStart": {
-                                    "description": "Unix timestamp (in seconds) when funding payments begin\n\nMarks the start of the first funding interval for the perpetual market",
-                                    "type": "integer",
-                                    "format": "int64"
-                                  },
-                                  "fundingPeriod": {
-                                    "description": "Total duration of a complete funding cycle in seconds.\n\nA funding cycle is broken down into further intervals for funding payments. Funding rates are calculated based on the length of the period and then prorated for the interval.",
-                                    "type": "integer",
-                                    "format": "int64"
-                                  },
-                                  "fundingInterval": {
-                                    "description": "Time between individual funding payments in seconds.",
-                                    "type": "integer",
-                                    "format": "int64"
-                                  },
-                                  "fundingRateCalculationInterval": {
-                                    "description": "Interval in seconds between premium index recalculations.",
-                                    "type": "integer",
-                                    "format": "int64"
-                                  },
-                                  "minimumFundingRate": {
-                                    "description": "Minimum funding rate (floor)",
-                                    "type": "string",
-                                    "format": "number"
-                                  },
-                                  "maximumFundingRate": {
-                                    "description": "Maximum funding rate (ceiling)",
-                                    "type": "string",
-                                    "format": "number"
-                                  },
-                                  "impactBidQuantity": {
-                                    "description": "Quantity of contracts on the bid side used for impact price calculation\n\nUsed to measure market impact and determine fair price for funding calculations",
-                                    "type": "integer",
-                                    "format": "int64"
-                                  },
-                                  "impactAskQuantity": {
-                                    "description": "Quantity of contracts on the ask side used for impact price calculation\n\nUsed to measure market impact and determine fair price for funding calculations",
-                                    "type": "integer",
-                                    "format": "int64"
-                                  }
-                                },
                                 "nullable": true
                               }
                             },
