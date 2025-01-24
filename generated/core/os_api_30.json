@@ -70,7 +70,7 @@
                                 "minimum": 0
                               },
                               "exchangeOrderId": {
-                                "description": "[Exchange order ID](./trade-api.md#exchange-order-id)",
+                                "description": "[Exchange order ID](/trade-api#exchange-order-id)",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0
@@ -110,7 +110,7 @@
                                 "minimum": 0
                               },
                               "restTime": {
-                                "description": "[Transact time](./trade-api.md#transact-time) of the NewOrderAck",
+                                "description": "[Transact time](/trade-api#transact-time) of the NewOrderAck",
                                 "type": "integer",
                                 "format": "uint64",
                                 "minimum": 0
@@ -300,7 +300,7 @@
                           "minimum": 0
                         },
                         "transactTime": {
-                          "description": "[Transact time](./trade-api.md#transact-time)",
+                          "description": "[Transact time](/trade-api#transact-time)",
                           "type": "integer",
                           "format": "uint64",
                           "minimum": 0
@@ -536,7 +536,7 @@
                                   "minimum": 0
                                 },
                                 "exchangeOrderId": {
-                                  "description": "[Exchange order ID](./trade-api.md#exchange-order-id)",
+                                  "description": "[Exchange order ID](/trade-api#exchange-order-id)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -571,7 +571,7 @@
                                   "format": "int32"
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](./trade-api.md#transact-time)",
+                                  "description": "[Transact time](/trade-api#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -635,7 +635,7 @@
                                   "minimum": 0
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](./trade-api.md#transact-time)",
+                                  "description": "[Transact time](/trade-api#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -852,7 +852,7 @@
                                   "minimum": 0
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](./trade-api.md#transact-time)",
+                                  "description": "[Transact time](/trade-api#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -872,7 +872,7 @@
                                   "minimum": 0
                                 },
                                 "exchangeOrderId": {
-                                  "description": "[Exchange order ID](./trade-api.md#exchange-order-id)",
+                                  "description": "[Exchange order ID](/trade-api#exchange-order-id)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -919,7 +919,7 @@
                                   "minimum": 0
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](./trade-api.md#transact-time)",
+                                  "description": "[Transact time](/trade-api#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -1129,7 +1129,7 @@
                                   "minimum": 0
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](./trade-api.md#transact-time)",
+                                  "description": "[Transact time](/trade-api#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -1168,7 +1168,7 @@
                                   "minimum": 0
                                 },
                                 "exchangeOrderId": {
-                                  "description": "[Exchange order ID](./trade-api.md#exchange-order-id)",
+                                  "description": "[Exchange order ID](/trade-api#exchange-order-id)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
@@ -1215,7 +1215,7 @@
                                   "minimum": 0
                                 },
                                 "transactTime": {
-                                  "description": "[Transact time](./trade-api.md#transact-time)",
+                                  "description": "[Transact time](/trade-api#transact-time)",
                                   "type": "integer",
                                   "format": "uint64",
                                   "minimum": 0
