@@ -19,6 +19,6 @@
 * [Perpetual Futures](perpetual-futures/README.md)
   * [Contract Specifications](perpetual-futures/contracts.md)
   * [Margin](perpetual-futures/margin.md)
-  * [PNL and Settlement](perpetual-futures/pnl-and-settlement.md)
   * [Funding](perpetual-futures/funding.md)
+  * [PnL Settlement](perpetual-futures/pnl-settlement.md)
   * [Liquidation](perpetual-futures/liquidation.md)
