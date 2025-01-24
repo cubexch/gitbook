@@ -19,6 +19,25 @@ Definitions appear for markets that are no longer in use; these can be used to i
 - Markets that are currently active for trading will have a `status` of `1` or `2`.
 - Markets that are no longer in use will have a `status` of `3`.
 
+## Authentication Headers
+
+The REST API uses the following HTTP headers for authentication:
+
+* `x-api-key`:\
+  The API Key ID, as specified on the [API settings page](https://cube.exchange/settings/api).
+    * Each API key has an associated access level, which is determined at the time of key creation.
+        * Read access allows only read HTTP methods (GET, HEAD, etc.).
+        * Write access permits all HTTP methods.
+* `x-api-signature`:\
+  The API signature string authenticating this request.
+    * The payload to be signed is a concatenation of the byte string `cube.xyz` and the current Unix epoch timestamp in seconds, converted into an 8-byte little-endian array. The signature is the HMAC-SHA256 digest of the payload, using the secret key associated with the specified API key.
+    * Implementation notes:
+        * The signature is base-64 encoded with the 'standard' alphabet and padding: `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/`.
+        * The timestamp should be encoded as an 8-byte little-endian array of bytes.
+        * The secret key should be decoded from a hex string into a 32-byte array of bytes.
+* `x-api-timestamp`:\
+  The timestamp used for signature generation.
+
 ## Endpoints, public
 
 {% swagger src="generated/core/ir_api_30.json" path="/markets" method="get" %}
@@ -31,7 +50,8 @@ Definitions appear for markets that are no longer in use; these can be used to i
 
 ## Endpoints, authentication required
 
-Endpoints in this section require [REST Authentication headers](README.md#rest-authentication-headers).
+Endpoints in this section require [REST Authentication
+headers](#authentication-headers).
 
 {% swagger src="generated/core/ir_api_30.json" path="/users/check" method="get" %}
 [ir_api_30.json](generated/core/ir_api_30.json)

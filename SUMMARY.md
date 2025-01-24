@@ -13,12 +13,12 @@
   * [REST API](rest-osmium-api.md)
   * [Implied Matching](implied-matching.md)
 
-* Fees
-  * [Cube Fees](cube-fees.md)
-
 * [Perpetual Futures](perpetual-futures/README.md)
   * [Contract Specifications](perpetual-futures/contracts.md)
   * [Margin](perpetual-futures/margin.md)
   * [Funding](perpetual-futures/funding.md)
   * [PnL Settlement](perpetual-futures/pnl-settlement.md)
   * [Liquidation](perpetual-futures/liquidation.md)
+
+* Fees
+  * [Cube Fees](cube-fees.md)

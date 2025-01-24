@@ -1,37 +1,41 @@
-# Cube Exchange API
 
-Cube Exchange offers a comprehensive REST API and a robust streaming WebSocket API. These APIs allow users to access market data and execute trades in real-time.
+## About
 
-## Environments and Base URLs
+Cube is a hybrid exchange built from first principles for the future of digital
+and traditional asset trading. At it's core, a low-latency matching engine
+powers trading at 200'000 operations per second with 200µs latency, and a
+decentralized settlement layer powers a non-custodial peer-to-peer settlement
+that ensures the safety of your assets.
 
-We offer both a live trading environment and a staging trading environment. The base URLs for the web front-end and API for each environment are as follows:
+## Overview
 
-- Live trading:
-    - Web front-end: https://cube.exchange
-    - API: https://api.cube.exchange
-- Staging trading:
-    - Web front-end: https://dev.cube.exchange
-    - API: https://staging.cube.exchange
+This documentation covers a large part of the Cube API, and is roughly
+organized into the following:
 
-## REST Authentication Headers
+- [Exchange Info](rest-iridium-api.md): Information about the exchange, such as
+  assets, markets, account management, and more.
+- [Market Data](rest-mendelev-api.md): Market data, including level 3 (order by
+  order) book data, trade summaries, and more.
+- [Order Entry](rest-osmium-api.md): Trading and order management.
+- [Perpetual Futures](perpetual-futures/README.md): Information about our
+  perpetual futures contracts, including contract specifications, margin
+  requirements, funding, PnL settlement, and liquidation.
+- [Fees](cube-fees.md): Information about fees on Cube.
 
-The REST API uses the following HTTP headers for authentication:
+### Connectivity
 
-* `x-api-key`:\
-  The API Key ID, as specified on the [API settings page](https://cube.exchange/settings/api).
-    * Each API key has an associated access level, which is determined at the time of key creation.
-        * Read access allows only read HTTP methods (GET, HEAD, etc.).
-        * Write access permits all HTTP methods.
-* `x-api-signature`:\
-  The API signature string authenticating this request.
-    * The payload to be signed is a concatenation of the byte string `cube.xyz` and the current Unix epoch timestamp in seconds, converted into an 8-byte little-endian array. The signature is the HMAC-SHA256 digest of the payload, using the secret key associated with the specified API key.
-    * Implementation notes:
-        * The signature is base-64 encoded with the 'standard' alphabet and padding: `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/`.
-        * The timestamp should be encoded as an 8-byte little-endian array of bytes.
-        * The secret key should be decoded from a hex string into a 32-byte array of bytes.
-* `x-api-timestamp`:\
-  The timestamp used for signature generation.
+- **REST**: For market data snapshots and order entry.
+- **Websocket**: For realtime market data and trading.
+- **TCP FIX and UDP Multicast**: Out lowest latency connectivity. Reach out for
+  more information.
 
-# WebSocket Ancillary Resources
 
-The `.proto` definition files and example client code for the WebSocket API are available [on Github](https://github.com/cubexch/ws-api).
+## Environments
+
+If you're interested in building with us, reach out about getting access to our
+staging environment, where you can test your integrations before going live!
+
+## Contact
+
+Reach out to us at [engineering@cube.xyz](mailto:engineering@cube.xyz) for
+questions or feedback!
