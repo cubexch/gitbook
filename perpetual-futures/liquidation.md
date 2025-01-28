@@ -31,18 +31,26 @@ intervention.
 ### Market Close Positions
 
 Second, if the position remains unhealthy after order cancellation, the system
-attempts to close positions through market orders. These closure attempts
-target prices more favorable than the designated liquidator price, protecting
-both the trader and market stability.
+attempts to close positions through market orders. These orders will target
+prices that leave the account with 70% of the maintenance margin requirement as
+equity.
+
+For example, if there is an open position for 1 BTC @ 100'000 perpetual with a
+maintenance margin of 10'000 USDC, market closes will leave at least 7'000
+USDC, and so will aggress at a price of 97'000.
 
 ## Takeover Liquidation and Auto-Deleveraging (ADL)
 
 If open market liquidation is unsuccessful, the protocol enables position
 takeover through two mechanisms:
 
-Active liquidators may assume control of all positions at the predetermined
-liquidator price. This provides an opportunity for market participants to
-strategically acquire positions while supporting system stability.
+Active backstop liquidity providers may takeover all positions, and are
+compensated by the liquidatee a `liquidator_fee` percentage of the position's
+notional. This provides an opportunity for market participants to strategically
+acquire positions while supporting system stability. Note that the
+`liquidator_fee` is expressed as a percentage of the maintenance margin
+requirement, and is based on the position's initial leverage, where higher
+leverage positions are charged a greater percentage fee.
 
 If there is insufficient capacity for backstop liquidity, the system implements
 Auto-Deleveraging (ADL), where traders holding opposing positions automatically
@@ -75,6 +83,14 @@ the protocol implements socialized loss distribution. Losses are allocated
 across all traders proportionally to their current notional position sizes,
 ensuring system stability through collective risk sharing.
 
+# Liquidation Clearance Fee
+
+To compensate for the risk and operational costs associated with liquidation,
+there is an additional liquidation clearance fee charged to the liquidatee in
+the market close and backstop liquidity phases. This liquidation clearance fee
+is charged on the position's notional value cleared.
+
+The liquidation clearance fee is paid to the insurance fund.
 
 # Prices
 
@@ -126,11 +142,3 @@ everything else is constant.
 => C1 + C2 + (u_x * p_x + q_x) < 0
 => p_x < -(C1 + C2 + q_x) / u_x
 ```
-
-## Liquidator Price
-
-The price that the liquidator would pay for the contract.
-
-This is a price improvement over the oracle price to incentivize liquidators to
-provide liquidity, while ensuring that cascading liquidations and thin order
-books do not result in egrigious liquidation prices.

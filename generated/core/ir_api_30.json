@@ -3762,7 +3762,7 @@
                                   "fundingStart",
                                   "impactAskQuantity",
                                   "impactBidQuantity",
-                                  "liquidationFee",
+                                  "liquidationClearanceFee",
                                   "liquidationPriority",
                                   "marginTierTableId",
                                   "maximumFundingRate",
@@ -3789,8 +3789,8 @@
                                     "format": "uint64",
                                     "minimum": 0
                                   },
-                                  "liquidationFee": {
-                                    "description": "The fee charged during liquidation, expressed in basis points (1 bps = 0.01%)",
+                                  "liquidationClearanceFee": {
+                                    "description": "The fee charged during liquidation.\n\nExpressed as a percentage of the closed positions notional mark value.\n\n`closed_units * mark_price * liquidation_clearance_fee`",
                                     "type": "string",
                                     "format": "number"
                                   },
@@ -4178,6 +4178,7 @@
                                   "description": "A single row in a MarginTable.",
                                   "type": "object",
                                   "required": [
+                                    "liquidatorFee",
                                     "maintenanceMarginRate",
                                     "maxLeverage",
                                     "notionalValueLe"
@@ -4195,6 +4196,11 @@
                                     },
                                     "maintenanceMarginRate": {
                                       "description": "The maintenance margin rate for this margin tier.",
+                                      "type": "string",
+                                      "format": "number"
+                                    },
+                                    "liquidatorFee": {
+                                      "description": "The percentage of the maintenance margin requirement received for providing backstop liquidity when liquidating a position.\n\nExpressed as a percentage of the backstopped position's maintenance margin.\n\n`maintenance_margin_required(backstopped_units * mark_price) * liquidator_fee`",
                                       "type": "string",
                                       "format": "number"
                                     }
