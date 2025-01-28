@@ -66,8 +66,7 @@ Effective Notional = Max (
 
 For example, if the open position is short 1 BTC perpetual contract (`-1 *
 10^-decimals` units) at a mark price of 100k, with an additional `0.5@90k` bid
-and `0.2@110k` ask, the effective notional is `MAX(ABS(-100k + 45k), ABS(-100k
-- 22k)) = 122k`.
+and `0.2@110k` ask, the effective notional is `MAX(ABS(-100k + 45k), ABS(-100k - 22k)) = 122k`.
 
 The initial margin is used by the position and cannot be used for other
 operations (e.g opening more perpetual positions or placing spot orders or
