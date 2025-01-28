@@ -24,7 +24,7 @@ Consider the case of a trade resulting in a credit of 5 Bitcoin:
 
 If you need exact granularity at time of trade, you can replicate the fee calculation performed by the exchange.
 To avoid rounding errors, this entire process is performed in integer math using the exponent as a divisor.
-In the example above, the full fee amount in indivisible [RawUnits](#rawunits) would be calculated as:
+In the example above, the full fee amount in indivisible [RawUnits](/generated/ws-api/websocket-trade-api.md#rawunits) would be calculated as:
 ```text
 5 * 100_000_000 * 11 / 10_000 = 550_000 RawUnits
 

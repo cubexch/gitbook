@@ -158,7 +158,7 @@ A resting order.
 | ----- | ---- | ----- | ----------- |
 | price | [uint64](#uint64) |  |  |
 | quantity | [uint64](#uint64) |  |  |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](/trade-api#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](/trade-api.md#exchange-order-id) |
 | side | [Side](#side) |  |  |
 | priority | [uint64](#uint64) |  | Order priority for execution. Valid within a price level and side. That is, orders must first be sorted by side and price (in descending order for bids and ascending for asks), and then the OrderPriority within the level. A lower value is a higher priority. |
 
@@ -201,7 +201,7 @@ An order diff creates, updates, or deletes a resting order based on the
 | ----- | ---- | ----- | ----------- |
 | price | [uint64](#uint64) |  |  |
 | quantity | [uint64](#uint64) |  |  |
-| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](/trade-api#exchange-order-id) |
+| exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](/trade-api.md#exchange-order-id) |
 | side | [Side](#side) |  |  |
 | op | [MarketByOrderDiff.DiffOp](#marketbyorderdiff.diffop) |  |  |
 | priority | [uint64](#uint64) |  | See [`MarketByOrder.Order`](#marketbyorder.order) |
@@ -303,10 +303,10 @@ orders and levels, respectively.
 | tradeId | [uint64](#uint64) |  | The ID assigned to this trade. All trades that occur from the same event will be assigned the same ID, and are considered to be an atomic batch. |
 | price | [uint64](#uint64) |  | The price that this trade occurred at. |
 | aggressing_side | [AggressingSide](#aggressingside) |  | The side of the aggressing order. |
-| resting_exchange_order_id | [uint64](#uint64) |  | The [Exchange order ID](/trade-api#exchange-order-id) of the resting order. |
+| resting_exchange_order_id | [uint64](#uint64) |  | The [Exchange order ID](/trade-api.md#exchange-order-id) of the resting order. |
 | fill_quantity | [uint64](#uint64) |  |  |
-| transact_time | [uint64](#uint64) |  | The [transact time](/trade-api#transact-time) assigned by the matching engine for this trade. All trades that occur from the same event will be assigned the same transact time. |
-| aggressing_exchange_order_id | [uint64](#uint64) |  | The [Exchange order ID](/trade-api#exchange-order-id) of the aggressing order. |
+| transact_time | [uint64](#uint64) |  | The [transact time](/trade-api.md#transact-time) assigned by the matching engine for this trade. All trades that occur from the same event will be assigned the same transact time. |
+| aggressing_exchange_order_id | [uint64](#uint64) |  | The [Exchange order ID](/trade-api.md#exchange-order-id) of the aggressing order. |
 
 
 
@@ -410,7 +410,7 @@ Top of book
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | market_id | [uint64](#uint64) |  |  |
-| transact_time | [uint64](#uint64) |  | The [transact time](/trade-api#transact-time) of the latest book update on this market. |
+| transact_time | [uint64](#uint64) |  | The [transact time](/trade-api.md#transact-time) of the latest book update on this market. |
 | bid_price | [uint64](#uint64) | optional | The best bid price of the direct or implied book, whichever is better. |
 | bid_quantity | [uint64](#uint64) | optional | The total bid quantity at the best bid price. |
 | ask_price | [uint64](#uint64) | optional | The best ask price of the direct or implied book, whichever is better. |
