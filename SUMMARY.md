@@ -19,6 +19,7 @@
   * [Funding](/perpetual-futures/funding.md)
   * [PnL Settlement](/perpetual-futures/pnl-settlement.md)
   * [Liquidation](/perpetual-futures/liquidation.md)
+  * [API](/perpetual-futures/api.md)
 
 * Fees
   * [Cube Fees](/cube-fees.md)
