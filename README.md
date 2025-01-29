@@ -12,15 +12,15 @@ that ensures the safety of your assets.
 This documentation covers a large part of the Cube API, and is roughly
 organized into the following:
 
-- [Exchange Info](rest-iridium-api.md): Information about the exchange, such as
+- [Exchange Info](/exchange-info.md): Information about the exchange, such as
   assets, markets, account management, and more.
-- [Market Data](rest-mendelev-api.md): Market data, including level 3 (order by
+- [Market Data](/market-data/rest-api.md): Market data, including level 3 (order by
   order) book data, trade summaries, and more.
-- [Order Entry](rest-osmium-api.md): Trading and order management.
-- [Perpetual Futures](perpetual-futures/README.md): Information about our
+- [Order Entry](/order-entry/rest-api.md): Trading and order management.
+- [Perpetual Futures](/perpetual-futures/README.md): Information about our
   perpetual futures contracts, including contract specifications, margin
   requirements, funding, PnL settlement, and liquidation.
-- [Fees](cube-fees.md): Information about fees on Cube.
+- [Fees](/cube-fees.md): Information about fees on Cube.
 
 ### Connectivity
 

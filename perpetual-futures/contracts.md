@@ -6,7 +6,7 @@ underlying spot price while providing leverage opportunities.
 
 Perpetual contracts and their parameters are defined as `assets` with
 `AssetType::Perpetual` under [market
-definitions](/rest-iridium-api.md#markets). The high-level structure is as
+definitions](/exchange-info.md#markets). The high-level structure is as
 follows:
 
 | Field               | Description                                                                                                                                        | Example                                                       |

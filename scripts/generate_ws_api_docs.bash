@@ -136,4 +136,11 @@ sed -i '' '/^### FundingDelta/i\
 ## Numeric Types\
 ' $OUT_DIR/websocket-market-data-api.md
 
+# move generated files into the right place
+mv "$OUT_DIR/websocket-trade-api.md" "$REPO_ROOT/order-entry/websocket-api.md"
+mv "$OUT_DIR/websocket-market-data-api.md" "$REPO_ROOT/market-data/websocket-api.md"
+
+# and cleanup outdir
+rm -r "$OUT_DIR"
+
 echo 'Success: generated/ws-api'
