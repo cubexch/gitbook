@@ -1,22 +1,30 @@
 
 ## Spot Balance
 
-Available settlement asset (USDC) in the account. This is the settled USDC
-balance, excluding spot units this are locked as open spot orders or intents.
+Settlement asset (USDC) in the account. Spot balance is the [`available` amount
+in AssetPosition](/order-entry/websocket-api.md#assetposition).
+
+This is the settled USDC balance, and is always in your MPC wallet on chain.
+Note that this balance excludes spot units this are reserved for open spot
+orders or intents.
 
 ## Unsettled Balance
 
-The unsettled PnL (and funding, fees, etc) for a particular perpetual contract.
+The unsettled balance (including Pnl, funding, fees, etc) for a particular
+perpetual contract. This is equal to [`units * mark_price +
+quote`](/order-entry/websocket-api.md#contractposition) for each perpetual
+contract position. That is, each perpetual contract has a separate unsettled
+balance, and the account's unsettled balance is their linear sum.
 
-Note that this is distinct from the _unrealized_ PnL, which is determined by
+Note that this is distinct from the _unrealized PnL_, which is determined by
 the cost basis and current mark price.
 
-## PnL Settlement
+## Settlement
 
 As mark prices change continuously, the value of open positions also change
-continuously. PnL settlement is the discretized process of moving profit or
-loss from the open perpetual positions into the settlement asset (USDC) token
-balance. Note that PnL settlement does not have an impact on open positions or
+continuously. Settlement is the discretized process of moving unsettled balance
+from the open perpetual positions into the settlement asset (USDC) token
+balance. Note that settlement does not have an impact on open positions or
 account health, and is performed over the entire subaccount (i.e positive
 unsettled balance in one contract cannot be settled independently of others).
 
@@ -29,7 +37,7 @@ party A who only traded contract X might be settled with party B who only
 traded contract Y (where ostensibly some chain of intermediate parties had the
 offsetting positions between).
 
-Morever, PnL settlement can only be initiated by acconuts with positive
+Morever, settlement can only be initiated by acconuts with positive
 realized PnL (and specifically, when the free balance is positive). But note
 that the counterparty's negative unsettled PnL might be entirely from
 unrealized PnL.

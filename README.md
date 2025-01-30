@@ -19,7 +19,7 @@ organized into the following:
 - [Order Entry](/order-entry/rest-api.md): Trading and order management.
 - [Perpetual Futures](/perpetual-futures/README.md): Information about our
   perpetual futures contracts, including contract specifications, margin
-  requirements, funding, PnL settlement, and liquidation.
+  requirements, funding, settlement, and liquidation.
 - [Fees](/cube-fees.md): Information about fees on Cube.
 
 ### Connectivity

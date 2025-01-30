@@ -17,7 +17,7 @@
   * [Contract Specifications](/perpetual-futures/contracts.md)
   * [Margin](/perpetual-futures/margin.md)
   * [Funding](/perpetual-futures/funding.md)
-  * [PnL Settlement](/perpetual-futures/pnl-settlement.md)
+  * [Settlement](/perpetual-futures/settlement.md)
   * [Liquidation](/perpetual-futures/liquidation.md)
   * [API](/perpetual-futures/api.md)
 

@@ -16,7 +16,7 @@
 - [ContractPosition](/order-entry/websocket-api.md#contractposition)
     - Open perpetual contract positions. Including (average) cost basis used
       for PnL calculations (used for e.g [free
-      balance](./pnl-settlement.md#other-terminology) calculations).,
+      balance](./settlement.md#other-terminology) calculations).,
       cumulative funding paid / accrued, etc.
 
 ## Market Data
