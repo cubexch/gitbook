@@ -569,8 +569,8 @@ units (and is thus almost almost always the opposite sign of
 Funding payments (/ credits) are applied to this balance directly and are
 not immediately settled. Also note that index price changes are not
 immediately reflected in the `quote` balance. These are all settled at time
-of settlement, and subsequent `ContractPosition` and `AssetPosition` messages
-will reflect those changes.
+of PnL settlement, and subsequent `ContractPosition` and `AssetPosition`
+messages will reflect those changes.
 
 The unsettled PnL (different from the unrealized pnl) of the position,
 which includes funding payments et al, is calculated as:

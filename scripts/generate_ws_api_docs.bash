@@ -113,6 +113,7 @@ ONCE=(
   FundingCalculation
   FundingApplication
   ContractStatistics
+  ContractPrice
   Heartbeat
   MdMessages
   # agg message

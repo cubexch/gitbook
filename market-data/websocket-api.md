@@ -50,6 +50,7 @@ Every exchange message from `/book/:market_id` will be wrapped as an
 | funding_calculation | [FundingCalculation](#fundingcalculation) |  | Funding calculation |
 | funding_application | [FundingApplication](#fundingapplication) |  | Funding application |
 | contract_statistics | [ContractStatistics](#contractstatistics) |  |  |
+| contract_price | [ContractPrice](#contractprice) |  |  |
 | market_id | [uint64](#uint64) | optional | The market ID that this message is for. Null for `MdMessage.Heartbeat`. |
 
 
@@ -236,7 +237,7 @@ An order diff creates, updates, or deletes a resting order based on the
 | transact_time | [uint64](#uint64) |  | Server time that this funding calculation was made. |
 | predicted_funding_rate | [int64](#int64) |  | Predicted funding rate percentage for the next funding interval. See `FundingApplication.funding_rate` for details on calculation. |
 | next_funding_application_time | [uint64](#uint64) |  | The server target time for the next funding application. Expressed in nanoseconds. <br> `countdown = next_funding_application_time - transact_time` |
-| premium_index | [int64](#int64) |  | Premium (or discount) percentage relative to the index price. <br> `mark_price = (1 + premium_index) * index_price` <br> Expressed with 9 decimals. |
+| premium_index | [int64](#int64) |  | Premium (or discount) percentage relative to the index price. <br> `premium_index = (MAX(impact_bid_price - index_price, 0) - MAX(index_price - impact_ask_price, 0)) / index_price` <br> Expressed with 9 decimals. |
 | index_price | [uint64](#uint64) |  | The index price used for the premium index calculation. Expressed with 9 decimals. |
 | latest_funding_rate | [int64](#int64) |  | The latest funding application's `funding_rate`. |
 
@@ -253,7 +254,7 @@ An order diff creates, updates, or deletes a resting order based on the
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | transact_time | [uint64](#uint64) |  |  |
-| funding_rate | [int64](#int64) |  | Funding rate percentage for this interval, calculated based on the average premium index over the funding interval. <br> `funding_rate = premium_index + clamp(interest_rate - premium_index, -clamp, +clamp)` |
+| funding_rate | [int64](#int64) |  | Funding rate percentage for this interval, calculated based on the average premium index over the funding interval. <br> `funding_rate = premium_index + clamp(interest_rate - premium_index, -clamp, +clamp)` </br> |
 | funding_delta | [FundingDelta](#fundingdelta) |  | The quote amount to be paid (or received) based on the given funding rate, funding interval duration, and current index price. |
 | next_funding_application_time | [uint64](#uint64) |  | The server target time for the next funding application. |
 
@@ -264,13 +265,29 @@ An order diff creates, updates, or deletes a resting order based on the
 
 
 ### ContractStatistics
-
+Statistics for the contract.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | transact_time | [uint64](#uint64) |  |  |
 | open_interest | [int64](#int64) |  | The total number of open contracts for this product. Counts both longs and shorts |
+
+
+
+
+
+
+
+### ContractPrice
+Latest contract price information.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| transact_time | [uint64](#uint64) |  |  |
+| index_price | [uint64](#uint64) |  | The spot index price of the contract. Expressed with 9 decimals. |
+| mark_price | [uint64](#uint64) |  | The mark price at `transact_time`. <br> `funding_basis = funding_rate * (time until funding / funding interval)` `mark_price = (1 + funding_basis) * index_price` </br> |
 
 
 
