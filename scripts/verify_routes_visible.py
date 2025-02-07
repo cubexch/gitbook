@@ -7,9 +7,9 @@ from typing import TypeAlias
 # relative to repo root
 # FIMXE: names identical so this can be auto-generated?
 OPENAPI_AND_MARKDOWN = {
-    'iridium': ('generated/core/ir_api_30.json', 'rest-iridium-api.md'),
-    'mendelev': ('generated/core/md_api_30.json', 'rest-mendelev-api.md'),
-    'osmium': ('generated/core/os_api_30.json', 'rest-osmium-api.md'),
+    'iridium': ('generated/core/ir_api_30.json', 'exchange-info.md'),
+    'mendelev': ('generated/core/md_api_30.json', 'market-data/rest-api.md'),
+    'osmium': ('generated/core/os_api_30.json', 'order-entry/rest-api.md'),
 }
 
 # path -> methods, e.g.

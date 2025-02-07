@@ -1,4 +1,3 @@
-# Summary
 Certain markets will be enabled for Implied Matching.  In these markets, aggressing orders may be matched against other markets' books
 when doing so would result in a better price than matching against resting orders in the market where the order was placed.
 
