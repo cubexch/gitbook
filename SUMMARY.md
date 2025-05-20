@@ -12,6 +12,7 @@
   * [WebSocket API](/order-entry/websocket-api.md)
   * [REST API](/order-entry/rest-api.md)
   * [Implied Matching](/implied-matching.md)
+  * [Market Price Protection](/order-entry/market-price-protection.md)
 
 * [Perpetual Futures](/perpetual-futures/README.md)
   * [Contract Specifications](/perpetual-futures/contracts.md)
