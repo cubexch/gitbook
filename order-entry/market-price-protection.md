@@ -34,7 +34,7 @@ the order is rejected.
     - expressed as percentages, e.g. "25" means 25% of reference price
     - typically, these are very wide (25% and 400% for a factor of 4x ref price)
 2. `protectionPriceLevels`
-    - Check is relative to the current top-of-book prices (TOB)
+    - check is relative to the current top-of-book prices (TOB)
     - determines how far orders can be placed from the aggressing-side's best (i.e. TOB) price
     - expressed as a number of levels, e.g. 20 levels away from price 500 is price 520
     - applies only to markets with opposing orders
@@ -55,49 +55,47 @@ Note the range of acceptable order prices in yellow:
   <figcaption>Market Price Protection Levels</figcaption>
 </figure>
 
-### (1) Off-Market Limit Check (`bid/ask_pct`)
+### (1) Off-Market Limit Check (`priceBandBid/AskPct`)
 
 The **reference price** is the last known price for the asset pair from an external price source.
 
-Orders placed more than `bid/ask_pct` off the reference price will be rejected.
+Orders placed more than `priceBandBid/AskPct` off the reference price will be rejected.
 
 This hints to participants to establish a market near the last known externally verified price
 while still leaving ample room for the market to move away from that price.
 
-### (2) Aggressing Threshold Calculation (`protection_levels`)
+### (2) Aggressing Threshold Calculation (`protectionPriceLevels`)
 
-The **aggressing threshold** (`a_thresh`) is the tighter of the aggressing TOB and the reference price, improved by `protection_levels`.
-- If there is no aggressing TOB, the reference price will be used as the base.
-- If there is no opposing market, the aggressing threshold is ignored.
+The aggressing threshold (`a_thresh`) is the tighter of the aggressing TOB and the reference price, improved by `protection_levels`.
 
-Note that when sending a `MarketWithProtection` order with no price specified, the aggressing threshold will be used as the halting price.
+Note that when sending a MarketWithProtection order with no price specified, the aggressing threshold will be used as the halting price.
 
 ### (3) Aggressing Threshold Limit Check
 
-The aggressing threshold limit applies when an opposing market exists, for which there are two possible cases:
+The aggressing threshold limit applies only when an opposing market exists, for which there are two possible cases:
 
-#### Threshold does not Cross Market
+#### (3a) Order Would Not Cross Market
 
-Spread is large / market is wide:
+If an order would not match:
 
-- Any order that would cross the book will be rejected, including all Market orders, as they are collared to `a_thresh`.
-- Any limit order that don’t cross the book will be accepted
+- Market orders that don't cross the book will be rejected
+- Limit orders that don't cross the book are always accepted, regardless of the aggressing threshold, assuming they don't violate the Off-Market Limit Check in (1).
 
-Note that none of this prevents participants from improving the book as they can place orders up until the point of crossing.
+If a trader wants to cross a wide market:
+- they can 'walk' the aggressing threshold over the opposing side of the market by repeatedly placing non-crossing limit orders close to same-side TOB.
+- this moves the `a_thresh` and allows placing an order that crosses the book while remaining within the `a_thresh`.
 
-In this case, one can 'walk' the aggressing threshold over the opposing side of the market by repeatedly placing non-crossing limit orders close to same-side TOB.
+This behavior encourages tighter markets and allows for gradual price discovery while still preventing trades at undesirable prices.
 
-#### Threshold Crosses Market
+#### (3b) Order Would Cross Market
 
-Spread is small / market is tight:
+If an order would cross the market, the protection logic ensures that:
 
-- Market orders will trade up until `a_thresh` or their specified protection price, whichever is tighter
-- Limit orders with a limit price worse than `a_thresh` will be rejected
-- Limit orders with a limit price better than `a_thresh`, including those that cross the book, will be accepted
+- Market orders will execute up to the aggressing threshold (`a_thresh`) or their specified protection price, whichever is tighter.
+- Limit orders with prices better, i.e. less aggressive than `a_thresh` will be accepted and will match immediately.
+- Limit orders with prices worse, i.e. more aggressive than `a_thresh` will be rejected.
 
-This allows trading near the TOB while providing protection against sudden pulls and sweeps of the opposing book to liquidity takers sending Market orders.
-
-Limit orders are unaffected by pulls or sweeps as the range where a limit order can be placed will only increase as the opposing book retreats.
+This protects trades from executing when the market is wide.
 
 ## Relevant Reject Errors
 
