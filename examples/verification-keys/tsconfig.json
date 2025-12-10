@@ -1,0 +1,15 @@
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "es2021",         // Use a modern target for WASM support
+    "module": "es2022",         // Use a modern module system
+    "esModuleInterop": true,    // Allows clean imports from CommonJS modules
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node", // Required for resolving node_modules
+    "outDir": "./dist",         // Where compiled JS goes
+    "rootDir": "./src",          // Where your TS source files are
+    "sourceMap": true
+  }
+}

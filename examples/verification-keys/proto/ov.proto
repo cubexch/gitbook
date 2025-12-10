@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package ov_schema;
+
+message VerificationKey {
+  oneof version {
+    VerificationKeyV0 v0 = 1;
+  }
+}
+
+message VerificationKeyV0 {
+  PublicKey public_key = 1;
+  optional int64 expires_at = 2;
+}
+
+message PublicKey {
+  reserved 1; // type secp256k1
+  oneof type {
+    bytes curve25519 = 2;
+    bytes ethereum = 3;
+  }
+}
