@@ -1,45 +1,13 @@
-import nacl from 'tweetnacl';
-import * as secp from "@noble/secp256k1";
-import { keccak_256 } from "@noble/hashes/sha3";
+# Register Verification Key
 
+Once you have generated your verification key, you must sign a provenance payload using your Cube wallet mpc secret key and a signing function provided in the public npm package [`@cubexch/electrum`](https://www.npmjs.com/package/@cubexch/electrum). Then you must send the signature and verification public key to the Cube API endpoint for registering verification keys. See the example below:
+
+```typescript
 import { sign_verification_key_provenance } from '@cubexch/electrum';
 
 // The fetchCubeApi code this references is provided
 // for convenience on the Access Cube Api Example page
 import { fetchCubeApi, cubeApiBaseUrl } from './fetch-cube-api';
-
-
-/**
- * Generates a curve25519 key pair.
- */
-export function generateCurve25519KeyPair() {
-  return nacl.sign.keyPair();
-}
-
-/**
- * Generates a secp256k1 key pair and Ethereum address.
- */
-export function generateEthereumKeyPair() {
-  // generate random 32-byte private key
-  const privateKey = secp.utils.randomSecretKey();
-
-  // get public key (uncompressed)
-  const publicKey = secp.getPublicKey(privateKey, false);
-
-  // Ethereum address:
-  // Skip the 0x04 prefix of the public key (ie. the first byte '04')
-  const pubKeySlice = publicKey.slice(1);
-  // Compute the keccak_256 hash and take the last 20 bytes of the result
-  const addressBytes = keccak_256(pubKeySlice).slice(-20);
-
-  const address = "0x" + Buffer.from(addressBytes).toString("hex");
-
-  return {
-    privateKey,
-    publicKey,
-    address,
-  };
-}
 
 /**
  * Registers a verification key with the Cube API for either a user or organization.
@@ -73,8 +41,8 @@ export const registerNewVerificationKey = async (
 
   const timestamp = Math.floor(Date.now() / 1000);
 
-  // Call the WASM function for signing verification key provenance which allows it to
-  // be registered with cube
+  // Call the electrum WASM function for signing verification key provenance
+  // which allows it to be registered with cube
   const {
     signature,
     verification_key: encodedVerificationKey,
@@ -85,6 +53,7 @@ export const registerNewVerificationKey = async (
     BigInt(timestamp),
   );
 
+ // This is the expected request body for the verification-keys endpoint
   const registerKeyBody = {
     verificationKey: bytesToBase64Normalized(encodedVerificationKey),
     signature: bytesToBase64Normalized(signature),
@@ -93,6 +62,7 @@ export const registerNewVerificationKey = async (
     metadata: {},
   };
 
+  // See Fetch Cube Api example code
   const response = await fetchCubeApi(
     new URL(isOrganization ?
       `${cubeApiBaseUrl}/organization/verification-keys` :
@@ -108,7 +78,7 @@ export const registerNewVerificationKey = async (
   return response;
 }
 
-
+// Helper function used to format byte strings correctly for the Cube Api
 function bytesToBase64Normalized(bytes: Uint8Array) {
   return btoa(String.fromCharCode(...bytes))
     .replace(/-/g, '+')
@@ -116,3 +86,4 @@ function bytesToBase64Normalized(bytes: Uint8Array) {
     .replace(/=/g, "")
     ;
 }
+```
