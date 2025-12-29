@@ -42,6 +42,35 @@ export function generateEthereumKeyPair() {
 }
 
 /**
+ * VerificationKey: The public component and type of key being registered.
+ *
+ * Using the `publicKey` bytes from generateCurve25519KeyPair...
+ *
+ * const verificationKey: VerificationKey = {
+ *   type: 'curve25519',
+ *   bytes: Buffer.from(publicKey).toString('hex'),
+ * };
+ *
+ * or
+ *
+ * Using the `address` string from generateEthereumKeyPair...
+ *
+ * const verificationKey: VerificationKey = {
+ *   type: 'ethereum',
+ *   address: address,
+ * };
+*/
+export type VerificationKey =
+  | {
+      type: 'curve25519';
+      bytes: string;
+    }
+  | {
+      type: 'ethereum';
+      address: string;
+    };
+
+/**
  * Registers a verification key with the Cube API for either a user or organization.
  *
  * @param cubeMpcSecretKey - The cube wallet private key as a Uint8Array
@@ -49,8 +78,7 @@ export function generateEthereumKeyPair() {
  * @param isOrganization - Whether this is an organization account or a standard user
  * @param apiKey - The API key for authenticating with the Cube API (without hyphens)
  * @param apiSecretKey - The API secret key for signing requests to the Cube API
- * @param verificationPublicKey - The verification public key to register (either curve25519 or ethereum)
- * @param verificationKeyType - The type of verification key ('curve25519 pubkey' or 'ethereum address')
+ * @param verificationKey - VerificationKey public key string and type
  * @returns The json response from the Cube API after registering the verification key
  */
 export const registerNewVerificationKey = async (
@@ -59,17 +87,9 @@ export const registerNewVerificationKey = async (
     isOrganization: boolean,
     apiKey: string,
     apiSecretKey: string,
-    verificationPublicKey: string,
-    verificationKeyType: 'curve25519' | 'ethereum'
+    verificationKey: VerificationKey,
 ): Promise<any> => {
   const parsedUserId = new Uint8Array(Buffer.from(cubeUserId.replaceAll('-', ''), 'hex'));
-
-  // create the verification key object expected by electrum to sign
-  const verificationKey = {
-    type: verificationKeyType,
-    ...(verificationKeyType === 'curve25519' ? { bytes: verificationPublicKey } : {}),
-    ...(verificationKeyType === 'ethereum' ? { address: verificationPublicKey } : {}),
-  }
 
   const timestamp = Math.floor(Date.now() / 1000);
 
@@ -109,7 +129,7 @@ export const registerNewVerificationKey = async (
 }
 
 
-function bytesToBase64Normalized(bytes: Uint8Array) {
+export function bytesToBase64Normalized(bytes: Uint8Array) {
   return btoa(String.fromCharCode(...bytes))
     .replace(/-/g, '+')
     .replace(/_/g, '/')

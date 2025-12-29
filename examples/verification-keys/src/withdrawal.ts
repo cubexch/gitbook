@@ -4,8 +4,9 @@ import { keccak_256 } from '@noble/hashes/sha3';
 
 import { fetchCubeApi, cubeApiBaseUrl } from './fetch-cube-api';
 
-import { ov_schema } from './proto';
-const PublicKey = ov_schema.PublicKey;
+import { VerificationKey, bytesToBase64Normalized } from './verification-key'
+
+import { encode_verification_key } from '@cubexch/electrum'
 
 export interface WithdrawalInputs {
   subaccountId: number;
@@ -24,9 +25,8 @@ export interface WithdrawalInputs {
  * @param isOrganization - Whether this is an organization account or a standard user
  * @param apiKey - The API key for authenticating with the Cube API (without hyphens)
  * @param apiSecretKey - The API secret key for signing requests to the Cube API
- * @param verificationPublicKey - The verification public key bytes
- * @param verificationPrivateKey - The verification private key bytes
- * @param verificationKeyType - The type of verification key ('curve25519 pubkey' or 'ethereum address')
+ * @param verificationKey - VerificationKey public key string and type
+ * @param verificationKeySecret - The verification secret key bytes
  * @returns The json response from the Cube API after withdrawing
  */
 
@@ -36,9 +36,8 @@ export const doWithdrawal = async (
   isOrganization: boolean,
   apiKey: string,
   apiSecretKey: string,
-  verificationPublicKey: Uint8Array,
-  verificationPrivateKey: Uint8Array,
-  verificationKeyType: 'curve25519' | 'ethereum'
+  verificationKey: VerificationKey,
+  verificationKeySecret: Uint8Array,
 ): Promise<any> => {
   const timestamp = Math.floor(Date.now() / 1000);
 
@@ -58,18 +57,12 @@ export const doWithdrawal = async (
   // sign the payload with the verification private key.
   // note the different signing helper functions below for each type of key
   const signature =
-    verificationKeyType === 'curve25519'
-      ? signCurve25519(payload, verificationPrivateKey)
-      : await signEthereum(payload, verificationPrivateKey);
+    verificationKey.type === 'curve25519'
+      ? signCurve25519(payload, verificationKeySecret)
+      : await signEthereum(payload, verificationKeySecret);
 
-  // create the corresponding proto object of the verification key to attach to the request
-  const verificationKeyEncoded = PublicKey.encode(
-    PublicKey.create({
-      ...(verificationKeyType === 'curve25519'
-        ? { curve25519: verificationPublicKey }
-        : { ethereum: verificationPublicKey }),
-    })
-  ).finish();
+  // use provided electrum WASM function to encode the verification key
+  const encodedVerificationKey = encode_verification_key(JSON.stringify(verificationKey));
 
   // construct the entire request for the Cube Api, including signature and key
   const withdrawalBody = {
@@ -80,7 +73,7 @@ export const doWithdrawal = async (
     destination: withdrawal.destination,
     signature: bytesToBase64Normalized(signature),
     timestamp,
-    verificationKey: bytesToBase64Normalized(verificationKeyEncoded),
+    verificationKey: bytesToBase64Normalized(encodedVerificationKey),
     dryRun: withdrawal.dryRun || false,
   };
 
@@ -125,10 +118,3 @@ const signEthereum = async (
   });
   return signature;
 };
-
-export function bytesToBase64Normalized(bytes: Uint8Array) {
-  return btoa(String.fromCharCode(...bytes))
-    .replace(/-/g, '+')
-    .replace(/_/g, '/')
-    .replace(/=/g, '');
-}

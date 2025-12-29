@@ -3,7 +3,8 @@ import { mpcSecretKeyFromMnemonicPhrases } from './mpc-key';
 import {
   generateCurve25519KeyPair,
   generateEthereumKeyPair,
-  registerNewVerificationKey
+  registerNewVerificationKey,
+  VerificationKey,
 } from './verification-key';
 import { doWithdrawal } from './withdrawal'
 
@@ -24,14 +25,18 @@ const exampleWithdrawalInputs = {
 export const exampleWithCurve25519 = async () => {
   const { secretKey, publicKey } = generateCurve25519KeyPair();
 
+  const verificationKey: VerificationKey = {
+    type: 'curve25519',
+    bytes: Buffer.from(publicKey).toString('hex'),
+  };
+
   registerNewVerificationKey(
     cubeMpcSecretKey,
     userKey,
     isOrg,
     apiPublicKey,
     apiSecret,
-    Buffer.from(publicKey).toString('hex'),
-    'curve25519'
+    verificationKey,
   )
     .then((result) => {
       console.log('Verification key response:');
@@ -52,9 +57,8 @@ export const exampleWithCurve25519 = async () => {
     isOrg,
     apiPublicKey,
     apiSecret,
-    publicKey,
+    verificationKey,
     secretKey,
-    'curve25519'
   )
     .then((result) => {
       console.log('Withdrawal response:');
@@ -73,14 +77,18 @@ export const exampleWithEthereum = async () => {
     address: ethAddress
   } = generateEthereumKeyPair();
 
+  const verificationKey: VerificationKey = {
+    type: 'ethereum',
+    address: ethAddress,
+  };
+
   registerNewVerificationKey(
     cubeMpcSecretKey,
     userKey,
     isOrg,
     apiPublicKey,
     apiSecret,
-    ethAddress,
-    'ethereum'
+    verificationKey,
   ).then(result => {
     console.log('Verification key registered:');
     console.log(result);
@@ -99,9 +107,8 @@ export const exampleWithEthereum = async () => {
     isOrg,
     apiPublicKey,
     apiSecret,
-    Buffer.from(ethAddress.replace('0x',''),'hex'),
+    verificationKey,
     privateKey,
-    'ethereum'
   ).then(result => {
     console.log('Withdrawal response:');
     console.log(result);
