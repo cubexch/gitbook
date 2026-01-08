@@ -32,7 +32,7 @@ export const fetchCubeApi = async (
   headers.set('x-api-signature', apiSignature);
   headers.set('x-api-timestamp', ts.toString());
   if (isOrganization) {
-    headers.set('x-organization-key', cubeUserId); // todo is this w hyphens or no
+    headers.set('x-organization-key', cubeUserId);
   }
 
   const request = {

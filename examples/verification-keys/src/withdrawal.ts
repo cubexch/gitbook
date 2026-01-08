@@ -1,6 +1,9 @@
-import nacl from 'tweetnacl';
+import * as ed25519 from '@noble/ed25519';
 import * as secp from '@noble/secp256k1';
 import { keccak_256 } from '@noble/hashes/sha3';
+
+import { sha512 } from '@noble/hashes/sha2';
+ed25519.hashes.sha512 = sha512;
 
 import { fetchCubeApi, cubeApiBaseUrl } from './fetch-cube-api';
 
@@ -58,7 +61,7 @@ export const doWithdrawal = async (
   // note the different signing helper functions below for each type of key
   const signature =
     verificationKey.type === 'curve25519'
-      ? signCurve25519(payload, verificationKeySecret)
+      ? await signCurve25519(payload, verificationKeySecret)
       : await signEthereum(payload, verificationKeySecret);
 
   // use provided electrum WASM function to encode the verification key
@@ -93,12 +96,11 @@ export const doWithdrawal = async (
   return response;
 };
 
-const signCurve25519 = (
+const signCurve25519 = async (
   payload: Uint8Array,
   secretKey: Uint8Array
-): Uint8Array => {
-  const signature = nacl.sign.detached(payload, secretKey);
-  return signature;
+): Promise<Uint8Array> => {
+  return await ed25519.signAsync(payload, secretKey);
 };
 
 const signEthereum = async (

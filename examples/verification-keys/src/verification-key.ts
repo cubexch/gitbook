@@ -1,6 +1,9 @@
-import nacl from 'tweetnacl';
+import * as ed25519 from '@noble/ed25519';
 import * as secp from "@noble/secp256k1";
 import { keccak_256 } from "@noble/hashes/sha3";
+
+import { sha512 } from '@noble/hashes/sha2';
+ed25519.hashes.sha512 = sha512;
 
 import { sign_verification_key_provenance } from '@cubexch/electrum';
 
@@ -13,7 +16,7 @@ import { fetchCubeApi, cubeApiBaseUrl } from './fetch-cube-api';
  * Generates a curve25519 key pair.
  */
 export function generateCurve25519KeyPair() {
-  return nacl.sign.keyPair();
+  return ed25519.keygen();
 }
 
 /**
