@@ -2,6 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'fs';
 import path from 'path';
+import { htmlToBlocks } from '@portabletext/block-tools';
+import { Schema } from '@sanity/schema';
+import { JSDOM } from 'jsdom';
+import { micromark } from 'micromark';
 import {
   applyDeterministicTopicLinksToSegments,
   createLinkingTaxonomyCatalog,
@@ -9,18 +13,75 @@ import {
 } from './api_doc_topic_linking.mjs';
 import {
   buildApiOperationBlock,
+  buildBodyForSourcePath,
   extractOpenApiLayoutSections,
   extractSegments,
   extractTitle,
   inferOpenApiReferenceFromMarkdown,
+  normalizeSourcePath,
   parseSummary,
   rewritePortableTextTopicLinks,
   rewriteMarkdownLinks,
   slugFromSourcePath,
   stripInlineApiOperationSections,
+  toSanityLayoutSections,
 } from './publish_to_sanity.mjs';
 
 const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const portableTextBodyType = Schema.compile({
+  name: 'cubeApiPublisher',
+  types: [
+    {
+      name: 'doc',
+      type: 'object',
+      fields: [{ name: 'body', type: 'array', of: [{ type: 'block' }] }],
+    },
+  ],
+})
+  .get('doc')
+  .fields.find(field => field.name === 'body').type;
+
+function convertMarkdownChunkToBlocks(markdown) {
+  if (!markdown.trim()) return [];
+
+  return htmlToBlocks(micromark(markdown), portableTextBodyType, {
+    parseHtml: value => new JSDOM(value).window.document,
+  });
+}
+
+function parseSwaggerSegment(segment) {
+  const openingLine = segment.split(/\r?\n/)[0] || '';
+  const src = openingLine.match(/src="([^"]+)"/)?.[1];
+  const operationPath = openingLine.match(/path="([^"]+)"/)?.[1];
+  const method = openingLine.match(/method="([^"]+)"/)?.[1];
+
+  return {
+    src: normalizeSourcePath(src),
+    operationPath,
+    method,
+  };
+}
+
+function buildPortableTextBodyFromMarkdown(sourcePath) {
+  const markdown = fs.readFileSync(path.join(repoRoot, sourcePath), 'utf8');
+  const segments = extractSegments(markdown);
+  const body = [];
+
+  for (const segment of segments) {
+    if (segment.type === 'markdown') {
+      body.push(...convertMarkdownChunkToBlocks(segment.value));
+      continue;
+    }
+
+    if (segment.type === 'swagger') {
+      const { src, operationPath, method } = parseSwaggerSegment(segment.value);
+      const spec = JSON.parse(fs.readFileSync(path.join(repoRoot, src), 'utf8'));
+      body.push(buildApiOperationBlock(path.basename(src), operationPath, method, spec));
+    }
+  }
+
+  return body;
+}
 
 test('slugFromSourcePath maps README and nested pages correctly', () => {
   assert.equal(slugFromSourcePath('README.md'), 'index');
@@ -235,6 +296,103 @@ test('extractOpenApiLayoutSections preserves authored section titles, descriptio
       ],
     },
   ]);
+});
+
+test('extractOpenApiLayoutSections matches authored section headings in API markdown files', () => {
+  const exchangeInfoBody = buildPortableTextBodyFromMarkdown('exchange-info.md');
+  const marketDataBody = buildPortableTextBodyFromMarkdown('market-data/rest-api.md');
+  const orderEntryBody = buildPortableTextBodyFromMarkdown('order-entry/rest-api.md');
+
+  assert.deepEqual(
+    extractOpenApiLayoutSections(exchangeInfoBody).map(section => section.title),
+    ['Endpoints, public', 'Endpoints, authentication required']
+  );
+  assert.deepEqual(
+    extractOpenApiLayoutSections(marketDataBody).map(section => section.title),
+    ['Endpoints, public']
+  );
+  assert.deepEqual(
+    extractOpenApiLayoutSections(orderEntryBody).map(section => section.title),
+    ['Endpoints, authentication required']
+  );
+});
+
+test('buildBodyForSourcePath preserves trailing apiOperation blocks', async () => {
+  const summary = parseSummary(fs.readFileSync(path.join(repoRoot, 'SUMMARY.md'), 'utf8'));
+  const knownDocPaths = new Set(summary.map(item => item.sourcePath));
+  const specs = new Map(
+    ['generated/core/ir_api_30.json', 'generated/core/md_api_30.json', 'generated/core/os_api_30.json'].map(relPath => [
+      relPath,
+      JSON.parse(fs.readFileSync(path.join(repoRoot, relPath), 'utf8')),
+    ])
+  );
+
+  const { body: marketDataBody } = await buildBodyForSourcePath('market-data/rest-api.md', {
+    markdownRoot: path.join(repoRoot, 'generated/linked-markdown'),
+    siteUrl: 'https://www.cube.exchange',
+    knownDocPaths,
+    specs,
+    resolveAssetUrl: async input => `asset://${input}`,
+    assetCache: new Map(),
+  });
+
+  const { body: orderEntryBody } = await buildBodyForSourcePath('order-entry/rest-api.md', {
+    markdownRoot: path.join(repoRoot, 'generated/linked-markdown'),
+    siteUrl: 'https://www.cube.exchange',
+    knownDocPaths,
+    specs,
+    resolveAssetUrl: async input => `asset://${input}`,
+    assetCache: new Map(),
+  });
+
+  assert.deepEqual(
+    marketDataBody.filter(block => block?._type === 'apiOperation').map(block => block.path),
+    [
+      '/book/{market_id}/snapshot',
+      '/book/{market_id}/recent-trades',
+      '/tickers/snapshot',
+      '/parsed/tickers',
+      '/parsed/book/{market_symbol}/snapshot',
+      '/parsed/book/{market_symbol}/recent-trades',
+    ]
+  );
+  assert.deepEqual(
+    orderEntryBody.filter(block => block?._type === 'apiOperation').map(block => `${block.method}:${block.path}`),
+    ['get:/orders', 'delete:/orders', 'post:/order', 'delete:/order', 'patch:/order', 'get:/positions']
+  );
+});
+
+test('toSanityLayoutSections adds stable Sanity metadata to nested layout arrays', () => {
+  const input = [
+    {
+      title: 'Endpoints, authentication required',
+      description: 'Signed requests only.',
+      operations: [
+        { method: 'GET', path: '/users/check' },
+        { method: 'post', path: '/users/apikeys' },
+      ],
+    },
+  ];
+  const sections = toSanityLayoutSections(input);
+
+  assert.equal(sections.length, 1);
+  assert.equal(sections[0]._type, 'object');
+  assert.ok(sections[0]._key);
+  assert.equal(sections[0].title, 'Endpoints, authentication required');
+  assert.equal(sections[0].description, 'Signed requests only.');
+  assert.deepEqual(
+    sections[0].operations.map(operation => ({
+      _type: operation._type,
+      hasKey: Boolean(operation._key),
+      method: operation.method,
+      path: operation.path,
+    })),
+    [
+      { _type: 'object', hasKey: true, method: 'get', path: '/users/check' },
+      { _type: 'object', hasKey: true, method: 'post', path: '/users/apikeys' },
+    ]
+  );
+  assert.deepEqual(toSanityLayoutSections(input), sections);
 });
 
 test('extractTitle prefers SUMMARY title and preserves the in-file H1', () => {

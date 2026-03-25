@@ -414,7 +414,9 @@ export function rewritePortableTextTopicLinks(value) {
 }
 
 function blockIsEmpty(block) {
-  if (!block || !Array.isArray(block.children)) return true;
+  if (!block || typeof block !== 'object') return true;
+  if (block._type !== 'block') return false;
+  if (!Array.isArray(block.children)) return true;
   return block.children.every(child => typeof child?.text !== 'string' || child.text.trim() === '');
 }
 
@@ -530,6 +532,39 @@ export function extractOpenApiLayoutSections(body) {
 
 function normalizeText(value) {
   return value.replace(/\s+/g, ' ').trim();
+}
+
+function createDeterministicArrayKey(input) {
+  return sha256(input).slice(0, 24);
+}
+
+export function toSanityLayoutSections(layoutSections) {
+  if (!Array.isArray(layoutSections)) return [];
+
+  return layoutSections.map(section => {
+    const normalizedTitle = normalizeText(section?.title || '');
+    const normalizedDescription = normalizeText(section?.description || '');
+    const operations = Array.isArray(section?.operations)
+      ? section.operations.map(operation => ({
+          _type: 'object',
+          _key: createDeterministicArrayKey(
+            `layout-operation:${normalizedTitle}:${String(operation?.method || '').toLowerCase()}:${String(operation?.path || '')}`
+          ),
+          method: String(operation?.method || '').toLowerCase(),
+          path: String(operation?.path || ''),
+        }))
+      : [];
+
+    return {
+      _type: 'object',
+      _key: createDeterministicArrayKey(
+        `layout-section:${normalizedTitle}:${normalizedDescription}:${operations.map(operation => `${operation.method}:${operation.path}`).join('|')}`
+      ),
+      title: normalizedTitle,
+      ...(normalizedDescription ? { description: normalizedDescription } : {}),
+      operations,
+    };
+  });
 }
 
 export function extractTitle(markdown, fallbackTitle) {
@@ -936,6 +971,19 @@ async function buildBody(markdown, context) {
   };
 }
 
+export async function buildBodyForSourcePath(sourcePath, context) {
+  const preferredPath = path.join(context.markdownRoot, sourcePath);
+  const fallbackPath = path.join(REPO_ROOT, sourcePath);
+  const absolutePath = fs.existsSync(preferredPath) ? preferredPath : fallbackPath;
+  const rawMarkdown = fs.readFileSync(absolutePath, 'utf8');
+  const { markdownWithoutTitle } = extractTitle(rawMarkdown);
+
+  return buildBody(markdownWithoutTitle, {
+    ...context,
+    sourcePath,
+  });
+}
+
 async function buildDocument(summaryEntry, context) {
   const preferredPath = path.join(context.markdownRoot, summaryEntry.sourcePath);
   const fallbackPath = path.join(REPO_ROOT, summaryEntry.sourcePath);
@@ -954,6 +1002,7 @@ async function buildDocument(summaryEntry, context) {
     sourcePath: summaryEntry.sourcePath,
   });
   const layoutSections = openApiReference ? extractOpenApiLayoutSections(body) : [];
+  const sanityLayoutSections = toSanityLayoutSections(layoutSections);
   const publishedBody = openApiReference ? stripInlineApiOperationSections(body) : body;
 
   const syncHash = sha256(
@@ -994,7 +1043,7 @@ async function buildDocument(summaryEntry, context) {
           openApiReference: {
             specUrl: openApiReference.specUrl,
             format: openApiReference.format,
-            layoutSections,
+            layoutSections: sanityLayoutSections,
           },
         }
       : {}),
@@ -1006,6 +1055,21 @@ async function buildDocument(summaryEntry, context) {
     isLanding: summaryEntry.isLanding,
     syncHash,
   };
+}
+
+export async function buildSanityLayoutSectionsForSourcePath(sourcePath, context) {
+  const preferredPath = path.join(context.markdownRoot, sourcePath);
+  const fallbackPath = path.join(REPO_ROOT, sourcePath);
+  const absolutePath = fs.existsSync(preferredPath) ? preferredPath : fallbackPath;
+  const rawMarkdown = fs.readFileSync(absolutePath, 'utf8');
+  const { markdownWithoutTitle } = extractTitle(rawMarkdown);
+  const { body } = await buildBody(markdownWithoutTitle, {
+    ...context,
+    sourcePath,
+    resolveAssetUrl: async repoRelativePath => `asset://${normalizeSourcePath(repoRelativePath)}`,
+  });
+
+  return toSanityLayoutSections(extractOpenApiLayoutSections(body));
 }
 
 async function fetchExistingHashes(client) {
@@ -1080,6 +1144,17 @@ export async function runPublisher(options) {
   if (options.commit) {
     for (const document of documents) {
       await client.createOrReplace(document);
+      if (document.openApiReference) {
+        const layoutSections = await buildSanityLayoutSectionsForSourcePath(document.sourcePath, {
+          markdownRoot,
+          siteUrl,
+          knownDocPaths,
+          specs,
+          resolveAssetUrl,
+          assetCache,
+        });
+        await client.patch(document._id).set({ 'openApiReference.layoutSections': layoutSections }).commit();
+      }
     }
   }
 
