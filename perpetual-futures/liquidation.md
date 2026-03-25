@@ -2,7 +2,7 @@ Liquidation is a multi-step process that is trigged when a trader's account
 equity is below the maintenance margin requirement. The liquidation process
 helps prevent negative account equity and maintains market stability.
 
-# Liquidation Process
+## Liquidation Process
 
 Liquidation occurs over the following steps:
 
@@ -15,20 +15,20 @@ Liquidation occurs over the following steps:
 At each step, if the account equity is now above the maintenance margin
 requirements, liquidation is complete and the process stops.
 
-## Open Market Liquidation
+### Open Market Liquidation
 
 Liquidation begins with forced open-market operations. Here, the liquidatee
 (subaccount being liquidated) automatically performs market operations to
 attempt to increase account health.
 
-### Open Order Cancellation
+#### Open Order Cancellation
 
 First, the system automatically cancels all open orders. This cancellation is
 crucial as open orders require maintenance margin allocation. By releasing this
 allocated margin, the account may return to a healthy state without further
 intervention.
 
-### Market Close Positions
+#### Market Close Positions
 
 Second, if the position remains unhealthy after order cancellation, the system
 attempts to close positions through market orders. These orders will target
@@ -39,7 +39,7 @@ For example, if there is an open position for 1 BTC @ 100'000 perpetual with a
 maintenance margin of 10'000 USDC, market closes will leave at least 7'000
 USDC, and so will aggress at a price of 97'000.
 
-## Takeover Liquidation and Auto-Deleveraging (ADL)
+### Takeover Liquidation and Auto-Deleveraging (ADL)
 
 If open market liquidation is unsuccessful, the protocol enables position
 takeover through two mechanisms:
@@ -72,7 +72,7 @@ Position rankings are calculated for open positions and sorted to determine the
 order of deleveraging.
 
 
-## Insurance Fund and Socialized Loss
+### Insurance Fund and Socialized Loss
 
 Once all positions are closed, any remaining settlement-asset losses are
 evaluated against the insurance fund. The fund serves as a protective buffer,
@@ -83,7 +83,7 @@ the protocol implements socialized loss distribution. Losses are allocated
 across all traders proportionally to their current notional position sizes,
 ensuring system stability through collective risk sharing.
 
-# Liquidation Clearance Fee
+## Liquidation Clearance Fee
 
 To compensate for the risk and operational costs associated with liquidation,
 there is an additional liquidation clearance fee charged to the liquidatee in
@@ -92,9 +92,9 @@ is charged on the position's notional value cleared.
 
 The liquidation clearance fee is paid to the insurance fund.
 
-# Prices
+## Prices
 
-## Liquidation Price
+### Liquidation Price
 
 The price for a perpetual contract at which liquidation occurs for the
 calculated subaccount, supposing that the prices of everything else is
@@ -132,7 +132,7 @@ tier:
 => p_x = (K - q_x - OFFSET) / (1 - MMR * SIGN(u_x)) / u_x
 ```
 
-## Bankruptcy Price
+### Bankruptcy Price
 
 The price at which the account is bankrupt, supposing that the prices of
 everything else is constant.

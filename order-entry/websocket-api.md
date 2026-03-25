@@ -1,4 +1,4 @@
-# WebSocket: Trade API
+## WebSocket: Trade API
 
 This schema defines the Protobuf messages used for communication with the
 Cube Order Service (OS, or "Osmium").
@@ -9,7 +9,7 @@ Cube Order Service (OS, or "Osmium").
   - The [Protobuf definition file for the Websocket connection](https://github.com/cubexch/ws-api/blob/main/schema/trade.proto)
   - [General documentation pertaining to the Trade API](https://cubexch.gitbook.io/cube-api/trade-api.md)
 
-### Connection
+## Connection
 
 The order service exposes a websocket endpoint for clients to connect to.
 Once connected, clients should submit a [`Credentials`](#credentials)
@@ -18,7 +18,7 @@ and positions, and then can begin submitting
 [`OrderRequest`](#orderrequest) and processing
 [`OrderResponse`](#orderresponse).
 
-### Heartbeats
+## Heartbeats
 
 Application-level heartbeats are expected every 30 seconds. If more than one
 interval is missed, the order service will disconnect the websocket.
@@ -1070,4 +1070,3 @@ corresponding field did not take a valid value.
 | bool |  | bool | bool | boolean | bool |
 | string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | String | string | str/unicode | string |
 | bytes | May contain any arbitrary sequence of bytes. | Vec<u8> | string | str | []byte |
-
