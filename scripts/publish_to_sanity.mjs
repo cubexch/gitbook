@@ -481,6 +481,53 @@ export function stripInlineApiOperationSections(body) {
   return filteredBody;
 }
 
+export function extractOpenApiLayoutSections(body) {
+  if (!Array.isArray(body)) return [];
+
+  const layoutSections = [];
+
+  for (let index = 0; index < body.length; index += 1) {
+    const block = body[index];
+
+    if (isHeadingBlock(block)) {
+      let cursor = index + 1;
+      const descriptionParts = [];
+
+      while (cursor < body.length && isNormalBlock(body[cursor])) {
+        const text = normalizeText(getBlockText(body[cursor]));
+        if (text) {
+          descriptionParts.push(text);
+        }
+        cursor += 1;
+      }
+
+      const operations = [];
+      while (cursor < body.length && isApiOperationBlock(body[cursor])) {
+        const operation = body[cursor];
+        if (typeof operation?.method === 'string' && typeof operation?.path === 'string') {
+          operations.push({
+            method: operation.method.toLowerCase(),
+            path: operation.path,
+          });
+        }
+        cursor += 1;
+      }
+
+      if (operations.length) {
+        const title = normalizeText(getBlockText(block)) || 'General';
+        layoutSections.push({
+          title,
+          description: descriptionParts.length ? descriptionParts.join('\n\n') : undefined,
+          operations,
+        });
+        index = cursor - 1;
+      }
+    }
+  }
+
+  return layoutSections;
+}
+
 function normalizeText(value) {
   return value.replace(/\s+/g, ' ').trim();
 }
@@ -906,6 +953,7 @@ async function buildDocument(summaryEntry, context) {
     ...context,
     sourcePath: summaryEntry.sourcePath,
   });
+  const layoutSections = openApiReference ? extractOpenApiLayoutSections(body) : [];
   const publishedBody = openApiReference ? stripInlineApiOperationSections(body) : body;
 
   const syncHash = sha256(
@@ -922,6 +970,7 @@ async function buildDocument(summaryEntry, context) {
         ? {
             sourceHref: openApiReference.sourceHref,
             format: openApiReference.format,
+            layoutSections,
           }
         : null,
       body: normalizedHashInput,
@@ -945,6 +994,7 @@ async function buildDocument(summaryEntry, context) {
           openApiReference: {
             specUrl: openApiReference.specUrl,
             format: openApiReference.format,
+            layoutSections,
           },
         }
       : {}),

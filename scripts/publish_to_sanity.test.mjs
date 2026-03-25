@@ -9,6 +9,7 @@ import {
 } from './api_doc_topic_linking.mjs';
 import {
   buildApiOperationBlock,
+  extractOpenApiLayoutSections,
   extractSegments,
   extractTitle,
   inferOpenApiReferenceFromMarkdown,
@@ -148,6 +149,92 @@ test('stripInlineApiOperationSections removes swagger-derived endpoint sections 
   ];
 
   assert.deepEqual(stripInlineApiOperationSections(body), [body[0], body[7]]);
+});
+
+test('extractOpenApiLayoutSections preserves authored section titles, descriptions, and endpoint order', () => {
+  const body = [
+    {
+      _key: 'intro',
+      _type: 'block',
+      style: 'normal',
+      children: [{ _key: 'intro-text', _type: 'span', text: 'Intro copy', marks: [] }],
+    },
+    {
+      _key: 'public-heading',
+      _type: 'block',
+      style: 'h2',
+      children: [{ _key: 'public-heading-text', _type: 'span', text: 'Endpoints, public', marks: [] }],
+    },
+    {
+      _key: 'public-copy',
+      _type: 'block',
+      style: 'normal',
+      children: [{ _key: 'public-copy-text', _type: 'span', text: 'No auth required.', marks: [] }],
+    },
+    {
+      _key: 'public-copy-2',
+      _type: 'block',
+      style: 'normal',
+      children: [{ _key: 'public-copy-2-text', _type: 'span', text: 'Anonymous clients only.', marks: [] }],
+    },
+    {
+      _key: 'public-operation-1',
+      _type: 'apiOperation',
+      method: 'get',
+      path: '/markets',
+    },
+    {
+      _key: 'public-operation-2',
+      _type: 'apiOperation',
+      method: 'get',
+      path: '/history/klines',
+    },
+    {
+      _key: 'auth-heading',
+      _type: 'block',
+      style: 'h2',
+      children: [
+        { _key: 'auth-heading-text', _type: 'span', text: 'Endpoints, authentication required', marks: [] },
+      ],
+    },
+    {
+      _key: 'auth-copy',
+      _type: 'block',
+      style: 'normal',
+      children: [{ _key: 'auth-copy-text', _type: 'span', text: 'Signed requests only.', marks: [] }],
+    },
+    {
+      _key: 'auth-operation-1',
+      _type: 'apiOperation',
+      method: 'get',
+      path: '/users/check',
+    },
+    {
+      _key: 'auth-operation-2',
+      _type: 'apiOperation',
+      method: 'post',
+      path: '/users/apikeys',
+    },
+  ];
+
+  assert.deepEqual(extractOpenApiLayoutSections(body), [
+    {
+      title: 'Endpoints, public',
+      description: 'No auth required.\n\nAnonymous clients only.',
+      operations: [
+        { method: 'get', path: '/markets' },
+        { method: 'get', path: '/history/klines' },
+      ],
+    },
+    {
+      title: 'Endpoints, authentication required',
+      description: 'Signed requests only.',
+      operations: [
+        { method: 'get', path: '/users/check' },
+        { method: 'post', path: '/users/apikeys' },
+      ],
+    },
+  ]);
 });
 
 test('extractTitle prefers SUMMARY title and preserves the in-file H1', () => {
