@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import {
   buildApiOperationBlock,
+  extractTitle,
   parseSummary,
   rewriteMarkdownLinks,
   slugFromSourcePath,
@@ -63,4 +64,12 @@ test('buildApiOperationBlock resolves OpenAPI operations into renderable fields'
   assert.equal(block.method, 'get');
   assert.ok(Array.isArray(block.responses));
   assert.ok(block.responses.length > 0);
+});
+
+test('extractTitle prefers SUMMARY title and preserves the in-file H1', () => {
+  const markdown = `Intro paragraph.\n\n# Implied Price\n\nThe implied price details.`;
+  const result = extractTitle(markdown, 'Implied Matching');
+
+  assert.equal(result.title, 'Implied Matching');
+  assert.equal(result.markdownWithoutTitle, markdown);
 });

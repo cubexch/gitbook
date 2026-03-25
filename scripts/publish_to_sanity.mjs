@@ -390,20 +390,17 @@ function normalizeText(value) {
   return value.replace(/\s+/g, ' ').trim();
 }
 
-function extractTitle(markdown, fallbackTitle) {
+export function extractTitle(markdown, fallbackTitle) {
   const match = markdown.match(/^#\s+(.+?)\s*$/m);
   if (!match) {
     return { title: fallbackTitle, markdownWithoutTitle: markdown };
   }
 
-  const title = normalizeText(match[1]);
-  const startIndex = match.index || 0;
-  const endIndex = startIndex + match[0].length;
-  const markdownWithoutTitle = `${markdown.slice(0, startIndex)}${markdown.slice(endIndex)}`.replace(/^\s+/, '');
+  const title = fallbackTitle || normalizeText(match[1]);
 
   return {
     title,
-    markdownWithoutTitle,
+    markdownWithoutTitle: markdown,
   };
 }
 
