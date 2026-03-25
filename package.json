@@ -5,6 +5,7 @@
   "scripts": {
     "link:api-docs": "node ./scripts/link_api_docs.mjs",
     "publish:sanity": "node ./scripts/publish_to_sanity.mjs",
+    "publish:sanity:linked": "node ./scripts/publish_linked_api_docs.mjs",
     "test:publisher": "node --test ./scripts/publish_to_sanity.test.mjs"
   },
   "dependencies": {
