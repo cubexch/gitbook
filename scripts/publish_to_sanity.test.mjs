@@ -3,9 +3,13 @@ import assert from 'node:assert/strict';
 import fs from 'fs';
 import path from 'path';
 import {
-  buildApiOperationBlock,
+  applyDeterministicTopicLinksToSegments,
   createLinkingTaxonomyCatalog,
   deterministicallyLinkMarkdownSegments,
+} from './api_doc_topic_linking.mjs';
+import {
+  buildApiOperationBlock,
+  extractSegments,
   extractTitle,
   parseSummary,
   rewritePortableTextTopicLinks,
@@ -195,4 +199,31 @@ test('rewritePortableTextTopicLinks converts topic:// link marks into topicLink 
       topicId: 'protocols.stablecoins.circle',
     },
   ]);
+});
+
+test('applyDeterministicTopicLinksToSegments only links markdown segments and preserves swagger blocks', () => {
+  const taxonomyCatalog = createLinkingTaxonomyCatalog({
+    topics: [{ topicId: 'markets.trading.order_types.limit_order', title: 'Limit Order', pageType: 'concept_explainer' }],
+  });
+
+  const linkedSegments = applyDeterministicTopicLinksToSegments(
+    extractSegments(
+      [
+        'A Limit Order controls price.',
+        '',
+        '{% swagger src="/generated/core/os_api_30.json" path="/order" method="post" %}',
+        '{% endswagger %}',
+        '',
+        'Another Limit Order comes later.',
+      ].join('\n')
+    ),
+    taxonomyCatalog
+  );
+
+  assert.equal(
+    linkedSegments[0].value,
+    'A [Limit Order](topic://markets.trading.order_types.limit_order) controls price.\n'
+  );
+  assert.equal(linkedSegments[1].type, 'swagger');
+  assert.equal(linkedSegments[2].value, '\nAnother Limit Order comes later.');
 });

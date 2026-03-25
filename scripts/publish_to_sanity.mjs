@@ -3,10 +3,10 @@
 import { htmlToBlocks } from '@portabletext/block-tools';
 import { createClient } from '@sanity/client';
 import { Schema } from '@sanity/schema';
+import { DEFAULT_LINKED_MARKDOWN_DIR, INTERNAL_LINK_SCHEME, expandHomePath } from './api_doc_topic_linking.mjs';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { JSDOM } from 'jsdom';
@@ -18,51 +18,10 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const DEFAULT_API_VERSION = '2023-10-13';
 const DEFAULT_SITE_URL = 'https://www.cube.exchange';
 const DEFAULT_DATASET_TAG = 'apiDocPage';
-const DEFAULT_TOPIC_UNIVERSE_PATH = path.join(os.homedir(), 'code/cube/scribe-v2/content/taxonomies/topic-universe.json');
 
 const FIGURE_BLOCK_RE = /<figure>[\s\S]*?<\/figure>/;
 const MARKDOWN_LINK_RE = /\[([^\]]+)\]\(([^)]+)\)/g;
 const DOC_HOSTS = new Set(['cubexch.gitbook.io', 'cube.exchange', 'www.cube.exchange']);
-const INTERNAL_LINK_SCHEME = 'topic://';
-const DASH_LIKE_CHARACTERS = /[‐‑‒–—―−]/g;
-
-const SKIP_TOPIC_IDS = new Set([
-  'foundations.defi.yield.yield',
-  'foundations.defi.yield',
-  'foundations.privacy',
-  'foundations.scaling.rollups.aggregator',
-  'foundations.scaling',
-  'foundations.staking',
-  'foundations',
-  'institutional',
-  'markets',
-  'protocols.ethereum.base',
-  'protocols.networks.near',
-  'protocols.networks',
-  'protocols',
-]);
-
-const PROTECTED_PHRASE_TARGETS = [
-  {
-    blockedPhrase: 'The Block',
-    targetTopicId: 'foundations.blockchain.block',
-  },
-];
-
-const INTERNAL_ALIAS_CANDIDATES = [
-  {
-    phrase: 'USDT',
-    targetTopicId: 'protocols.stablecoins.tether',
-  },
-  {
-    phrase: 'USDC',
-    targetTopicId: 'protocols.stablecoins.circle',
-  },
-  {
-    phrase: 'Deribit',
-    targetTopicId: 'protocols.exchanges.cex.deribit',
-  },
-];
 
 function printUsage() {
   console.log(`Usage:
@@ -72,8 +31,8 @@ function printUsage() {
 Options:
   --dry-run       Build payloads and compare sync hashes without writing.
   --commit        Upload assets and upsert documents in Sanity.
+  --markdown-root Root directory to read markdown from (default: repo root, or ${DEFAULT_LINKED_MARKDOWN_DIR} for linked artifacts)
   --site-url      Public site URL used for internal links (default: ${DEFAULT_SITE_URL})
-  --topic-universe Path to scribe-v2 topic-universe.json (default: ${DEFAULT_TOPIC_UNIVERSE_PATH})
   --help, -h      Show this help
 `);
 }
@@ -82,8 +41,8 @@ function parseArgs(argv) {
   const out = {
     dryRun: false,
     commit: false,
+    markdownRoot: REPO_ROOT,
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL,
-    topicUniversePath: DEFAULT_TOPIC_UNIVERSE_PATH,
     help: false,
   };
 
@@ -111,12 +70,12 @@ function parseArgs(argv) {
       index += 1;
       continue;
     }
-    if (arg === '--topic-universe') {
+    if (arg === '--markdown-root') {
       const value = argv[index + 1];
       if (!value || value.startsWith('--')) {
         throw new Error(`Missing value for ${arg}`);
       }
-      out.topicUniversePath = value;
+      out.markdownRoot = value;
       index += 1;
       continue;
     }
@@ -153,11 +112,6 @@ function loadEnvFiles() {
 
 function createKey() {
   return crypto.randomBytes(6).toString('hex');
-}
-
-function expandHomePath(value) {
-  if (!value?.startsWith('~/')) return value;
-  return path.join(os.homedir(), value.slice(2));
 }
 
 function sha256(input) {
@@ -250,288 +204,6 @@ function inferSchemaType(schema) {
   if (schema.properties) return 'object';
   if (schema.items) return 'array';
   return undefined;
-}
-
-function normalizeDeterministicText(value) {
-  return value.toLowerCase().replace(DASH_LIKE_CHARACTERS, '-');
-}
-
-function isWordChar(ch) {
-  return ch !== undefined && /[\p{L}\p{N}]/u.test(ch);
-}
-
-function isOverlapping(ranges, start, end) {
-  return ranges.some(range => start < range.end && end > range.start);
-}
-
-function forEachLineRange(text, callback) {
-  let cursor = 0;
-  for (const rawLine of text.split('\n')) {
-    const line = rawLine.replace(/\r$/, '');
-    const start = cursor;
-    const end = start + line.length;
-    callback(line, start, end);
-    cursor += rawLine.length + 1;
-  }
-}
-
-function findExistingMarkdownLinkRanges(text) {
-  const ranges = [];
-  const regex = /(?<!!)\[[^\]]*\]\([^)]*\)/g;
-  let match;
-  while ((match = regex.exec(text)) !== null) {
-    ranges.push({ end: match.index + match[0].length, start: match.index });
-  }
-  return ranges;
-}
-
-function findHeadingRanges(text) {
-  const ranges = [];
-  forEachLineRange(text, (line, start, end) => {
-    if (/^\s*#{1,6}\s+/.test(line)) {
-      ranges.push({ start, end });
-    }
-  });
-  return ranges;
-}
-
-function findMarkdownTableRanges(text) {
-  const ranges = [];
-  forEachLineRange(text, (line, start, end) => {
-    if (line.trim().startsWith('|')) {
-      ranges.push({ start, end });
-    }
-  });
-  return ranges;
-}
-
-function findFencedCodeRanges(text) {
-  const ranges = [];
-  let openRangeStart = null;
-
-  forEachLineRange(text, (line, start, end) => {
-    if (!/^\s*`{3,}/.test(line)) {
-      return;
-    }
-
-    if (openRangeStart === null) {
-      openRangeStart = start;
-      return;
-    }
-
-    ranges.push({ start: openRangeStart, end });
-    openRangeStart = null;
-  });
-
-  if (openRangeStart !== null) {
-    ranges.push({ start: openRangeStart, end: text.length });
-  }
-
-  return ranges;
-}
-
-function findInlineCodeRanges(text) {
-  const ranges = [];
-  const regex = /`[^`\n]+`/g;
-  let match;
-  while ((match = regex.exec(text)) !== null) {
-    ranges.push({ start: match.index, end: match.index + match[0].length });
-  }
-  return ranges;
-}
-
-function findProtectedRangesForTopic(text, targetTopicId) {
-  const matches = PROTECTED_PHRASE_TARGETS.filter(entry => entry.targetTopicId === targetTopicId);
-  if (matches.length === 0) return [];
-
-  const normalizedText = normalizeDeterministicText(text);
-  const ranges = [];
-
-  for (const match of matches) {
-    const normalizedPhrase = normalizeDeterministicText(match.blockedPhrase);
-    let index = normalizedText.indexOf(normalizedPhrase);
-
-    while (index !== -1) {
-      ranges.push({ start: index, end: index + normalizedPhrase.length });
-      index = normalizedText.indexOf(normalizedPhrase, index + 1);
-    }
-  }
-
-  return ranges;
-}
-
-function findBlockedRanges(text) {
-  return [
-    ...findExistingMarkdownLinkRanges(text),
-    ...findHeadingRanges(text),
-    ...findFencedCodeRanges(text),
-    ...findMarkdownTableRanges(text),
-    ...findInlineCodeRanges(text),
-  ];
-}
-
-function findFirstValidMatchIndex(normalizedText, normalizedPhrase, originalText, blockedRanges, claimedRanges) {
-  const phraseLength = normalizedPhrase.length;
-  let index = normalizedText.indexOf(normalizedPhrase);
-
-  while (index !== -1) {
-    const end = index + phraseLength;
-    if (
-      !isWordChar(normalizedText[index - 1]) &&
-      !isWordChar(normalizedText[end]) &&
-      !isOverlapping(blockedRanges, index, end) &&
-      !isOverlapping(claimedRanges, index, end)
-    ) {
-      return index;
-    }
-    index = normalizedText.indexOf(normalizedPhrase, index + 1);
-  }
-
-  return null;
-}
-
-function applyMarkdownEdits(text, edits) {
-  return edits
-    .slice()
-    .sort((left, right) => right.start - left.start)
-    .reduce((current, edit) => {
-      const linkedPhrase = current.slice(edit.start, edit.end);
-      return `${current.slice(0, edit.start)}[${linkedPhrase}](${INTERNAL_LINK_SCHEME}${edit.targetTopicId})${current.slice(edit.end)}`;
-    }, text);
-}
-
-function loadTopicUniverse(topicUniversePath) {
-  const expandedPath = expandHomePath(topicUniversePath);
-  const absolutePath = path.isAbsolute(expandedPath) ? expandedPath : path.resolve(expandedPath);
-
-  if (!fs.existsSync(absolutePath)) {
-    throw new Error(`Topic universe file not found: ${absolutePath}`);
-  }
-
-  const parsed = JSON.parse(fs.readFileSync(absolutePath, 'utf8'));
-  if (!Array.isArray(parsed?.topics)) {
-    throw new Error(`Invalid topic universe file: ${absolutePath}`);
-  }
-
-  return parsed;
-}
-
-export function createLinkingTaxonomyCatalog(topicUniverse) {
-  const topicsByNormalizedTitle = new Map();
-
-  for (const topic of topicUniverse.topics) {
-    const normalizedTitle = normalizeText(topic.title).toLowerCase();
-    const group = topicsByNormalizedTitle.get(normalizedTitle) ?? [];
-    group.push(topic);
-    topicsByNormalizedTitle.set(normalizedTitle, group);
-  }
-
-  return topicUniverse.topics.map(topic => {
-    const normalizedTitle = normalizeText(topic.title).toLowerCase();
-    const duplicateTitleTopics = topicsByNormalizedTitle
-      .get(normalizedTitle)
-      ?.filter(candidate => candidate.topicId !== topic.topicId);
-
-    if (!duplicateTitleTopics || duplicateTitleTopics.length === 0) {
-      return {
-        pageType: topic.pageType,
-        title: topic.title,
-        topicId: topic.topicId,
-      };
-    }
-
-    const preferredConceptTopic = [topic, ...duplicateTitleTopics].find(candidate => candidate.pageType === 'concept_explainer');
-
-    return {
-      duplicateTitleTopicIds: duplicateTitleTopics.map(candidate => candidate.topicId),
-      pageType: topic.pageType,
-      preferredDuplicateTopicId: preferredConceptTopic?.topicId ?? topic.topicId,
-      title: topic.title,
-      topicId: topic.topicId,
-    };
-  });
-}
-
-function buildDeterministicMatchCandidates(taxonomyCatalog) {
-  const candidates = new Map();
-
-  for (const entry of taxonomyCatalog) {
-    candidates.set(`title:${entry.topicId}:${entry.title}`, {
-      phrase: entry.title,
-      targetTopicId: entry.topicId,
-    });
-  }
-
-  for (const alias of INTERNAL_ALIAS_CANDIDATES) {
-    if (!taxonomyCatalog.some(entry => entry.topicId === alias.targetTopicId)) {
-      continue;
-    }
-
-    candidates.set(`alias:${alias.targetTopicId}:${alias.phrase}`, {
-      phrase: alias.phrase,
-      targetTopicId: alias.targetTopicId,
-    });
-  }
-
-  return Array.from(candidates.values()).sort((left, right) => right.phrase.length - left.phrase.length);
-}
-
-export function deterministicallyLinkMarkdownSegments(markdownSegments, taxonomyCatalog) {
-  const coveredTopicIds = new Set();
-  const segmentStates = markdownSegments.map(text => ({
-    blockedRanges: findBlockedRanges(text),
-    claimedRanges: [],
-    edits: [],
-    normalizedText: normalizeDeterministicText(text),
-    text,
-  }));
-
-  for (const entry of buildDeterministicMatchCandidates(taxonomyCatalog)) {
-    const canonicalEntry = taxonomyCatalog.find(candidate => candidate.topicId === entry.targetTopicId);
-    if (!canonicalEntry) continue;
-    if (
-      canonicalEntry.preferredDuplicateTopicId !== undefined &&
-      canonicalEntry.preferredDuplicateTopicId !== canonicalEntry.topicId
-    ) {
-      continue;
-    }
-
-    const targetTopicId = canonicalEntry.preferredDuplicateTopicId ?? canonicalEntry.topicId;
-    if (coveredTopicIds.has(targetTopicId) || SKIP_TOPIC_IDS.has(targetTopicId)) {
-      continue;
-    }
-
-    const normalizedPhrase = normalizeDeterministicText(entry.phrase);
-
-    for (const segmentState of segmentStates) {
-      const protectedRanges = findProtectedRangesForTopic(segmentState.text, targetTopicId);
-      const matchIndex = findFirstValidMatchIndex(
-        segmentState.normalizedText,
-        normalizedPhrase,
-        segmentState.text,
-        [...segmentState.blockedRanges, ...protectedRanges],
-        segmentState.claimedRanges
-      );
-
-      if (matchIndex === null) {
-        continue;
-      }
-
-      segmentState.claimedRanges.push({
-        start: matchIndex,
-        end: matchIndex + entry.phrase.length,
-      });
-      segmentState.edits.push({
-        start: matchIndex,
-        end: matchIndex + entry.phrase.length,
-        targetTopicId,
-      });
-      coveredTopicIds.add(targetTopicId);
-      break;
-    }
-  }
-
-  return segmentStates.map(segmentState => applyMarkdownEdits(segmentState.text, segmentState.edits));
 }
 
 function buildOperationContent(content, spec) {
@@ -863,7 +535,7 @@ export async function rewriteMarkdownLinks(markdown, context) {
   return result;
 }
 
-function extractSegments(markdown) {
+export function extractSegments(markdown) {
   const lines = markdown.split(/\r?\n/);
   const segments = [];
   let textBuffer = [];
@@ -1097,21 +769,14 @@ async function buildBody(markdown, context) {
     currentSourcePath: context.sourcePath,
   });
   const segments = extractSegments(rewrittenMarkdown);
-  const rewrittenMarkdownSegments = deterministicallyLinkMarkdownSegments(
-    segments.filter(segment => segment.type === 'markdown').map(segment => segment.value),
-    context.taxonomyCatalog
-  );
   const body = [];
   const hashSegments = [];
-  let markdownSegmentIndex = 0;
 
   for (const segment of segments) {
     if (segment.type === 'markdown') {
-      const linkedSegmentValue = rewrittenMarkdownSegments[markdownSegmentIndex] ?? segment.value;
-      markdownSegmentIndex += 1;
-      const blocks = convertMarkdownChunkToBlocks(linkedSegmentValue);
+      const blocks = convertMarkdownChunkToBlocks(segment.value);
       body.push(...blocks);
-      hashSegments.push(linkedSegmentValue);
+      hashSegments.push(segment.value);
       continue;
     }
 
@@ -1145,7 +810,9 @@ async function buildBody(markdown, context) {
 }
 
 async function buildDocument(summaryEntry, context) {
-  const absolutePath = path.join(REPO_ROOT, summaryEntry.sourcePath);
+  const preferredPath = path.join(context.markdownRoot, summaryEntry.sourcePath);
+  const fallbackPath = path.join(REPO_ROOT, summaryEntry.sourcePath);
+  const absolutePath = fs.existsSync(preferredPath) ? preferredPath : fallbackPath;
   const rawMarkdown = fs.readFileSync(absolutePath, 'utf8');
   const { title, markdownWithoutTitle } = extractTitle(rawMarkdown, summaryEntry.title);
   const description = extractDescription(markdownWithoutTitle);
@@ -1223,19 +890,22 @@ export async function runPublisher(options) {
   const summary = parseSummary(fs.readFileSync(summaryPath, 'utf8'));
   const knownDocPaths = new Set(summary.map(item => item.sourcePath));
   const specs = loadOpenApiSpecs();
-  const taxonomyCatalog = createLinkingTaxonomyCatalog(loadTopicUniverse(options.topicUniversePath));
   const assetCache = new Map();
   const resolveAssetUrl = await createAssetResolver({ client, commit: options.commit, assetCache });
   const siteUrl = options.siteUrl || DEFAULT_SITE_URL;
+  const markdownRoot = (() => {
+    const expanded = expandHomePath(options.markdownRoot || REPO_ROOT);
+    return path.isAbsolute(expanded) ? expanded : path.join(REPO_ROOT, expanded);
+  })();
 
   const documents = [];
   for (const entry of summary) {
     documents.push(
       await buildDocument(entry, {
+        markdownRoot,
         siteUrl,
         knownDocPaths,
         specs,
-        taxonomyCatalog,
         resolveAssetUrl,
         assetCache,
       })

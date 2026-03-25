@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "link:api-docs": "node ./scripts/link_api_docs.mjs",
     "publish:sanity": "node ./scripts/publish_to_sanity.mjs",
     "test:publisher": "node --test ./scripts/publish_to_sanity.test.mjs"
   },
