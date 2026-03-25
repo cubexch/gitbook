@@ -302,9 +302,10 @@ test('extractOpenApiLayoutSections matches authored section headings in API mark
   const exchangeInfoBody = buildPortableTextBodyFromMarkdown('exchange-info.md');
   const marketDataBody = buildPortableTextBodyFromMarkdown('market-data/rest-api.md');
   const orderEntryBody = buildPortableTextBodyFromMarkdown('order-entry/rest-api.md');
+  const exchangeInfoSections = extractOpenApiLayoutSections(exchangeInfoBody);
 
   assert.deepEqual(
-    extractOpenApiLayoutSections(exchangeInfoBody).map(section => section.title),
+    exchangeInfoSections.map(section => section.title),
     ['Endpoints, public', 'Endpoints, authentication required']
   );
   assert.deepEqual(
@@ -314,6 +315,32 @@ test('extractOpenApiLayoutSections matches authored section headings in API mark
   assert.deepEqual(
     extractOpenApiLayoutSections(orderEntryBody).map(section => section.title),
     ['Endpoints, authentication required']
+  );
+  assert.deepEqual(
+    exchangeInfoSections.find(section => section.title === 'Endpoints, authentication required')?.operations.map(
+      operation => `${operation.method}:${operation.path}`
+    ),
+    [
+      'get:/users/check',
+      'post:/users/apikeys',
+      'delete:/users/apikeys/{api_key}',
+      'get:/users/subaccounts',
+      'post:/users/subaccounts',
+      'get:/users/subaccount/{subaccount_id}',
+      'patch:/users/subaccount/{subaccount_id}',
+      'get:/users/subaccount/{subaccount_id}/positions',
+      'get:/users/subaccount/{subaccount_id}/transactions',
+      'get:/users/subaccount/{subaccount_id}/transfers',
+      'get:/users/subaccount/{subaccount_id}/deposits',
+      'get:/users/subaccount/{subaccount_id}/withdrawals',
+      'get:/users/subaccount/{subaccount_id}/orders',
+      'get:/users/subaccount/{subaccount_id}/fills',
+      'post:/users/fee-estimates',
+      'get:/users/address',
+      'get:/users/address/settings',
+      'post:/users/withdraw',
+      'post:/users/transfer',
+    ]
   );
 });
 

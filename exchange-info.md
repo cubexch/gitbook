@@ -85,6 +85,10 @@ headers](#authentication-headers).
 [ir_api_30.json](/generated/core/ir_api_30.json)
 {% endswagger %}
 
+{% swagger src="/generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/transactions" method="get" %}
+[ir_api_30.json](/generated/core/ir_api_30.json)
+{% endswagger %}
+
 {% swagger src="/generated/core/ir_api_30.json" path="/users/subaccount/{subaccount_id}/transfers" method="get" %}
 [ir_api_30.json](/generated/core/ir_api_30.json)
 {% endswagger %}
@@ -118,5 +122,9 @@ headers](#authentication-headers).
 {% endswagger %}
 
 {% swagger src="/generated/core/ir_api_30.json" path="/users/withdraw" method="post" %}
+[ir_api_30.json](/generated/core/ir_api_30.json)
+{% endswagger %}
+
+{% swagger src="/generated/core/ir_api_30.json" path="/users/transfer" method="post" %}
 [ir_api_30.json](/generated/core/ir_api_30.json)
 {% endswagger %}
