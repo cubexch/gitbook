@@ -11,10 +11,12 @@ import {
   buildApiOperationBlock,
   extractSegments,
   extractTitle,
+  inferOpenApiReferenceFromMarkdown,
   parseSummary,
   rewritePortableTextTopicLinks,
   rewriteMarkdownLinks,
   slugFromSourcePath,
+  stripInlineApiOperationSections,
 } from './publish_to_sanity.mjs';
 
 const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
@@ -71,6 +73,81 @@ test('buildApiOperationBlock resolves OpenAPI operations into renderable fields'
   assert.equal(block.method, 'get');
   assert.ok(Array.isArray(block.responses));
   assert.ok(block.responses.length > 0);
+});
+
+test('inferOpenApiReferenceFromMarkdown resolves linked OpenAPI assets', async () => {
+  const reference = await inferOpenApiReferenceFromMarkdown(
+    'Definitions for requests and responses can be found in the [Market Data OpenAPI Document](/generated/core/md_api_30.json).',
+    {
+      currentSourcePath: 'market-data/rest-api.md',
+      siteUrl: 'https://www.cube.exchange',
+      knownDocPaths: new Set(['market-data/rest-api.md']),
+      resolveAssetUrl: async input => `asset://${input}`,
+    }
+  );
+
+  assert.deepEqual(reference, {
+    specUrl: 'asset://generated/core/md_api_30.json',
+    format: 'auto',
+    sourceHref: '/generated/core/md_api_30.json',
+  });
+});
+
+test('stripInlineApiOperationSections removes swagger-derived endpoint sections from Sanity body output', () => {
+  const body = [
+    {
+      _key: 'intro',
+      _type: 'block',
+      style: 'normal',
+      children: [{ _key: 'intro-text', _type: 'span', text: 'Intro copy', marks: [] }],
+    },
+    {
+      _key: 'public-heading',
+      _type: 'block',
+      style: 'h2',
+      children: [{ _key: 'public-heading-text', _type: 'span', text: 'Endpoints, public', marks: [] }],
+    },
+    {
+      _key: 'public-copy',
+      _type: 'block',
+      style: 'normal',
+      children: [{ _key: 'public-copy-text', _type: 'span', text: 'No auth required.', marks: [] }],
+    },
+    {
+      _key: 'public-operation',
+      _type: 'apiOperation',
+      method: 'get',
+      path: '/markets',
+    },
+    {
+      _key: 'auth-heading',
+      _type: 'block',
+      style: 'h2',
+      children: [
+        { _key: 'auth-heading-text', _type: 'span', text: 'Endpoints, authentication required', marks: [] },
+      ],
+    },
+    {
+      _key: 'auth-copy',
+      _type: 'block',
+      style: 'normal',
+      children: [{ _key: 'auth-copy-text', _type: 'span', text: 'Signed requests only.', marks: [] }],
+    },
+    {
+      _key: 'auth-operation',
+      _type: 'apiOperation',
+      method: 'post',
+      path: '/users/check',
+    },
+    {
+      _key: 'tail',
+      _type: 'block',
+      style: 'h2',
+      children: [{ _key: 'tail-text', _type: 'span', text: 'Authentication Headers', marks: [] }],
+    },
+  ];
+
+  assert.deepEqual(stripInlineApiOperationSections(body), [body[0], body[7]]);
 });
 
 test('extractTitle prefers SUMMARY title and preserves the in-file H1', () => {

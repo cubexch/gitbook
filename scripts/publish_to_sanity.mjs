@@ -427,6 +427,60 @@ function trimPortableTextValue(value) {
   return value.slice(start, end);
 }
 
+function isHeadingBlock(block) {
+  return (
+    block &&
+    typeof block === 'object' &&
+    block._type === 'block' &&
+    typeof block.style === 'string' &&
+    /^h[1-6]$/.test(block.style)
+  );
+}
+
+function isNormalBlock(block) {
+  return block && typeof block === 'object' && block._type === 'block' && block.style === 'normal';
+}
+
+function isApiOperationBlock(block) {
+  return block && typeof block === 'object' && block._type === 'apiOperation';
+}
+
+export function stripInlineApiOperationSections(body) {
+  if (!Array.isArray(body)) return body;
+
+  const filteredBody = [];
+
+  for (let index = 0; index < body.length; index += 1) {
+    const block = body[index];
+
+    if (isHeadingBlock(block)) {
+      let cursor = index + 1;
+
+      while (cursor < body.length && isNormalBlock(body[cursor])) {
+        cursor += 1;
+      }
+
+      let operationCursor = cursor;
+      while (operationCursor < body.length && isApiOperationBlock(body[operationCursor])) {
+        operationCursor += 1;
+      }
+
+      if (operationCursor > cursor) {
+        index = operationCursor - 1;
+        continue;
+      }
+    }
+
+    if (isApiOperationBlock(block)) {
+      continue;
+    }
+
+    filteredBody.push(block);
+  }
+
+  return filteredBody;
+}
+
 function normalizeText(value) {
   return value.replace(/\s+/g, ' ').trim();
 }
@@ -533,6 +587,32 @@ export async function rewriteMarkdownLinks(markdown, context) {
 
   result += markdown.slice(cursor);
   return result;
+}
+
+export async function inferOpenApiReferenceFromMarkdown(markdown, context) {
+  for (const match of markdown.matchAll(MARKDOWN_LINK_RE)) {
+    const label = normalizeText(match[1] || '');
+    const href = (match[2] || '').trim();
+    if (!href) continue;
+
+    const haystack = `${label} ${href}`.toLowerCase();
+    const looksLikeOpenApiReference =
+      haystack.includes('openapi') ||
+      haystack.includes('swagger') ||
+      /\.(json|ya?ml)(?:$|[?#])/.test(href.toLowerCase());
+
+    if (!looksLikeOpenApiReference) continue;
+
+    const resolvedHref = await rewriteHref({ ...context, href });
+
+    return {
+      specUrl: resolvedHref,
+      format: 'auto',
+      sourceHref: href,
+    };
+  }
+
+  return null;
 }
 
 export function extractSegments(markdown) {
@@ -816,10 +896,17 @@ async function buildDocument(summaryEntry, context) {
   const rawMarkdown = fs.readFileSync(absolutePath, 'utf8');
   const { title, markdownWithoutTitle } = extractTitle(rawMarkdown, summaryEntry.title);
   const description = extractDescription(markdownWithoutTitle);
+  const openApiReference = await inferOpenApiReferenceFromMarkdown(markdownWithoutTitle, {
+    currentSourcePath: summaryEntry.sourcePath,
+    siteUrl: context.siteUrl,
+    knownDocPaths: context.knownDocPaths,
+    resolveAssetUrl: context.resolveAssetUrl,
+  });
   const { body, normalizedHashInput } = await buildBody(markdownWithoutTitle, {
     ...context,
     sourcePath: summaryEntry.sourcePath,
   });
+  const publishedBody = openApiReference ? stripInlineApiOperationSections(body) : body;
 
   const syncHash = sha256(
     JSON.stringify({
@@ -831,6 +918,12 @@ async function buildDocument(summaryEntry, context) {
       navOrder: summaryEntry.navOrder,
       parentSlug: summaryEntry.parentSlug || null,
       isLanding: summaryEntry.isLanding,
+      openApiReference: openApiReference
+        ? {
+            sourceHref: openApiReference.sourceHref,
+            format: openApiReference.format,
+          }
+        : null,
       body: normalizedHashInput,
     })
   );
@@ -846,7 +939,15 @@ async function buildDocument(summaryEntry, context) {
     description,
     seoTitle: `${title} | Cube API`,
     seoDescription: description,
-    body,
+    body: publishedBody,
+    ...(openApiReference
+      ? {
+          openApiReference: {
+            specUrl: openApiReference.specUrl,
+            format: openApiReference.format,
+          },
+        }
+      : {}),
     sourcePath: summaryEntry.sourcePath,
     navGroup: summaryEntry.navGroup,
     navGroupOrder: summaryEntry.navGroupOrder,
