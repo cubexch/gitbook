@@ -81,11 +81,7 @@ export const doWithdrawal = async (
   };
 
   const response = await fetchCubeApi(
-    new URL(
-      isOrganization
-        ? `${cubeApiBaseUrl}/organization/withdraw`
-        : `${cubeApiBaseUrl}/users/withdraw`
-    ),
+    new URL(`${cubeApiBaseUrl}/users/withdraw`),
     'POST',
     withdrawalBody,
     apiKey,

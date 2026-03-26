@@ -30,43 +30,36 @@ export const exampleWithCurve25519 = async () => {
     bytes: Buffer.from(publicKey).toString('hex'),
   };
 
-  registerNewVerificationKey(
-    cubeMpcSecretKey,
-    userKey,
-    isOrg,
-    apiPublicKey,
-    apiSecret,
-    verificationKey,
-  )
-    .then((result) => {
-      console.log('Verification key response:');
-      console.log(result);
-      console.log('Curve25519 Public Key', Buffer.from(publicKey).toString('hex'));
-      console.log('Curve25519 Secret Key', Buffer.from(secretKey).toString('hex'));
-    })
-    .catch((err) => {
-      console.error('Error:', err);
-      return;
-    });
+  try {
+    const verificationResult = await registerNewVerificationKey(
+      cubeMpcSecretKey,
+      userKey,
+      isOrg,
+      apiPublicKey,
+      apiSecret,
+      verificationKey,
+    );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('Verification key response:');
+    console.log(verificationResult);
+    console.log('Curve25519 Public Key', Buffer.from(publicKey).toString('hex'));
+    console.log('Curve25519 Secret Key', Buffer.from(secretKey).toString('hex'));
 
-  doWithdrawal(
-    exampleWithdrawalInputs,
-    userKey,
-    isOrg,
-    apiPublicKey,
-    apiSecret,
-    verificationKey,
-    secretKey,
-  )
-    .then((result) => {
-      console.log('Withdrawal response:');
-      console.log(result);
-    })
-    .catch((err) => {
-      console.error('Error:', err);
-    });
+    const withdrawalResult = await doWithdrawal(
+      exampleWithdrawalInputs,
+      userKey,
+      isOrg,
+      apiPublicKey,
+      apiSecret,
+      verificationKey,
+      secretKey,
+    );
+
+    console.log('Withdrawal response:');
+    console.log(withdrawalResult);
+  } catch (err) {
+    console.error('Error:', err);
+  }
 };
 
 
@@ -74,7 +67,7 @@ export const exampleWithEthereum = async () => {
   const {
     privateKey,
     publicKey: ethPublicKey,
-    address: ethAddress
+    address: ethAddress,
   } = generateEthereumKeyPair();
 
   const verificationKey: VerificationKey = {
@@ -82,41 +75,38 @@ export const exampleWithEthereum = async () => {
     address: ethAddress,
   };
 
-  registerNewVerificationKey(
-    cubeMpcSecretKey,
-    userKey,
-    isOrg,
-    apiPublicKey,
-    apiSecret,
-    verificationKey,
-  ).then(result => {
+  try {
+    const verificationResult = await registerNewVerificationKey(
+      cubeMpcSecretKey,
+      userKey,
+      isOrg,
+      apiPublicKey,
+      apiSecret,
+      verificationKey,
+    );
+
     console.log('Verification key registered:');
-    console.log(result);
+    console.log(verificationResult);
     console.log('Ethereum Address', ethAddress);
     console.log('Ethereum Public Key', Buffer.from(ethPublicKey).toString('hex'));
     console.log('Ethereum Private Key', Buffer.from(privateKey).toString('hex'));
-  }).catch(err => {
-    console.error('Error:', err);
-  });
 
+    const withdrawalResult = await doWithdrawal(
+      exampleWithdrawalInputs,
+      userKey,
+      isOrg,
+      apiPublicKey,
+      apiSecret,
+      verificationKey,
+      privateKey,
+    );
 
-
-  doWithdrawal(
-    exampleWithdrawalInputs,
-    userKey,
-    isOrg,
-    apiPublicKey,
-    apiSecret,
-    verificationKey,
-    privateKey,
-  ).then(result => {
     console.log('Withdrawal response:');
-    console.log(result);
-  }).catch(err => {
+    console.log(withdrawalResult);
+  } catch (err) {
     console.error('Error:', err);
-  });
-
-}
+  }
+};
 
 // Helper to read the cube secret key mnemoics file and conver it to the secret key bytes
 function getSecretKey(mnemonicsPath: string): Uint8Array {
