@@ -7,7 +7,7 @@ ed25519.hashes.sha512 = sha512;
 
 import { fetchCubeApi, cubeApiBaseUrl } from './fetch-cube-api';
 
-import { VerificationKey, bytesToBase64Normalized } from './verification-key'
+import { VerificationKey, bytesToBase64Normalized } from './register-verification-key';
 
 import { encode_verification_key } from '@cubexch/electrum'
 

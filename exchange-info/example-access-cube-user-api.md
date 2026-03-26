@@ -1,8 +1,8 @@
 # Example: Access Cube User API
 
+<!-- embedme ../examples/verification-keys/src/fetch-cube-api.ts -->
 ```typescript
 import crypto from 'crypto';
-
 export const cubeApiBaseUrl: string = 'https://api.cube.exchange/ir/v0';
 
 /**
@@ -28,8 +28,6 @@ export const fetchCubeApi = async (
   isOrganization: boolean
 ): Promise<any> => {
   const ts = Math.floor(Date.now() / 1000);
-
-  // see `generateApiSignature` below
   const apiSignature = generateApiSignature(apiSecretKey, ts);
 
   const headers = new Headers();
@@ -38,7 +36,7 @@ export const fetchCubeApi = async (
   headers.set('x-api-signature', apiSignature);
   headers.set('x-api-timestamp', ts.toString());
   if (isOrganization) {
-    headers.set('x-organization-key', cubeUserId); // todo is this w hyphens or no
+    headers.set('x-organization-key', cubeUserId);
   }
 
   const request = {
@@ -55,6 +53,7 @@ export const fetchCubeApi = async (
   }
   return await response.json();
 };
+
 
 /**
  * Generates an HMAC-SHA256 signature for Cube API authentication.
@@ -80,6 +79,5 @@ const generateApiSignature = (
 
   return signature;
 };
-
 
 ```

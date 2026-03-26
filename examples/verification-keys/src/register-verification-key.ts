@@ -1,48 +1,8 @@
-import * as ed25519 from '@noble/ed25519';
-import * as secp from "@noble/secp256k1";
-import { keccak_256 } from "@noble/hashes/sha3";
-
-import { sha512 } from '@noble/hashes/sha2';
-ed25519.hashes.sha512 = sha512;
-
 import { sign_verification_key_provenance } from '@cubexch/electrum';
 
 // The fetchCubeApi code this references is provided
 // for convenience on the Access Cube Api Example page
 import { fetchCubeApi, cubeApiBaseUrl } from './fetch-cube-api';
-
-
-/**
- * Generates a curve25519 key pair.
- */
-export function generateCurve25519KeyPair() {
-  return ed25519.keygen();
-}
-
-/**
- * Generates a secp256k1 key pair and Ethereum address.
- */
-export function generateEthereumKeyPair() {
-  // generate random 32-byte private key
-  const privateKey = secp.utils.randomSecretKey();
-
-  // get public key (uncompressed)
-  const publicKey = secp.getPublicKey(privateKey, false);
-
-  // Ethereum address:
-  // Skip the 0x04 prefix of the public key (ie. the first byte '04')
-  const pubKeySlice = publicKey.slice(1);
-  // Compute the keccak_256 hash and take the last 20 bytes of the result
-  const addressBytes = keccak_256(pubKeySlice).slice(-20);
-
-  const address = "0x" + Buffer.from(addressBytes).toString("hex");
-
-  return {
-    privateKey,
-    publicKey,
-    address,
-  };
-}
 
 /**
  * VerificationKey: The public component and type of key being registered.
@@ -131,7 +91,7 @@ export const registerNewVerificationKey = async (
   return response;
 }
 
-
+// Helper function used to format byte strings correctly for the Cube Api
 export function bytesToBase64Normalized(bytes: Uint8Array) {
   return btoa(String.fromCharCode(...bytes))
     .replace(/-/g, '+')

@@ -7,6 +7,7 @@ There are two types of verification keys that the Cube API supports: `'curve2551
 
 #### Generate `'curve25519'` Verification Key
 
+<!-- embedme ../../examples/verification-keys/src/generate-curve25519-key.ts -->
 ```typescript
 import * as ed25519 from '@noble/ed25519';
 import { sha512 } from '@noble/hashes/sha2';
@@ -27,12 +28,13 @@ export function generateCurve25519KeyPair() {
 
 #### Generate `'ethereum'` Verification Key
 
-```ts
+<!-- embedme ../../examples/verification-keys/src/generate-ethereum-key.ts -->
+```typescript
 import * as secp from "@noble/secp256k1";
 import { keccak_256 } from "@noble/hashes/sha3";
 
 /**
- * Generates a secp256k1 key pair and derived Ethereum address.
+ * Generates a secp256k1 key pair and Ethereum address.
  */
 export function generateEthereumKeyPair() {
   // generate random 32-byte private key

@@ -2,13 +2,13 @@
 
 Once you have generated your verification key, you must sign a provenance payload using your Cube wallet mpc secret key and a signing function provided in the public npm package [`@cubexch/electrum`](https://www.npmjs.com/package/@cubexch/electrum). Then you must send the signature and verification public key to the Cube API endpoint for registering verification keys. See the example below:
 
+<!-- embedme ../../examples/verification-keys/src/register-verification-key.ts -->
 ```typescript
 import { sign_verification_key_provenance } from '@cubexch/electrum';
 
 // The fetchCubeApi code this references is provided
 // for convenience on the Access Cube Api Example page
 import { fetchCubeApi, cubeApiBaseUrl } from './fetch-cube-api';
-
 
 /**
  * VerificationKey: The public component and type of key being registered.
@@ -98,11 +98,12 @@ export const registerNewVerificationKey = async (
 }
 
 // Helper function used to format byte strings correctly for the Cube Api
-function bytesToBase64Normalized(bytes: Uint8Array) {
+export function bytesToBase64Normalized(bytes: Uint8Array) {
   return btoa(String.fromCharCode(...bytes))
     .replace(/-/g, '+')
     .replace(/_/g, '/')
     .replace(/=/g, "")
     ;
 }
+
 ```

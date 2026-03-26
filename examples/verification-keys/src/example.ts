@@ -1,17 +1,12 @@
 import fs from 'fs';
 import { mpcSecretKeyFromMnemonicPhrases } from './mpc-key';
+import { generateCurve25519KeyPair } from './generate-curve25519-key';
+import { generateEthereumKeyPair } from './generate-ethereum-key';
 import {
-  generateCurve25519KeyPair,
-  generateEthereumKeyPair,
   registerNewVerificationKey,
   VerificationKey,
-} from './verification-key';
-import { doWithdrawal } from './withdrawal'
-
-const cubeMpcSecretKey: Uint8Array = Buffer.from('1234567890abcdef', 'hex');
-const apiPublicKey: string = '';
-const apiSecret: string = '';
-const userKey: string = '';
+} from './register-verification-key';
+import { doWithdrawal } from './withdraw-with-verification-key'
 const isOrg: boolean = false;
 
 const exampleWithdrawalInputs = {

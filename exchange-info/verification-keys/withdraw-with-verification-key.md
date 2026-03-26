@@ -2,6 +2,7 @@
 
 With a successfully registered Verification Key, you may sign and send withdrawal or transfer requests to the Cube Api. You may use the same verification key to sign many subsequent withdrawals. Note that you must use the published [`@cubexch/electrum`](https://www.npmjs.com/package/@cubexch/electrum) module here as well to encode the verification key into the format required by the Api.
 
+<!-- embedme ../../examples/verification-keys/src/withdraw-with-verification-key.ts -->
 ```typescript
 import * as ed25519 from '@noble/ed25519';
 import * as secp from '@noble/secp256k1';
@@ -10,11 +11,9 @@ import { keccak_256 } from '@noble/hashes/sha3';
 import { sha512 } from '@noble/hashes/sha2';
 ed25519.hashes.sha512 = sha512;
 
-// The fetchCubeApi code this references is provided
-// for convenience on the Access Cube Api Example page
 import { fetchCubeApi, cubeApiBaseUrl } from './fetch-cube-api';
 
-import { VerificationKey, bytesToBase64Normalized } from './verification-key'
+import { VerificationKey, bytesToBase64Normalized } from './register-verification-key';
 
 import { encode_verification_key } from '@cubexch/electrum'
 
@@ -123,12 +122,5 @@ const signEthereum = async (
   });
   return signature;
 };
-
-export function bytesToBase64Normalized(bytes: Uint8Array) {
-  return btoa(String.fromCharCode(...bytes))
-    .replace(/-/g, '+')
-    .replace(/_/g, '/')
-    .replace(/=/g, '');
-}
 
 ```
