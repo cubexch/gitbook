@@ -139,9 +139,21 @@ export function slugFromSourcePath(sourcePath) {
   return stripMarkdownExtension(normalized);
 }
 
-function buildPublicPathFromSlug(slug, isLanding = false) {
-  if (isLanding || !slug || slug === 'index') return '/cube-api';
-  return `/cube-api/${slug}`;
+function resolveKnownDocPath(inputPath, knownDocPaths) {
+  const normalizedPath = normalizeSourcePath(inputPath).replace(/^cube-api\/?/, '');
+  const candidates = normalizedPath
+    ? [normalizedPath]
+    : ['README.md'];
+
+  if (normalizedPath && !normalizedPath.endsWith('.md')) {
+    candidates.push(`${normalizedPath}.md`, `${normalizedPath}/README.md`);
+  }
+
+  return candidates.find(candidate => knownDocPaths.has(candidate));
+}
+
+function buildRelativeDocHref(currentSourcePath, targetSourcePath) {
+  return path.posix.relative(path.posix.dirname(currentSourcePath), targetSourcePath) || path.posix.basename(targetSourcePath);
 }
 
 function getPointerValue(spec, pointer) {
@@ -606,11 +618,7 @@ function splitHref(input) {
   };
 }
 
-function asAbsoluteSiteUrl(siteUrl, pathname) {
-  return new URL(pathname, siteUrl).toString();
-}
-
-async function rewriteHref({ href, currentSourcePath, siteUrl, knownDocPaths, resolveAssetUrl }) {
+async function rewriteHref({ href, currentSourcePath, knownDocPaths, resolveAssetUrl }) {
   const trimmed = href.trim();
   if (!trimmed || trimmed.startsWith('#')) return trimmed;
 
@@ -620,14 +628,9 @@ async function rewriteHref({ href, currentSourcePath, siteUrl, knownDocPaths, re
     const url = new URL(trimmed);
     if (!DOC_HOSTS.has(url.hostname)) return trimmed;
 
-    if (url.pathname.startsWith('/cube-api')) {
-      return asAbsoluteSiteUrl(siteUrl, stripMarkdownExtension(url.pathname)) + url.search + url.hash;
-    }
-
-    const normalizedPath = normalizeSourcePath(url.pathname);
-    const maybeDocPath = normalizedPath.replace(/^cube-api\//, '');
-    if (knownDocPaths.has(maybeDocPath)) {
-      return asAbsoluteSiteUrl(siteUrl, buildPublicPathFromSlug(slugFromSourcePath(maybeDocPath), maybeDocPath === 'README.md')) + url.search + url.hash;
+    const resolvedDocPath = resolveKnownDocPath(url.pathname, knownDocPaths);
+    if (resolvedDocPath) {
+      return buildRelativeDocHref(currentSourcePath, resolvedDocPath) + url.search + url.hash;
     }
 
     return trimmed;
@@ -637,11 +640,9 @@ async function rewriteHref({ href, currentSourcePath, siteUrl, knownDocPaths, re
     ? normalizeSourcePath(pathname)
     : normalizeSourcePath(path.join(path.dirname(currentSourcePath), pathname));
 
-  if (knownDocPaths.has(repoRelativePath)) {
-    return asAbsoluteSiteUrl(
-      siteUrl,
-      buildPublicPathFromSlug(slugFromSourcePath(repoRelativePath), repoRelativePath === 'README.md')
-    ) + suffix;
+  const resolvedDocPath = resolveKnownDocPath(repoRelativePath, knownDocPaths);
+  if (resolvedDocPath) {
+    return buildRelativeDocHref(currentSourcePath, resolvedDocPath) + suffix;
   }
 
   if (repoRelativePath.startsWith('generated/core/') || repoRelativePath.startsWith('images/')) {

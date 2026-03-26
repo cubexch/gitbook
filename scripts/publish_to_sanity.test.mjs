@@ -121,8 +121,8 @@ test('rewriteMarkdownLinks rewrites local doc links and GitBook absolute links',
     resolveAssetUrl: async input => `asset://${input}`,
   });
 
-  assert.match(rewritten, /\[Trade\]\(https:\/\/www\.cube\.exchange\/cube-api\/trade-api\)/);
-  assert.match(rewritten, /\[Socket\]\(https:\/\/www\.cube\.exchange\/cube-api\/order-entry\/websocket-api#credentials\)/);
+  assert.match(rewritten, /\[Trade\]\(\.\.\/trade-api\.md\)/);
+  assert.match(rewritten, /\[Socket\]\(websocket-api\.md#credentials\)/);
   assert.match(rewritten, /\[Hash\]\(#section\)/);
 });
 
