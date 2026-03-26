@@ -3,9 +3,12 @@
 With a successfully registered Verification Key, you may sign and send withdrawal or transfer requests to the Cube Api. You may use the same verification key to sign many subsequent withdrawals. Note that you must use the published [`@cubexch/electrum`](https://www.npmjs.com/package/@cubexch/electrum) module here as well to encode the verification key into the format required by the Api.
 
 ```typescript
-import nacl from 'tweetnacl';
+import * as ed25519 from '@noble/ed25519';
 import * as secp from '@noble/secp256k1';
 import { keccak_256 } from '@noble/hashes/sha3';
+
+import { sha512 } from '@noble/hashes/sha2';
+ed25519.hashes.sha512 = sha512;
 
 // The fetchCubeApi code this references is provided
 // for convenience on the Access Cube Api Example page
@@ -65,7 +68,7 @@ export const doWithdrawal = async (
   // note the different signing helper functions below for each type of key
   const signature =
     verificationKey.type === 'curve25519'
-      ? signCurve25519(payload, verificationKeySecret)
+      ? await signCurve25519(payload, verificationKeySecret)
       : await signEthereum(payload, verificationKeySecret);
 
   // use provided electrum WASM function to encode the verification key
@@ -85,11 +88,7 @@ export const doWithdrawal = async (
   };
 
   const response = await fetchCubeApi(
-    new URL(
-      isOrganization
-        ? `${cubeApiBaseUrl}/organization/withdraw`
-        : `${cubeApiBaseUrl}/users/withdraw`
-    ),
+    new URL(`${cubeApiBaseUrl}/users/withdraw`),
     'POST',
     withdrawalBody,
     apiKey,
@@ -100,12 +99,11 @@ export const doWithdrawal = async (
   return response;
 };
 
-const signCurve25519 = (
+const signCurve25519 = async (
   payload: Uint8Array,
   secretKey: Uint8Array
-): Uint8Array => {
-  const signature = nacl.sign.detached(payload, secretKey);
-  return signature;
+): Promise<Uint8Array> => {
+  return await ed25519.signAsync(payload, secretKey);
 };
 
 const signEthereum = async (
