@@ -2,6 +2,11 @@
 
 * [Introduction](/README.md)
 * [Exchange Info](/exchange-info.md)
+  * [Example: Access Cube User API](/exchange-info/example-access-cube-user-api.md)
+  * [Verification Keys](/exchange-info/verification-keys/README.md)
+    * [Generate Verification Key](/exchange-info/verification-keys/generate-verification-key.md)
+    * [Register Verification Key](/exchange-info/verification-keys/register-verification-key.md)
+    * [Withdraw With Verification Key](/exchange-info/verification-keys/withdraw-with-verification-key.md)
 
 * Market Data
   * [Websocket API](/market-data/websocket-api.md)
