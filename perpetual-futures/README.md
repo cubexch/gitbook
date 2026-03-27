@@ -1,3 +1,5 @@
+## Introduction
+
 [Perpetual futures contracts](./contracts.md) are derivatives instruments that
 provide continuous exposure to an underlying asset without explicit expiration
 dates. These contracts maintain price alignment with the spot market through a

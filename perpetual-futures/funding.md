@@ -6,7 +6,7 @@ amount of funding paid is based proportionally on the position value (defined
 as `ABS(open contracts * mark price)`) at the time of the funding event,
 regardless of subaccount leverage.
 
-# Funding Calculation
+## Funding Calculation
 
 The funding rate is composed of an interest component and a premium/discount
 component.
@@ -40,7 +40,7 @@ This funding is then clamped between the contract-specified minimum/maximum
 funding rates. The clamped funding rate is then applied to the position value
 to calculate the funding.
 
-# Funding Application
+## Funding Application
 
 ```
 funding = open contracts * index price

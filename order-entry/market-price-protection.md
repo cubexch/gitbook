@@ -1,15 +1,15 @@
-# Market Price Protection Limits
+## Market Price Protection Limits
 
 Price protection limits constrain where orders can be placed in a given market.
 
-## Goals
+### Goals
 
 There are a few competing goals to the protection logic:
 - to prevent fills at undesirable prices, e.g. when using Market orders on wide markets or with no specified protection price
 - to allow seamless trading when the market is tight
 - to make sure that new quotes that would improve the book are never blocked
 
-## Parameters
+### Parameters
 
 Three parameters affect price protection, and they can differ between markets:
 - `priceBandBidPct`
@@ -21,7 +21,7 @@ the [Cube Market Definitions](https://api.cube.exchange/ir/v0/markets/).
 
 For more details on those definitions, see [Exchange Info](/exchange-info.md).
 
-## Protection Checks
+### Protection Checks
 
 There are two separate checks applied to each incoming order.  Both are considered separately.
 
@@ -40,7 +40,7 @@ the order is rejected.
     - applies only to markets with opposing orders
     - see diagram below for details
 
-## Diagram
+### Diagram
 
 This diagram illustrates which prices will cause orders to be rejected.
 Note the range of acceptable order prices in yellow:
@@ -55,7 +55,7 @@ Note the range of acceptable order prices in yellow:
   <figcaption>Market Price Protection Levels</figcaption>
 </figure>
 
-### Description
+#### Description
 
 1. Off-Market Limit Check (`priceBandBid/AskPct`)
     * The **reference price** is the last known price for the asset pair from an external price source.
@@ -83,17 +83,17 @@ Note that if a trader wants to cross a wide market:
 
 This behavior encourages tighter markets and allows for gradual price discovery while still preventing trades at undesirable prices.
 
-## Relevant Reject Errors
+### Relevant Reject Errors
 
 The following `NewRejectReason`s are sent when price protection rejects an order:
 
-### `PROTECTION_PRICE_WOULD_NOT_TRADE`
+#### `PROTECTION_PRICE_WOULD_NOT_TRADE`
 - Trader sent a market order with a given protection price
 - The protection price is tighter than the opposing TOB, so the order would not trade
 
 Resolution: loosen the protection price to allow more slippage
 
-### `SLIPPAGE_TOO_HIGH`
+#### `SLIPPAGE_TOO_HIGH`
 - Trader sent a market order
 - the calculated `a_thresh` is tighter than the opposing TOB, so the order would not trade
 
@@ -102,7 +102,7 @@ as the order may be able to trade at that price, but not at `a_thresh`.
 
 Resolution: place limit orders on the book to reduce the spread, then try crossing the market again
 
-### `OUTSIDE_PRICE_BAND`
+#### `OUTSIDE_PRICE_BAND`
 - `a_thresh` is tighter than the limit price or market price
 - The order would cross the book and trade at the limit price or market price
 - The market is wide, so the order is rejected

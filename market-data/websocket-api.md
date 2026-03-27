@@ -1,10 +1,10 @@
-# WebSocket: Market Data API
+## WebSocket: Market Data API
 
 This schema defines the Protobuf messages used for communication with the
 Cube Market Data Service (Mendelev, MD). The `proto` definition file can be
 found [here](https://github.com/cubexch/ws-api/blob/main/schema/market_data.proto).
 
-### Order Book Data
+## Order Book Data
 
 The market data service exposes a websocket endpoint for order book data for
 a given market at `wss://api.cube.exchange/md/book/:market_id`. The order
@@ -18,13 +18,13 @@ process a stream of [`MdMessages`](#mdmessages).
 Note that this message type is distinct from the [`MdMessage`](#mdmessage),
 where the former is a wrapper containing one or more of the latter.
 
-### Aggregate Book Tops Data
+## Aggregate Book Tops Data
 
 The market data service exposes a websocket endpoint for aggregated
 tops-of-book for all markets at `wss://api.cube.exchange/md/tops`. Client
 should process [`AggMessage`](#aggmessage).
 
-### Heartbeats
+## Heartbeats
 
 Application-level heartbeats are expected every 30 seconds. If more than one
 interval is missed, the market data service will disconnect the websocket.
@@ -667,4 +667,3 @@ order is `REMOVE`'d when it is fully filled or canceled.
 | bool |  | bool | bool | boolean | bool |
 | string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | String | string | str/unicode | string |
 | bytes | May contain any arbitrary sequence of bytes. | Vec<u8> | string | str | []byte |
-
