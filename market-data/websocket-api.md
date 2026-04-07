@@ -1,10 +1,11 @@
-## WebSocket: Market Data API
+# WebSocket: Market Data API
+
 
 This schema defines the Protobuf messages used for communication with the
 Cube Market Data Service (Mendelev, MD). The `proto` definition file can be
 found [here](https://github.com/cubexch/ws-api/blob/main/schema/market_data.proto).
 
-## Order Book Data
+### Order Book Data
 
 The market data service exposes a websocket endpoint for order book data for
 a given market at `wss://api.cube.exchange/md/book/:market_id`. The order
@@ -18,13 +19,13 @@ process a stream of [`MdMessages`](#mdmessages).
 Note that this message type is distinct from the [`MdMessage`](#mdmessage),
 where the former is a wrapper containing one or more of the latter.
 
-## Aggregate Book Tops Data
+### Aggregate Book Tops Data
 
 The market data service exposes a websocket endpoint for aggregated
 tops-of-book for all markets at `wss://api.cube.exchange/md/tops`. Client
 should process [`AggMessage`](#aggmessage).
 
-## Heartbeats
+### Heartbeats
 
 Application-level heartbeats are expected every 30 seconds. If more than one
 interval is missed, the market data service will disconnect the websocket.
@@ -255,7 +256,7 @@ An order diff creates, updates, or deletes a resting order based on the
 | ----- | ---- | ----- | ----------- |
 | transact_time | [uint64](#uint64) |  |  |
 | funding_rate | [int64](#int64) |  | Funding rate percentage for this interval, calculated based on the average premium index over the funding interval. <br> `funding_rate = premium_index + clamp(interest_rate - premium_index, -clamp, +clamp)` </br> |
-| funding_delta | [FundingDelta](#fundingdelta) |  | The quote amount to be paid (or received) based on the given funding rate, funding interval duration, and current index price. |
+| funding_delta | [types.FundingDelta](#types.fundingdelta) |  | The quote amount to be paid (or received) based on the given funding rate, funding interval duration, and current index price. |
 | next_funding_application_time | [uint64](#uint64) |  | The server target time for the next funding application. |
 
 
@@ -413,6 +414,7 @@ Every exchange message from `/tops` will be wrapped as an `AggMessage`.
 | heartbeat | [Heartbeat](#heartbeat) |  | Server heartbeat reply |
 | top_of_books | [TopOfBooks](#topofbooks) |  | Top of books |
 | rate_updates | [RateUpdates](#rateupdates) |  | Rates for all assets |
+| contract_prices | [ContractPrices](#contractprices) |  |  |
 
 
 
@@ -492,6 +494,22 @@ rate-updates message.
 
 
 
+## ContractPrices
+Contract prices for all markets. Published on connect and updates since the
+last contract-prices message.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| market_ids | [uint64](#uint64) | repeated |  |
+| prices | [ContractPrice](#contractprice) | repeated |  |
+
+
+
+
+
+
+
 ## ClientMessage
 Client heartbeats and configs. This wrapper is used for both
 `/book/:market_id` and `/tops`, but `config` messages are ignored on the
@@ -522,25 +540,6 @@ and `mbo` can be set.
 | summary | [bool](#bool) |  | Enable 24h summary |
 | klines | [KlineInterval](#klineinterval) | repeated | Enable price klines |
 | market_ids | [uint64](#uint64) | repeated | Market's to subscribe to. Limit 3. |
-
-
-
-
-
-
-
-
-## Numeric Types
-### FundingDelta
-Funding delta to be applied per open contract unit, for a particular funding
-interval. The delta is expressed as a signed (twos-complement) fixed point
-number with 18 decimal places.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| word0 | [uint64](#uint64) |  |  |
-| word1 | [uint64](#uint64) |  |  |
 
 
 
@@ -667,3 +666,4 @@ order is `REMOVE`'d when it is fully filled or canceled.
 | bool |  | bool | bool | boolean | bool |
 | string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | String | string | str/unicode | string |
 | bytes | May contain any arbitrary sequence of bytes. | Vec<u8> | string | str | []byte |
+

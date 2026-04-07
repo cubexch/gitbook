@@ -1,4 +1,5 @@
-## WebSocket: Trade API
+# WebSocket: Trade API
+
 
 This schema defines the Protobuf messages used for communication with the
 Cube Order Service (OS, or "Osmium").
@@ -9,7 +10,7 @@ Cube Order Service (OS, or "Osmium").
   - The [Protobuf definition file for the Websocket connection](https://github.com/cubexch/ws-api/blob/main/schema/trade.proto)
   - [General documentation pertaining to the Trade API](https://cubexch.gitbook.io/cube-api/trade-api.md)
 
-## Connection
+### Connection
 
 The order service exposes a websocket endpoint for clients to connect to.
 Once connected, clients should submit a [`Credentials`](#credentials)
@@ -18,7 +19,7 @@ and positions, and then can begin submitting
 [`OrderRequest`](#orderrequest) and processing
 [`OrderResponse`](#orderresponse).
 
-## Heartbeats
+### Heartbeats
 
 Application-level heartbeats are expected every 30 seconds. If more than one
 interval is missed, the order service will disconnect the websocket.
@@ -123,6 +124,7 @@ print(signature)
 | access_key_id | [string](#string) |  | Public API key |
 | signature | [string](#string) |  | HMAC signature, base-64 encoded |
 | timestamp | [uint64](#uint64) |  | Timestamp in seconds |
+| flags | [uint64](#uint64) |  | Connection flags bitfield [ConnectionFlags](#connectionflags) |
 
 
 
@@ -142,6 +144,23 @@ OrderRequest.
 | modify | [ModifyOrder](#modifyorder) |  |  |
 | heartbeat | [Heartbeat](#heartbeat) |  |  |
 | mc | [MassCancel](#masscancel) |  |  |
+| signature_info | [SignatureInfo](#signatureinfo) | optional |  |
+
+
+
+
+
+
+
+## SignatureInfo
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| timestamp | [uint64](#uint64) |  | Unused |
+| verification_key | [string](#string) |  | Base-64 encoded `cube_ov_utils::ov_schema::PublicKey` |
+| signature | [string](#string) |  | Base-64 encoded signature of this request |
 
 
 
@@ -186,6 +205,7 @@ In the event of a server-side disconnect that causes a halt in trading, such as 
 | quote_quantity | [uint64](#uint64) | optional | The quantity of the quote asset that the user wants to spend (for a BID) or receive (for an ASK). For limit orders, this is immediately converted to a base quantity using the provided price. For market orders, this is the maximum quantity that will be executed.
 
 Note that lot size rules will be respected, and the actual quantity executed will be expressed in base quantity units. |
+| stop_price | [uint64](#uint64) | optional | The price at which a Stop Order will trigger. Only valid for STOP_LOSS and STOP_LIMIT. |
 
 
 
@@ -245,7 +265,8 @@ remaining_quantity + cumulative_quantity`.
 | market_id | [uint64](#uint64) |  |  |
 | client_order_id | [uint64](#uint64) |  | The order ID specified by the client on the NewOrder request. |
 | request_id | [uint64](#uint64) |  | A request ID that is echoed back on the ModifyOrderAck or ModifyOrderReject |
-| new_price | [uint64](#uint64) |  |  |
+| new_price | [uint64](#uint64) | optional | The updated price for the order. Required, unless modifying an untriggered STOP_LOSS order, in which case leaving this field unset will remove the protection price, following the same semantics as NewOrder. |
+| new_stop_price | [uint64](#uint64) | optional | The price at which a Stop Order will trigger. Only valid for untriggered STOP_LOSS and STOP_LIMIT orders. If order is a Stop Order and has already triggered, this field must not be set. |
 | new_quantity | [uint64](#uint64) |  |  |
 | subaccount_id | [uint64](#uint64) |  | The subaccount that the NewOrder was placed on. |
 | self_trade_prevention | [SelfTradePrevention](#selftradeprevention) | optional |  |
@@ -335,7 +356,9 @@ any fills for this order.
 | request_id | [uint64](#uint64) |  | The request ID specified in the new-order request. |
 | exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](/trade-api.md#exchange-order-id) |
 | market_id | [uint64](#uint64) |  |  |
-| price | [uint64](#uint64) |  | The price that matching completed at. For limit orders, this will be the limit price. For market orders, this will be the protection price. |
+| status | [OrderPlacementStatus](#orderplacementstatus) |  | Whether the order is pending or open after being accepted. For Stop orders, this will be PENDING_OPEN. For other orders, it will be OPEN. See comment on similar field in [ModifyOrderAck]. |
+| price | [uint64](#uint64) | optional | The price submitted in the new-order request. If no price was specified, this will be unset. |
+| stop_price | [uint64](#uint64) | optional | For Stop Orders, the stop_price specified in the new-order request. For other orders, this will be unset. |
 | quantity | [uint64](#uint64) |  | If `quote_quantity` was not specified, the quantity submitted in the new-order request. Otherwise, the quantity of the base asset that was executed. |
 | side | [Side](#side) |  |  |
 | time_in_force | [TimeInForce](#timeinforce) |  |  |
@@ -344,6 +367,7 @@ any fills for this order.
 | subaccount_id | [uint64](#uint64) |  |  |
 | cancel_on_disconnect | [bool](#bool) |  |  |
 | quote_quantity | [uint64](#uint64) | optional |  |
+| algo_strategy_id | [uint64](#uint64) | optional |  |
 
 
 
@@ -366,6 +390,7 @@ canceled as the result of a different user-initiated reason.
 | reason | [CancelOrderAck.Reason](#cancelorderack.reason) |  |  |
 | market_id | [uint64](#uint64) |  |  |
 | exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](/trade-api.md#exchange-order-id) |
+| base_quantity_canceled | [uint64](#uint64) |  | Base quantity remaining to be filled at the time the order was canceled. |
 
 
 
@@ -385,10 +410,12 @@ this order.
 | client_order_id | [uint64](#uint64) |  |  |
 | request_id | [uint64](#uint64) |  | The request ID specified in the modify request. |
 | transact_time | [uint64](#uint64) |  | [Transact time](/trade-api.md#transact-time) |
+| status | [OrderPlacementStatus](#orderplacementstatus) |  | Whether the order is pending or open after applying the modify request. When a Stop Order triggers, you will receive an unsolicited ModifyOrderAck with the status set to `OPEN`. |
 | remaining_quantity | [uint64](#uint64) |  | The quantity remaining on the book after applying the modify request. |
 | subaccount_id | [uint64](#uint64) |  |  |
 | market_id | [uint64](#uint64) |  |  |
-| price | [uint64](#uint64) |  |  |
+| price | [uint64](#uint64) | optional |  |
+| stop_price | [uint64](#uint64) | optional |  |
 | quantity | [uint64](#uint64) |  | The quantity submitted in the modify request. |
 | cumulative_quantity | [uint64](#uint64) |  | The cumulative filled quantity for this order. |
 | exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](/trade-api.md#exchange-order-id) |
@@ -401,8 +428,8 @@ this order.
 
 ### MassCancelAck
 Mass-cancel-ack confirms a mass-cancel request. If `reason` is set, the mass
-cancel was not applied and there are no affected orders. Individual
-CancelOrderAck's will be sent for each order that was affected.
+cancel was not applied and there are no affected orders. In addition to this message,
+A separate CancelOrderAck will be sent for each order that was affected.
 
 
 | Field | Type | Label | Description |
@@ -439,6 +466,8 @@ New-order-reject indicates that a new-order request was not applied.
 | time_in_force | [TimeInForce](#timeinforce) |  |  |
 | order_type | [OrderType](#ordertype) |  |  |
 | quote_quantity | [uint64](#uint64) | optional |  |
+| algo_strategy_id | [uint64](#uint64) | optional |  |
+| stop_price | [uint64](#uint64) | optional |  |
 
 
 
@@ -505,7 +534,7 @@ A fill for an order.
 | cumulative_quantity | [uint64](#uint64) |  | The cumulative filled base quantity for this order after the fill is applied. |
 | side | [Side](#side) |  |  |
 | aggressor_indicator | [bool](#bool) |  |  |
-| fee_ratio | [FixedPointDecimal](#fixedpointdecimal) |  | Indicates the fee charged on this trade. See [Trading Fees](/cube-fees.md#trading-fees) for details. |
+| fee_ratio | [types.FixedPointDecimal](#types.fixedpointdecimal) |  | Indicates the fee charged on this trade. See [Trading Fees](/cube-fees.md#trading-fees) for details. |
 | trade_id | [uint64](#uint64) |  | The unique trade ID associated with a match event. Each order participanting in the match event will receive this trade ID |
 
 
@@ -531,7 +560,7 @@ this message will still be delivered and the fee_amount will be zero.
 | client_order_id | [uint64](#uint64) |  | The ID assigned by the client that placed the aggressing order that resulted in the implied match. |
 | exchange_order_id | [uint64](#uint64) |  | The ID assigned by the exchange to the agressing order that resulted in the implied match. |
 | fee_asset_id | [uint64](#uint64) |  | The ID of the asset demoninating the fee_amount. |
-| fee_amount | [RawUnits](#rawunits) |  | The magnitude of the implied match fee in indivisible RawUnits. For details on how this is calculated, reference the documentation related to Implied Matching. Note that, unlike trading fees, this value is already accounted for in the quantities reported by the fill_quantity and fill_quote_quantity fields. It does not need to be subtracted when reconciling the associated order's fills against on-chain settlement. |
+| fee_amount | [types.RawUnits](#types.rawunits) |  | The magnitude of the implied match fee in indivisible RawUnits. For details on how this is calculated, reference the documentation related to Implied Matching. Note that, unlike trading fees, this value is already accounted for in the quantities reported by the fill_quantity and fill_quote_quantity fields. It does not need to be subtracted when reconciling the associated order's fills against on-chain settlement. |
 | fee_direction | [AdjustmentDirection](#adjustmentdirection) |  | Which way the fee_amount funds are moving, from the perspective of the client. |
 
 
@@ -550,8 +579,8 @@ can also be tracked by applying other OrderResponse messages individually.
 | ----- | ---- | ----- | ----------- |
 | subaccount_id | [uint64](#uint64) |  |  |
 | asset_id | [uint64](#uint64) |  |  |
-| total | [RawUnits](#rawunits) |  |  |
-| available | [RawUnits](#rawunits) |  | The available amount after open orders are subtracted. |
+| total | [types.RawUnits](#types.rawunits) |  |  |
+| available | [types.RawUnits](#types.rawunits) |  | The available amount after open orders are subtracted. |
 
 
 
@@ -601,12 +630,12 @@ let unsettled_pnl = base_notional + quote;
 | subaccount_id | [uint64](#uint64) |  |  |
 | contract_id | [uint64](#uint64) |  |  |
 | net_contract_units | [int64](#int64) |  | The net number of open contracts held by this subaccount. |
-| quote | [HealthValue](#healthvalue) |  |  |
-| bids | [RawUnits](#rawunits) |  |  |
-| asks | [RawUnits](#rawunits) |  |  |
-| cost_basis | [HealthValue](#healthvalue) |  | The cost basis paid for the current position. Lots are averaged together. <br> The cost basis will be the same sign as `net_contract_units`. <br> Display only. Reset when the position is closed or the position direction changes. |
-| realized_pnl | [HealthValue](#healthvalue) |  | The realized PnL for the current position. Calculated as the sum of differences between contract value at time of close and average cost basis. <br> Display only. Reset when the position is closed or the position direction changes. |
-| funding | [HealthValue](#healthvalue) |  | Total funding paid (positive) or received (negative) by this position. <br> Display only. Reset when the position is closed or the position direction changes. |
+| quote | [types.HealthValue](#types.healthvalue) |  |  |
+| bids | [types.RawUnits](#types.rawunits) |  |  |
+| asks | [types.RawUnits](#types.rawunits) |  |  |
+| cost_basis | [types.HealthValue](#types.healthvalue) |  | The cost basis paid for the current position. Lots are averaged together. <br> The cost basis will be the same sign as `net_contract_units`. <br> Display only. Reset when the position is closed or the position direction changes. |
+| realized_pnl | [types.HealthValue](#types.healthvalue) |  | The realized PnL for the current position. Calculated as the sum of differences between contract value at time of close and average cost basis. <br> Display only. Reset when the position is closed or the position direction changes. |
+| funding | [types.HealthValue](#types.healthvalue) |  | Total funding paid (positive) or received (negative) by this position. <br> Display only. Reset when the position is closed or the position direction changes. |
 | leverage | [uint32](#uint32) |  | The leverage override applied to the contract. (0 if there is no override) <br> Leverage ratio affects the maximum notional position size as well as the initial margin requirements for the position. Note that this does not directly affect the maintenance margin requirements. |
 
 
@@ -620,14 +649,14 @@ A bootstrap message sent after Credentials authentication.
 Client resting and pending orders used to bootstrap state.
 Sent as the first message(s) after initialization.
 A message containing the `Done` variant indicates that the Bootstrap is complete.
-Multiple messages may be received for `RestingOrders` and `AssetPositions`
+Multiple messages may be received for `ActiveOrders` and `AssetPositions`
 and these should be concatenated.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | done | [Done](#done) |  |  |
-| resting | [RestingOrders](#restingorders) |  |  |
+| active | [ActiveOrders](#activeorders) |  |  |
 | position | [AssetPositions](#assetpositions) |  |  |
 | trading_status | [TradingStatus](#tradingstatus) |  |  |
 | contract_position | [ContractPositions](#contractpositions) |  |  |
@@ -638,13 +667,13 @@ and these should be concatenated.
 
 
 
-### RestingOrders
-A chunk of resting orders. Sent on bootstrap.
+## ActiveOrders
+A chunk of active orders. Sent on bootstrap.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| orders | [RestingOrder](#restingorder) | repeated |  |
+| orders | [ActiveOrder](#activeorder) | repeated |  |
 
 
 
@@ -710,8 +739,9 @@ This message will be sent each time that scope changes.
 
 
 
-### RestingOrder
-A resting order. Sent on bootstrap in `RestingOrders`.
+## ActiveOrder
+An active order. Sent on bootstrap in `ActiveOrders`.
+Might be a resting order or a pending order, depending on the status.
 
 
 | Field | Type | Label | Description |
@@ -719,76 +749,19 @@ A resting order. Sent on bootstrap in `RestingOrders`.
 | client_order_id | [uint64](#uint64) |  | The client order ID specified in the new-order request. |
 | exchange_order_id | [uint64](#uint64) |  | [Exchange order ID](/trade-api.md#exchange-order-id) |
 | market_id | [uint64](#uint64) |  |  |
-| price | [uint64](#uint64) |  |  |
-| order_quantity | [uint64](#uint64) |  | The quantity submitted in the latest quantity-modifying request. If the order has not been modified, then it is the quantity on the new-order-ack. If it has been modified, then it is the quantity of the latest modify-order-ack. |
+| status | [OrderPlacementStatus](#orderplacementstatus) |  | Whether the order is resting on the book or pending e.g. |
+| price | [uint64](#uint64) | optional | When `status` is OPEN: the resting price of the order. When `status` is PENDING_OPEN: the price specified on the most recent new-order or modify-order request. |
+| stop_price | [uint64](#uint64) | optional | The stop price specified on the most recent new-order or modify-order request. Only present when `order_type` is STOP_LOSS or STOP_LIMIT. |
+| order_quantity | [uint64](#uint64) |  | The base quantity submitted in the latest new-order or modify-order request, if any. For a PENDING_OPEN order specified in quote quantity, that quantity will be converted to Base Quantity at the Stop Price to determine this value. |
+| order_quote_quantity | [uint64](#uint64) | optional | The quote quantity submitted in the latest new-order or modify-order request, if any. If the order was specified in base quantity, or has rested on the book, this will not be sent. |
 | side | [Side](#side) |  |  |
 | time_in_force | [TimeInForce](#timeinforce) |  |  |
 | order_type | [OrderType](#ordertype) |  |  |
-| remaining_quantity | [uint64](#uint64) |  | The current remaining quantity on the book. |
+| remaining_quantity | [uint64](#uint64) |  | The base quantity currently remaining to be filled for this active order. when status is PENDING_OPEN, this field will equal to order_quantity. |
+| cumulative_quantity | [uint64](#uint64) |  | The base quantity filled thus far for this active order. when status is PENDING_OPEN, this field will be 0. |
 | rest_time | [uint64](#uint64) |  | [Transact time](/trade-api.md#transact-time) of the NewOrderAck |
 | subaccount_id | [uint64](#uint64) |  |  |
-| cumulative_quantity | [uint64](#uint64) |  | The cumulative filled quantity for this order. |
-| cancel_on_disconnect | [bool](#bool) |  |  |
-
-
-
-
-
-
-
-
-## Numeric Types
-### FixedPointDecimal
-A fixed-point decimal number.
-Matches the representation preferred by the FIX protocol,
-except that the exponent is int32 since Protobuf does not have an int8 type.
-The value is computed as `mantissa * 10^exponent`;
-for example, `mantissa = 1234` and `exponent = -2` is `12.34`.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| mantissa | [int64](#int64) |  |  |
-| exponent | [int32](#int32) |  |  |
-
-
-
-
-
-
-
-### RawUnits
-Raw-units is a 256-bit number for the amount of an asset. The precision is
-based on the underlying asset. For example, ETH is specified as if in
-fixed-point 10^18, while BTC is specified as if in fixed-point 10^8.
-
-The number is interpreted in 'little-endian' as `[word0, word1, word2,
-word3]`.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| word0 | [uint64](#uint64) |  |  |
-| word1 | [uint64](#uint64) |  |  |
-| word2 | [uint64](#uint64) |  |  |
-| word3 | [uint64](#uint64) |  |  |
-
-
-
-
-
-
-
-### HealthValue
-Signed (twos-complement), fixed point 18-decimal-digit value.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| word0 | [uint64](#uint64) |  |  |
-| word1 | [uint64](#uint64) |  |  |
-| word2 | [uint64](#uint64) |  |  |
-| word3 | [uint64](#uint64) |  |  |
+| cancel_on_disconnect | [bool](#bool) |  | If true, this order will be cancelled if the connection that placed it becomes disconnected. |
 
 
 
@@ -885,9 +858,11 @@ Market order protections:
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| LIMIT | 0 | A limit order is accompanied with a price (inclusive) that specifies the upper limit to buy and the lower limit to sell. If the price is not immediately available and the TIF allows resting orders, the limit order will rest until filled or canceled. |
-| MARKET_LIMIT | 1 | A market limit order crosses the bid-ask spread and, if not fully filled, becomes a limit order at the best available market price. - If there is no opposing market, the order is rejected with the NO_OPPOSING_RESTING_ORDER reason. - The price must be null. |
-| MARKET_WITH_PROTECTION | 2 | A market with protection order crosses the bid-ask spread and continues to cross until the order is fully filled or the protection level is reached. - The protection price is defined as: - If the price is provided, this price is used as the protection price. - If the price is null, the best market price widened by a market-specific protection point count. - If the protection price would not cross the resting market, the order is rejected with the NO_OPPOSING_RESTING_ORDER reason instead of resting at that level. |
+| LIMIT | 0 | A LIMIT order is accompanied with a price (inclusive) that specifies the upper limit to buy and the lower limit to sell. If the price is not immediately available and the TIF allows resting orders, the limit order will rest until filled or canceled. |
+| MARKET_LIMIT | 1 | A MARKET_LIMIT order crosses the bid-ask spread and, if not fully filled, becomes a limit order at the best available market price. - If there is no opposing market, the order is rejected with the NO_OPPOSING_RESTING_ORDER reason. - The price must be null. |
+| MARKET_WITH_PROTECTION | 2 | A MARKET_WITH_PROTECTION order crosses the bid-ask spread and continues to cross until the order is fully filled or the protection level is reached. - The protection price is defined as: - If the price is provided, this price is used as the protection price. - If the price is null, the best market price widened by a market-specific protection point count. - If the protection price would not cross the resting market, the order is rejected with the NO_OPPOSING_RESTING_ORDER reason instead of resting at that level. - If a match is in progress for a MARKET_WITH_PROTECTION order that has TimeInForce = GOOD_FOR_SESSION and the match halts due to reaching the protection price, the remaining quantity will rest on the book as a limit order at the protection price. Note that the resting price may be many levels away from the nearest executed price if there are no opposing orders between the nearest executed price and the protection price. |
+| STOP_LOSS | 3 | A STOP_LOSS order specifies a stop_price in addition to other fields. When the opposing market crosses the stop price, the order will be executed as a market order according to the remaining fields. Also known as a "Take Profit" order. TimeInForce and PostOnly must be a valid combination for a MARKET_WITH_PROTECTION order; the Stop Order itself is assumed to be GOOD_FOR_SESSION. |
+| STOP_LIMIT | 4 | A STOP_LIMIT order specifies a stop_price in addition to other fields. When the opposing market crosses the stop price, the order will be executed as a limit order according to the remaining fields. TimeInForce and PostOnly must be a valid combination for a LIMIT order; the Stop Order itself is assumed to be GOOD_FOR_SESSION. |
 
 
 
@@ -934,6 +909,31 @@ The ConnectionStatus may change during a single connection's lifetime.
 
 
 
+### ConnectionFlags
+A bitfield of connection flags.
+
+Each value is a power of 2, so they can be combined with bitwise OR.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| CF_EMPTY | 0 |  |
+| CF_WALLET_EVENTS | 1 | If set, wallet events will be sent to this connection. |
+
+
+
+
+### OrderPlacementStatus
+Indicates the state of an active order within the matching engine.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PLACEMENT_STATUS_UNSPECIFIED | 0 |  |
+| PENDING_OPEN | 1 | Order is waiting to match against the book, e.g. a Stop Order whose trigger condition has not been met. |
+| OPEN | 2 | Order will match against the book. This is the default state for Market and Limit orders. |
+
+
+
+
 ### CancelOrderAck.Reason
 
 
@@ -948,6 +948,9 @@ The ConnectionStatus may change during a single connection's lifetime.
 | MASS_CANCEL | 6 | This order was covered by a mass-cancel request. |
 | POSITION_LIMIT | 7 | This order was canceled because asset position limits would be otherwise breached. |
 | LIQUIDATION | 8 | This order was canceled because the subaccount health was insufficient and a liquidation event was triggered. |
+| LOT_QUANTIZATION | 9 | This order was canceled because the desired execution quantity would be less than one lot in a market on the execution pathway, and thus could not trade in that market. |
+| WOULD_EXCEED_PROTECTION_RANGE | 10 | Ths order has crossed the opposing book by a number of price levels equal to the protection limit, and further execution would take it beyond that limit. The remainder of the order is canceled. |
+| STOP_ORDER_FAILED_TO_REST | 11 | A triggered stop order failed to rest on the book. This could be for various reasons, such as insufficient position, etc. |
 
 
 
@@ -960,6 +963,9 @@ The ConnectionStatus may change during a single connection's lifetime.
 | UNCLASSIFIED | 0 |  |
 | INVALID_MARKET_ID | 1 |  |
 | INVALID_SIDE | 2 |  |
+| INVALID_SIGNATURE_TIMESTAMP | 50 | The signature info's specified timestamp was too far from now. |
+| INVALID_SIGNATURE_VERIFICATION_KEY | 51 | The verification key specified was malformed or not found. |
+| INVALID_SIGNATURE | 52 | The signature was malformed or did not validate. |
 
 
 
@@ -1002,6 +1008,13 @@ corresponding field did not take a valid value.
 | INSUFFICIENT_INITIAL_MARGIN | 29 | The subaccount does not have sufficient additional initial margin to place this order. |
 | INSUFFICIENT_MAINTENANCE_MARGIN | 30 | The subaccount does not have sufficient additional maintenance margin to place this order. |
 | EXCEEDS_INITIAL_NOTIONAL_LIMIT | 31 | The value of the order, if executed, would cause the subaccount's total position to exceed the initial notional limit for the configured leverage. |
+| INVALID_TIF_FOR_ORDER_TYPE | 32 | Market orders with no explicit resting price are not permitted to rest on the book as it's unclear what the desired resting price would be. As such: - A MarketWithProtection may not be TimeInForce GOOD_FOR_SESSION. - A MarketLimit order may be GOOD_FOR_SESSION as the top of the opposing book is assumed to be the resting price. - A Stop Order must be GOOD_FOR_SESSION, and its OrderType indicates its matching behavior when it triggers: - GFS StopLimit -> GFS Limit - GFS StopLoss -> IOC MarketWithProtection |
+| STOP_ORDER_TYPE_WITHOUT_STOP_PRICE | 33 | The order being modified is a pending Stop Order but no stop price was provided. |
+| STOP_PRICE_WITHOUT_STOP_ORDER_TYPE | 34 | The order being modified is resting on the book, but a stop price was provided. |
+| LIMIT_OR_PROTECTION_PRICE_WOULD_NOT_TRADE_AT_STOP_PRICE | 35 | A stop price was specified, but would not be expected to fill when the order is triggered. For example, a StopLoss Ask with price = 20 and stop_price = 18 would trigger at 18 while the price is falling, but that would imply the price level at 20 were already exhausted, so we would not expect it to trade4HwaN1wjrPQGKHzB7bL8AHgsLPtqFnsRmftCpJkhVNqr. |
+| INVALID_SIGNATURE_TIMESTAMP | 50 | The signature info's specified timestamp was too far from now. |
+| INVALID_SIGNATURE_VERIFICATION_KEY | 51 | The verification key specified was malformed or not found. |
+| INVALID_SIGNATURE | 52 | The signature was malformed or did not validate. |
 
 
 
@@ -1014,6 +1027,9 @@ corresponding field did not take a valid value.
 | UNCLASSIFIED | 0 |  |
 | INVALID_MARKET_ID | 1 | The specified market ID does not exist. |
 | ORDER_NOT_FOUND | 2 | The specified client order ID does not exist for the corresponding market ID and subaccount ID. |
+| INVALID_SIGNATURE_TIMESTAMP | 50 | The signature info's specified timestamp was too far from now. |
+| INVALID_SIGNATURE_VERIFICATION_KEY | 51 | The verification key specified was malformed or not found. |
+| INVALID_SIGNATURE | 52 | The signature was malformed or did not validate. |
 
 
 
@@ -1043,6 +1059,12 @@ corresponding field did not take a valid value.
 | INSUFFICIENT_INITIAL_MARGIN | 16 | The subaccount does not have sufficient additional initial margin to place this order. |
 | INSUFFICIENT_MAINTENANCE_MARGIN | 18 | The subaccount does not have sufficient additional maintenance margin to place this order. |
 | EXCEEDS_INITIAL_NOTIONAL_LIMIT | 19 | The value of the order, if executed, would cause the subaccount's total position to exceed the initial notional limit for the configured leverage. |
+| STOP_ORDER_TYPE_WITHOUT_STOP_PRICE | 20 | The order being modified is a pending Stop Order but no stop price was provided. |
+| STOP_PRICE_WITHOUT_STOP_ORDER_TYPE | 21 | The order being modified is resting on the book, but a stop price was provided. |
+| LIMIT_OR_PROTECTION_PRICE_WOULD_NOT_TRADE_AT_STOP_PRICE | 22 | A stop price was specified, but would not be expected to fill when the order is triggered. |
+| INVALID_SIGNATURE_TIMESTAMP | 50 | The signature info's specified timestamp was too far from now. |
+| INVALID_SIGNATURE_VERIFICATION_KEY | 51 | The verification key specified was malformed or not found. |
+| INVALID_SIGNATURE | 52 | The signature was malformed or did not validate. |
 
 
 
@@ -1070,3 +1092,4 @@ corresponding field did not take a valid value.
 | bool |  | bool | bool | boolean | bool |
 | string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | String | string | str/unicode | string |
 | bytes | May contain any arbitrary sequence of bytes. | Vec<u8> | string | str | []byte |
+
